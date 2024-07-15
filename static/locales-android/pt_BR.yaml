@@ -1,18 +1,26 @@
 Keep Alive Notification:
-  Running In Background Message: ''
+  Running In Background Message: 'Manter notificação ativa->Mensagem de execução em
+    segundo plano'
 Player Settings:
-  Use Old Layout For Info: ''
+  Use Old Layout For Info: 'Configurações de reprodução->Usar layout antigo para obter
+    informações'
 Distraction Free Settings:
-  Hide Thumbnail In Media Controls: ''
+  Hide Thumbnail In Media Controls: 'Configurações de distração->Ocultar miniatura
+    nos controles de mídia'
 Data Settings:
-  Data Directory: ''
-  Select Data Directory: ''
-  Reset Data Directory: ''
-  Your data directory has been moved successfully: ''
-  Error moving data directory: ''
-  Nothing to change: ''
-  Copy Data Files When Moving: ''
-  Copy Data Files When Moving Tooltip: ''
-  Data Is Currently Stored In: ''
+  Data Directory: 'Configurações de dados->Diretório de dados'
+  Select Data Directory: 'Configurações de dados->Selecionar diretório de dados'
+  Reset Data Directory: 'Configurações de dados->Redefinir diretório de dados'
+  Your data directory has been moved successfully: 'Configurações de dados->Seu diretório
+    de dados foi movido com sucesso'
+  Error moving data directory: 'Configurações de dados->Erro ao mover o diretório
+    de dados'
+  Nothing to change: 'Configurações de dados->Sem alterações'
+  Copy Data Files When Moving: 'Configurações de dados->Copiar arquivos de dados ao
+    mover'
+  Copy Data Files When Moving Tooltip: 'Configurações de dados->Copiar arquivos de
+    dados ao mover dica de ferramenta'
+  Data Is Currently Stored In: 'Configurações de dados->Os dados estão armazenados
+    atualmente em'
 Log Viewer:
-  Console Log: ''
+  Console Log: 'Visualizador de log->Log do console'
