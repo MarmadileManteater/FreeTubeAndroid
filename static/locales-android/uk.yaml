@@ -1,18 +1,22 @@
 Keep Alive Notification:
-  Running In Background Message: ''
+  Running In Background Message: 'Залишати повідомлення->Запускати в фоновому режимі'
 Player Settings:
-  Use Old Layout For Info: ''
+  Use Old Layout For Info: 'Налаштування плеєра->Використовувати старий макет для
+    подробиць'
 Distraction Free Settings:
-  Hide Thumbnail In Media Controls: ''
+  Hide Thumbnail In Media Controls: 'Налаштування зосередженості->Приховувати обкладинку
+    в керуванні медіафайлами'
 Data Settings:
-  Data Directory: ''
-  Select Data Directory: ''
-  Reset Data Directory: ''
-  Your data directory has been moved successfully: ''
-  Error moving data directory: ''
-  Nothing to change: ''
-  Copy Data Files When Moving: ''
-  Copy Data Files When Moving Tooltip: ''
-  Data Is Currently Stored In: ''
+  Data Directory: 'Налаштування даних->Тека для даних'
+  Select Data Directory: 'Налаштування даних->Обрати теку для даних'
+  Reset Data Directory: 'Налаштування даних->Скинути теку для даних'
+  Your data directory has been moved successfully: 'Налаштування даних->Ваша тека
+    для даних була успішно переміщена'
+  Error moving data directory: 'Налаштування даних->Помилка переміщення теки для даних'
+  Nothing to change: 'Налаштування даних->Немає, що змінювати'
+  Copy Data Files When Moving: 'Налаштування даних->Скопіювати файли при переміщенні'
+  Copy Data Files When Moving Tooltip: 'Налаштування даних->Скопіювати файли при переміщенні
+    (підказка)'
+  Data Is Currently Stored In: 'Налаштування даних->Дані зараз зберігаються у'
 Log Viewer:
-  Console Log: ''
+  Console Log: 'Переглядач журналу->Журнал консолі'
