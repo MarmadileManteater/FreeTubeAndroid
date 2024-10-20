@@ -116,7 +116,7 @@
     "npm-run-all2": "^6.2.3",
     "postcss": "^8.4.47",
     "postcss-scss": "^4.0.9",
-    "prettier": "^2.8.8",
+    "prettier": "^3.3.3",
     "rimraf": "^6.0.1",
     "string-width": "4.2.3",
     "strip-ansi": "6.0.1",
