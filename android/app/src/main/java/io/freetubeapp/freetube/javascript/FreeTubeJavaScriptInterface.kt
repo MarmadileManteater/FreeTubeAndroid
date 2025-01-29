@@ -18,6 +18,7 @@ import android.os.Build
 import android.provider.OpenableColumns
 import android.view.WindowManager
 import android.webkit.JavascriptInterface
+import android.webkit.WebView
 import androidx.activity.result.ActivityResult
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
@@ -32,6 +33,7 @@ import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.writeBytes
 import io.freetubeapp.freetube.helpers.writeText
+import io.freetubeapp.freetube.webviews.BotGuardWebView
 import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
@@ -42,7 +44,9 @@ import java.util.UUID.*
 
 
 class FreeTubeJavaScriptInterface {
-  private var context: MainActivity
+  private val context: MainActivity
+  private val webView: WebView
+  private val bgWebView: WebView
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
@@ -57,8 +61,10 @@ class FreeTubeJavaScriptInterface {
     private val NOTIFICATION_TAG = String.format("%s", randomUUID())
   }
 
-  constructor(main: MainActivity)  {
+  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView)  {
     context = main
+    webView = givenWebView
+    bgWebView = givenBotGuardWebView
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -278,27 +284,27 @@ class FreeTubeJavaScriptInterface {
       session.setCallback(object : MediaSession.Callback() {
         override fun onSkipToNext() {
           super.onSkipToNext()
-          context.webView.dispatchEvent("media-next")
+          webView.dispatchEvent("media-next")
         }
 
         override fun onSkipToPrevious() {
           super.onSkipToPrevious()
-          context.webView.dispatchEvent("media-previous")
+          webView.dispatchEvent("media-previous")
         }
 
         override fun onSeekTo(pos: Long) {
           super.onSeekTo(pos)
-          context.webView.dispatchEvent("media-seek", "position", pos)
+          webView.dispatchEvent("media-seek", "position", pos)
         }
 
         override fun onPlay() {
           super.onPlay()
-          context.webView.dispatchEvent("media-play")
+          webView.dispatchEvent("media-play")
         }
 
         override fun onPause() {
           super.onPause()
-          context.webView.dispatchEvent("media-pause")
+          webView.dispatchEvent("media-pause")
         }
 
       })
@@ -659,19 +665,19 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun enterPromptMode() {
-    context.webView.isVerticalScrollBarEnabled = false
+    webView.isVerticalScrollBarEnabled = false
     context.isInAPrompt = true
   }
 
   @JavascriptInterface
   fun exitPromptMode() {
-    context.webView.isVerticalScrollBarEnabled = true
+    webView.isVerticalScrollBarEnabled = true
     context.isInAPrompt = false
   }
 
   @JavascriptInterface
   fun setScale(scale: Int) {
-    context.webView.setScale(scale / 100.0)
+    webView.setScale(scale / 100.0)
   }
 
   // endregion
@@ -683,7 +689,7 @@ class FreeTubeJavaScriptInterface {
     return Promise(context.threadPoolExecutor, {
       resolve,
       reject ->
-        val bgWv = context.bgWebView
+        val bgWv = bgWebView
         val script = context.assets.readText("botGuardScript.js")
         try {
           val functionName = script.split("export{")[1].split(" as default};")[0]

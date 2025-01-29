@@ -186,7 +186,12 @@ class MainActivity : AppCompatActivity() {
     // allow playlist ▶auto-play in background
     webView.settings.mediaPlaybackRequiresUserGesture = false
 
-    jsInterface = FreeTubeJavaScriptInterface(this)
+    bgWebView = binding.botGuardWebView
+    bgJsInterface = BotGuardJavascriptInterface(this)
+    bgWebView.addJavascriptInterface(bgJsInterface, "Android")
+    bgWebView.settings.javaScriptEnabled = true
+
+    jsInterface = FreeTubeJavaScriptInterface(this, webView, bgWebView)
     webView.addJavascriptInterface(jsInterface, "Android")
     webView.webChromeClient = object: WebChromeClient() {
 
@@ -325,11 +330,6 @@ class MainActivity : AppCompatActivity() {
     } else {
       webView.loadUrl("file:///android_asset/index.html")
     }
-
-    bgWebView = binding.botGuardWebView
-    bgJsInterface = BotGuardJavascriptInterface(this)
-    bgWebView.addJavascriptInterface(bgJsInterface, "Android")
-    bgWebView.settings.javaScriptEnabled = true
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
