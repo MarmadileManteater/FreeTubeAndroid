@@ -48,7 +48,7 @@ import java.util.concurrent.ThreadPoolExecutor
 class FreeTubeJavaScriptInterface {
   private val context: MainActivity
   private val webView: WebView
-  private val bgWebView: WebView
+  private val bgWebView: BotGuardWebView
   private val mainExecutor: ThreadPoolExecutor
   private val contentResolver: ContentResolver
   private var mediaSession: MediaSession?
@@ -710,37 +710,9 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun generatePOTokenFromVisitorData(visitorData: String): String {
-    return Promise(mainExecutor, {
-      resolve,
-      reject ->
-        val bgWv = bgWebView
-        val script = context.assets.readText("botGuardScript.js")
-        try {
-          val functionName = script.split("export{")[1].split(" as default};")[0]
-          val exportSection = "export{${functionName} as default};"
-          context.bgJsInterface.onReturnToken {
-            run {
-              context.runOnUiThread {
-                resolve(it)
-                bgWv.loadUrl("about:blank")
-              }
-            }
-          }
-          val bakedScript =
-            script.replace(exportSection, "; ${functionName}(\"${visitorData}\").then((TOKEN_RESULT) => { console.log(`Your potoken is \${TOKEN_RESULT}`) ; Android.returnToken(TOKEN_RESULT) })")
-          context.runOnUiThread {
-            bgWv.loadDataWithBaseURL(
-              "https://www.youtube.com",
-              "<script>${bakedScript}</script>",
-              "text/html",
-              "utf-8",
-              null
-            )
-          }
-        } catch (exception: Exception) {
-          reject(exception.message!!)
-        }
-    }).addJsCommunicator(jsCommunicator)
+    return bgWebView
+      .generatePOTokenFromVisitorData(visitorData)
+      .addJsCommunicator(jsCommunicator)
   }
 
   // endregion
