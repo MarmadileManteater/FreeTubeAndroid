@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity() {
     bgWebView.addJavascriptInterface(bgJsInterface, "Android")
     bgWebView.settings.javaScriptEnabled = true
 
-    jsInterface = FreeTubeJavaScriptInterface(this, webView, bgWebView)
+    jsInterface = FreeTubeJavaScriptInterface(this, webView, bgWebView, threadPoolExecutor)
     webView.addJavascriptInterface(jsInterface, "Android")
     webView.webChromeClient = object: WebChromeClient() {
 

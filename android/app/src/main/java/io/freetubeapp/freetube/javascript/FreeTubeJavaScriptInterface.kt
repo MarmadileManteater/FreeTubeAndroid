@@ -41,12 +41,14 @@ import java.net.URL
 import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.util.UUID.*
+import java.util.concurrent.ThreadPoolExecutor
 
 
 class FreeTubeJavaScriptInterface {
   private val context: MainActivity
   private val webView: WebView
   private val bgWebView: WebView
+  private val mainExecutor: ThreadPoolExecutor
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
@@ -61,10 +63,11 @@ class FreeTubeJavaScriptInterface {
     private val NOTIFICATION_TAG = String.format("%s", randomUUID())
   }
 
-  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView)  {
+  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor)  {
     context = main
     webView = givenWebView
     bgWebView = givenBotGuardWebView
+    mainExecutor = givenThreadPoolExecutor
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -441,7 +444,7 @@ class FreeTubeJavaScriptInterface {
    */
   @JavascriptInterface
   fun readFile(basedir: String, filename: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(mainExecutor, {
       resolve,
       reject ->
       try {
@@ -466,7 +469,7 @@ class FreeTubeJavaScriptInterface {
    */
   @JavascriptInterface
   fun writeFile(basedir: String, filename: String, content: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(mainExecutor, {
       resolve,
       reject ->
       try {
@@ -496,7 +499,7 @@ class FreeTubeJavaScriptInterface {
    */
   @JavascriptInterface
   fun requestSaveDialog(fileName: String, fileType: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(mainExecutor, {
       resolve,
       reject
       ->
@@ -522,7 +525,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun requestOpenDialog(fileTypes: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(mainExecutor, {
       resolve,
       reject ->
         context.launchIntent(
@@ -551,7 +554,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun requestDirectoryAccessDialog(): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(mainExecutor, {
       resolve,
       reject ->
       context.launchIntent(
@@ -686,7 +689,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun generatePOTokenFromVisitorData(visitorData: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(mainExecutor, {
       resolve,
       reject ->
         val bgWv = bgWebView
