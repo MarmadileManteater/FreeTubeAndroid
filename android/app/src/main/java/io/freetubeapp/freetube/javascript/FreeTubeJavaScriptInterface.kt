@@ -6,6 +6,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -49,6 +50,7 @@ class FreeTubeJavaScriptInterface {
   private val webView: WebView
   private val bgWebView: WebView
   private val mainExecutor: ThreadPoolExecutor
+  private val contentResolver: ContentResolver
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
@@ -63,11 +65,12 @@ class FreeTubeJavaScriptInterface {
     private val NOTIFICATION_TAG = String.format("%s", randomUUID())
   }
 
-  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor)  {
+  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor, givenContentResolver: ContentResolver)  {
     context = main
     webView = givenWebView
     bgWebView = givenBotGuardWebView
     mainExecutor = givenThreadPoolExecutor
+    contentResolver = givenContentResolver
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -385,7 +388,7 @@ class FreeTubeJavaScriptInterface {
   @JavascriptInterface
   fun getFileNameFromUri(uri: String): String {
     var result: String? = null
-    val cursor = context.contentResolver.query(Uri.parse(uri),  null, null, null, null)
+    val cursor = contentResolver.query(Uri.parse(uri),  null, null, null, null)
     try {
       if (cursor != null && cursor.moveToFirst()) {
         val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -450,7 +453,7 @@ class FreeTubeJavaScriptInterface {
       try {
         if (basedir.startsWith("content://")) {
           resolve(
-            context.contentResolver
+            contentResolver
             .readBytes(Uri.parse(basedir))
             .toString(Charset.forName("utf-8"))
           )
@@ -475,7 +478,7 @@ class FreeTubeJavaScriptInterface {
       try {
         if (basedir.startsWith("content://")) {
           // urls created by save dialog
-          context.contentResolver.writeBytes(
+          contentResolver.writeBytes(
             Uri.parse(basedir),
             content.toByteArray()
           )
@@ -538,7 +541,7 @@ class FreeTubeJavaScriptInterface {
             }
             try {
               val uri = it.data!!.data
-              val mimeType = context.contentResolver.getType(uri!!)
+              val mimeType = contentResolver.getType(uri!!)
               val fileName = getFileNameFromUri(uri.toString())
               val payload = JSONObject()
               payload.put("uri", uri)
@@ -565,7 +568,7 @@ class FreeTubeJavaScriptInterface {
           }
           try {
             val uri = it.data!!.data!!
-            context.contentResolver.takePersistableUriPermission(
+            contentResolver.takePersistableUriPermission(
               uri,
               Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
