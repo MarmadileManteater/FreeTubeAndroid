@@ -9,7 +9,6 @@ import android.app.PendingIntent
 import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.media.MediaMetadata
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
@@ -23,13 +22,11 @@ import android.webkit.WebView
 import androidx.activity.result.ActivityResult
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.view.WindowCompat
 import androidx.documentfile.provider.DocumentFile
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.MediaControlsReceiver
 import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.helpers.Promise
-import io.freetubeapp.freetube.helpers.hexToColour
 import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.writeBytes
@@ -37,9 +34,7 @@ import io.freetubeapp.freetube.helpers.writeText
 import io.freetubeapp.freetube.webviews.BotGuardWebView
 import org.json.JSONObject
 import java.io.File
-import java.io.FileInputStream
 import java.net.URL
-import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.util.UUID.*
 import java.util.concurrent.ThreadPoolExecutor
@@ -62,6 +57,7 @@ class FreeTubeJavaScriptInterface {
   private val launchIntent: (Intent) -> Promise<ActivityResult?, Exception>
   private val revokeUriPermission : (uri: Uri, modeFlags: Int) -> Unit
   private val fromTreeUri: (uri: Uri) -> DocumentFile?
+  private val themeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit
   // endregion
 
   companion object {
@@ -79,7 +75,8 @@ class FreeTubeJavaScriptInterface {
     givenContentResolver: ContentResolver,
     givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>,
     givenRevokeUriPermission: (uri: Uri, modeFlags: Int) -> Unit,
-    givenFromTreeUri: (uri: Uri) -> DocumentFile?
+    givenFromTreeUri: (uri: Uri) -> DocumentFile?,
+    givenThemeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit
   )  {
     context = main
     webView = givenWebView
@@ -89,6 +86,7 @@ class FreeTubeJavaScriptInterface {
     launchIntent = givenLaunchIntent
     revokeUriPermission = givenRevokeUriPermission
     fromTreeUri = givenFromTreeUri
+    themeSystemUi = givenThemeSystemUi
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -663,14 +661,7 @@ class FreeTubeJavaScriptInterface {
    */
   @JavascriptInterface
   fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
-    context.runOnUiThread {
-      val windowInsetsController =
-        WindowCompat.getInsetsController(context.window, context.window.decorView)
-      windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
-      windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
-      context.window.navigationBarColor = navigationHex.hexToColour()
-      context.window.statusBarColor = statusHex.hexToColour()
-    }
+    themeSystemUi.invoke(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
   }
 
   @JavascriptInterface

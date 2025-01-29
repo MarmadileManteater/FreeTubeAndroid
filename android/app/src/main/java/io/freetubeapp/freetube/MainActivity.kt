@@ -1,7 +1,6 @@
 package io.freetubeapp.freetube
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
@@ -22,23 +21,19 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.documentfile.provider.DocumentFile
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.Promise
+import io.freetubeapp.freetube.helpers.hexToColour
 import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
 import io.freetubeapp.freetube.webviews.BotGuardWebView
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 import java.net.URLEncoder
 import java.util.UUID
 import java.util.concurrent.BlockingQueue
@@ -200,18 +195,26 @@ class MainActivity : AppCompatActivity() {
       threadPoolExecutor,
       contentResolver,
       {
-        intent: Intent ->
-          launchIntent(intent)
+          intent: Intent ->
+            launchIntent(intent)
       },
       {
           uri: Uri,
           modeFlags: Int ->
-          revokeUriPermission(uri, modeFlags)
+            revokeUriPermission(uri, modeFlags)
       },
       {
-        uri: Uri
+          uri: Uri
           ->
-        DocumentFile.fromTreeUri(this, uri)
+            DocumentFile.fromTreeUri(this, uri)
+      },
+      {
+        navigationHex: String,
+        statusHex: String,
+        navigationDarkMode: Boolean,
+        statusDarkMode: Boolean
+        ->
+        themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
       }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
@@ -415,7 +418,7 @@ class MainActivity : AppCompatActivity() {
     activityResultListeners.add(listener)
   }
 
-  fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
+  private fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
     return Promise(threadPoolExecutor, {
         resolve,
         reject ->
@@ -428,5 +431,16 @@ class MainActivity : AppCompatActivity() {
         reject(exception)
       }
     })
+  }
+
+  private fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
+    runOnUiThread {
+      val windowInsetsController =
+        WindowCompat.getInsetsController(window, window.decorView)
+      windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
+      windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
+      window.navigationBarColor = navigationHex.hexToColour()
+      window.statusBarColor = statusHex.hexToColour()
+    }
   }
 }
