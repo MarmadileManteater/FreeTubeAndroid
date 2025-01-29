@@ -199,6 +199,12 @@ class MainActivity : AppCompatActivity() {
             launchIntent(intent)
       },
       {
+          intent,
+          intentClass
+        ->
+        intent.setClass(this, intentClass)
+      },
+      {
           uri: Uri,
           modeFlags: Int ->
             revokeUriPermission(uri, modeFlags)
@@ -214,10 +220,13 @@ class MainActivity : AppCompatActivity() {
         navigationDarkMode: Boolean,
         statusDarkMode: Boolean
         ->
-        themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
+          themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
       },
       {
         getLogs()
+      },
+      {
+        restart()
       }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
@@ -456,5 +465,14 @@ class MainActivity : AppCompatActivity() {
     logs = logs.substring(0, logs.length - 1)
     logs += "]"
     return logs
+  }
+
+  private fun restart() {
+    finish()
+    startActivity(
+      Intent(Intent.ACTION_MAIN)
+        .addCategory(Intent.CATEGORY_LAUNCHER)
+        .setClass(this, MainActivity::class.java)
+    )
   }
 }

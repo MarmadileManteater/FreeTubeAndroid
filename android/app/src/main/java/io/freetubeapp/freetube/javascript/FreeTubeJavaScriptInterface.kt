@@ -59,6 +59,8 @@ class FreeTubeJavaScriptInterface {
   private val fromTreeUri: (uri: Uri) -> DocumentFile?
   private val themeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit
   private val getLogs: () -> String
+  private val setIntentClass: (intent: Intent, cls: Class<*>) -> Intent
+  private val restart: () -> Unit
   // endregion
 
   companion object {
@@ -75,10 +77,12 @@ class FreeTubeJavaScriptInterface {
     givenThreadPoolExecutor: ThreadPoolExecutor,
     givenContentResolver: ContentResolver,
     givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>,
+    givenSetIntentClass: (intent: Intent, cls: Class<*>) -> Intent,
     givenRevokeUriPermission: (uri: Uri, modeFlags: Int) -> Unit,
     givenFromTreeUri: (uri: Uri) -> DocumentFile?,
     givenThemeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit,
-    givenGetLogs: () -> String
+    givenGetLogs: () -> String,
+    givenRestart: () -> Unit
   )  {
     context = main
     webView = givenWebView
@@ -90,10 +94,12 @@ class FreeTubeJavaScriptInterface {
     fromTreeUri = givenFromTreeUri
     themeSystemUi = givenThemeSystemUi
     getLogs = givenGetLogs
+    setIntentClass = givenSetIntentClass
+    restart = givenRestart
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
-    jsCommunicator = AsyncJSCommunicator(main.webView)
+    jsCommunicator = AsyncJSCommunicator(webView)
   }
 
   // region Media Notifications
@@ -113,17 +119,17 @@ class FreeTubeJavaScriptInterface {
       Notification.Action.Builder(
         androidx.media3.ui.R.drawable.exo_ic_skip_previous,
         "Back",
-        PendingIntent.getBroadcast(context, 1, Intent(context, MediaControlsReceiver::class.java).setAction("previous"), PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.getBroadcast(context, 1, setIntentClass(Intent(), MediaControlsReceiver::class.java).setAction("previous"), PendingIntent.FLAG_IMMUTABLE)
       ).build(),
       Notification.Action.Builder(
         neutralIcon,
         neutralAction[0],
-        PendingIntent.getBroadcast(context, 1, Intent(context, MediaControlsReceiver::class.java).setAction(neutralAction[1]), PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.getBroadcast(context, 1, setIntentClass(Intent(), MediaControlsReceiver::class.java).setAction(neutralAction[1]), PendingIntent.FLAG_IMMUTABLE)
       ).build(),
       Notification.Action.Builder(
         androidx.media3.ui.R.drawable.exo_ic_skip_next,
         "Next",
-        PendingIntent.getBroadcast(context, 1, Intent(context, MediaControlsReceiver::class.java).setAction("next"), PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.getBroadcast(context, 1, setIntentClass(Intent(), MediaControlsReceiver::class.java).setAction("next"), PendingIntent.FLAG_IMMUTABLE)
       ).build()
     )
   }
@@ -149,9 +155,11 @@ class FreeTubeJavaScriptInterface {
     val mediaStyle = getMediaStyle()
     if (mediaStyle != null) {
       // when clicking the notification, launch the app as if the user tapped on it in their launcher (open an existing instance if able)
-      val notificationIntent = Intent(Intent.ACTION_MAIN)
-        .addCategory(Intent.CATEGORY_LAUNCHER)
-        .setClass(context,  MainActivity::class.java)
+      val notificationIntent = setIntentClass(
+          Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER),
+          MainActivity::class.java
+      )
 
       // always reuse notification
       if (lastNotification != null) {
@@ -610,10 +618,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun restart() {
-    context.finish()
-    context.startActivity(Intent(Intent.ACTION_MAIN)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setClass(context,  MainActivity::class.java))
+    restart.invoke()
   }
 
   /**
