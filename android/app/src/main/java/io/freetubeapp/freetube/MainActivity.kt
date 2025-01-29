@@ -196,7 +196,11 @@ class MainActivity : AppCompatActivity() {
       webView,
       bgWebView,
       threadPoolExecutor,
-      contentResolver
+      contentResolver,
+      {
+        intent: Intent ->
+          launchIntent(intent)
+      }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
     webView.webChromeClient = object: WebChromeClient() {

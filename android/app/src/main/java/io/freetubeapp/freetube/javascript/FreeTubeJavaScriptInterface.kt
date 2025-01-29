@@ -58,6 +58,8 @@ class FreeTubeJavaScriptInterface {
   private var keepScreenOn: Boolean = false
   private val jsCommunicator: AsyncJSCommunicator
 
+  private val launchIntent: (Intent) -> Promise<ActivityResult?, Exception>
+
   companion object {
     private const val DATA_DIRECTORY = "data://"
     private const val CHANNEL_ID = "media_controls"
@@ -65,12 +67,13 @@ class FreeTubeJavaScriptInterface {
     private val NOTIFICATION_TAG = String.format("%s", randomUUID())
   }
 
-  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor, givenContentResolver: ContentResolver)  {
+  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor, givenContentResolver: ContentResolver, givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>)  {
     context = main
     webView = givenWebView
     bgWebView = givenBotGuardWebView
     mainExecutor = givenThreadPoolExecutor
     contentResolver = givenContentResolver
+    launchIntent = givenLaunchIntent
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -506,7 +509,7 @@ class FreeTubeJavaScriptInterface {
       resolve,
       reject
       ->
-      context.launchIntent(
+      launchIntent(
         Intent(Intent.ACTION_CREATE_DOCUMENT)
         .addCategory(Intent.CATEGORY_OPENABLE)
         .setType(fileType)
@@ -531,7 +534,7 @@ class FreeTubeJavaScriptInterface {
     return Promise(mainExecutor, {
       resolve,
       reject ->
-        context.launchIntent(
+        launchIntent(
           Intent(Intent.ACTION_GET_CONTENT)
           .setType("*/*")
           .putExtra(Intent.EXTRA_MIME_TYPES, fileTypes.split(",").toTypedArray())
@@ -560,7 +563,7 @@ class FreeTubeJavaScriptInterface {
     return Promise(mainExecutor, {
       resolve,
       reject ->
-      context.launchIntent(
+      launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
           if (it!!.resultCode == Activity.RESULT_CANCELED) {
