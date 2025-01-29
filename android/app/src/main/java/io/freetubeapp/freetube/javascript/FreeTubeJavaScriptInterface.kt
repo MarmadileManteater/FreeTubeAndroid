@@ -58,6 +58,7 @@ class FreeTubeJavaScriptInterface {
   private val revokeUriPermission : (uri: Uri, modeFlags: Int) -> Unit
   private val fromTreeUri: (uri: Uri) -> DocumentFile?
   private val themeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit
+  private val getLogs: () -> String
   // endregion
 
   companion object {
@@ -76,7 +77,8 @@ class FreeTubeJavaScriptInterface {
     givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>,
     givenRevokeUriPermission: (uri: Uri, modeFlags: Int) -> Unit,
     givenFromTreeUri: (uri: Uri) -> DocumentFile?,
-    givenThemeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit
+    givenThemeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit,
+    givenGetLogs: () -> String
   )  {
     context = main
     webView = givenWebView
@@ -87,6 +89,7 @@ class FreeTubeJavaScriptInterface {
     revokeUriPermission = givenRevokeUriPermission
     fromTreeUri = givenFromTreeUri
     themeSystemUi = givenThemeSystemUi
+    getLogs = givenGetLogs
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -602,14 +605,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun getLogs(): String {
-    var logs = "["
-    for (message in context.consoleMessages) {
-      logs += "${message},"
-    }
-    // get rid of trailing comma
-    logs = logs.substring(0, logs.length - 1)
-    logs += "]"
-    return logs
+    return getLogs.invoke()
   }
 
   @JavascriptInterface

@@ -215,6 +215,9 @@ class MainActivity : AppCompatActivity() {
         statusDarkMode: Boolean
         ->
         themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
+      },
+      {
+        getLogs()
       }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
@@ -442,5 +445,16 @@ class MainActivity : AppCompatActivity() {
       window.navigationBarColor = navigationHex.hexToColour()
       window.statusBarColor = statusHex.hexToColour()
     }
+  }
+
+  private fun getLogs(): String {
+    var logs = "["
+    for (message in consoleMessages) {
+      logs += "${message},"
+    }
+    // get rid of trailing comma
+    logs = logs.substring(0, logs.length - 1)
+    logs += "]"
+    return logs
   }
 }
