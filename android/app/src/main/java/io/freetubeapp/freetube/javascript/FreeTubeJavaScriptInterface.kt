@@ -61,6 +61,7 @@ class FreeTubeJavaScriptInterface {
   // region Methods from MainActivity
   private val launchIntent: (Intent) -> Promise<ActivityResult?, Exception>
   private val revokeUriPermission : (uri: Uri, modeFlags: Int) -> Unit
+  private val fromTreeUri: (uri: Uri) -> DocumentFile?
   // endregion
 
   companion object {
@@ -70,7 +71,16 @@ class FreeTubeJavaScriptInterface {
     private val NOTIFICATION_TAG = String.format("%s", randomUUID())
   }
 
-  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor, givenContentResolver: ContentResolver, givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>, givenRevokeUriPermission: (uri: Uri, modeFlags: Int) -> Unit)  {
+  constructor(
+    main: MainActivity,
+    givenWebView: WebView,
+    givenBotGuardWebView: BotGuardWebView,
+    givenThreadPoolExecutor: ThreadPoolExecutor,
+    givenContentResolver: ContentResolver,
+    givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>,
+    givenRevokeUriPermission: (uri: Uri, modeFlags: Int) -> Unit,
+    givenFromTreeUri: (uri: Uri) -> DocumentFile?
+  )  {
     context = main
     webView = givenWebView
     bgWebView = givenBotGuardWebView
@@ -78,6 +88,7 @@ class FreeTubeJavaScriptInterface {
     contentResolver = givenContentResolver
     launchIntent = givenLaunchIntent
     revokeUriPermission = givenRevokeUriPermission
+    fromTreeUri = givenFromTreeUri
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -421,7 +432,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun listFilesInTree(tree: String): String {
-    val directory = DocumentFile.fromTreeUri(context, Uri.parse(tree))
+    val directory = fromTreeUri(Uri.parse(tree))
     val files = directory!!.listFiles().joinToString(",") { file ->
       "{ \"uri\": \"${file.uri}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
     }
@@ -430,19 +441,19 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun createFileInTree(tree: String, fileName: String): String {
-    val directory = DocumentFile.fromTreeUri(context, Uri.parse(tree))
+    val directory = fromTreeUri(Uri.parse(tree))
     return directory!!.createFile("*/*", fileName)!!.uri.toString()
   }
 
   @JavascriptInterface
   fun createDirectoryInTree(tree: String, fileName: String): String {
-    val directory = DocumentFile.fromTreeUri(context, Uri.parse(tree))
+    val directory = fromTreeUri(Uri.parse(tree))
     return directory!!.createDirectory(fileName)!!.uri.toString()
   }
 
   @JavascriptInterface
   fun deleteFileInTree(fileUri: String): Boolean {
-    val file = DocumentFile.fromTreeUri(context, Uri.parse(fileUri))
+    val file = fromTreeUri(Uri.parse(fileUri))
     return file!!.delete()
   }
 

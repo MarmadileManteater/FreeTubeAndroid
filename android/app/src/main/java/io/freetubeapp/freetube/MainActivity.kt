@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.documentfile.provider.DocumentFile
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
@@ -206,6 +207,11 @@ class MainActivity : AppCompatActivity() {
           uri: Uri,
           modeFlags: Int ->
           revokeUriPermission(uri, modeFlags)
+      },
+      {
+        uri: Uri
+          ->
+        DocumentFile.fromTreeUri(this, uri)
       }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
