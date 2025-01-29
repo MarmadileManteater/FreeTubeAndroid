@@ -58,7 +58,10 @@ class FreeTubeJavaScriptInterface {
   private var keepScreenOn: Boolean = false
   private val jsCommunicator: AsyncJSCommunicator
 
+  // region Methods from MainActivity
   private val launchIntent: (Intent) -> Promise<ActivityResult?, Exception>
+  private val revokeUriPermission : (uri: Uri, modeFlags: Int) -> Unit
+  // endregion
 
   companion object {
     private const val DATA_DIRECTORY = "data://"
@@ -67,13 +70,14 @@ class FreeTubeJavaScriptInterface {
     private val NOTIFICATION_TAG = String.format("%s", randomUUID())
   }
 
-  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor, givenContentResolver: ContentResolver, givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>)  {
+  constructor(main: MainActivity, givenWebView: WebView, givenBotGuardWebView: BotGuardWebView, givenThreadPoolExecutor: ThreadPoolExecutor, givenContentResolver: ContentResolver, givenLaunchIntent: (Intent) -> Promise<ActivityResult?, Exception>, givenRevokeUriPermission: (uri: Uri, modeFlags: Int) -> Unit)  {
     context = main
     webView = givenWebView
     bgWebView = givenBotGuardWebView
     mainExecutor = givenThreadPoolExecutor
     contentResolver = givenContentResolver
     launchIntent = givenLaunchIntent
+    revokeUriPermission = givenRevokeUriPermission
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -412,7 +416,7 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun revokePermissionForTree(treeUri: String) {
-    context.revokeUriPermission(Uri.parse(treeUri), Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    revokeUriPermission(Uri.parse(treeUri), Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
   }
 
   @JavascriptInterface
