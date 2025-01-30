@@ -385,7 +385,7 @@ class MainActivity : AppCompatActivity() {
     showSplashScreen = false
   }
 
-  fun enableKeepScreenOn() {
+  private fun enableKeepScreenOn() {
     if (!keepScreenOn) {
       keepScreenOn = true
       runOnUiThread {
@@ -394,7 +394,7 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  fun disableKeepScreenOn() {
+  private fun disableKeepScreenOn() {
     if (keepScreenOn) {
       keepScreenOn = false
       runOnUiThread {
