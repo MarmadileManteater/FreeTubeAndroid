@@ -1,14 +1,11 @@
 package io.freetubeapp.freetube.webviews
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.webkit.JavascriptInterface
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
-import java.util.concurrent.ThreadPoolExecutor
 
 
 class BotGuardWebView @JvmOverloads constructor(

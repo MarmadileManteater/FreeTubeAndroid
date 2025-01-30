@@ -3,7 +3,6 @@ package io.freetubeapp.freetube
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -11,10 +10,6 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
@@ -28,10 +23,8 @@ import androidx.documentfile.provider.DocumentFile
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.hexToColour
-import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
-import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
 import io.freetubeapp.freetube.webviews.BotGuardWebView
 import io.freetubeapp.freetube.webviews.MainWebView
 import org.json.JSONObject
@@ -253,95 +246,7 @@ class MainActivity : AppCompatActivity() {
         webView.dispatchEvent("end-fullscreen")
       }
     }
-    webView.webViewClient = object: WebViewClient() {
 
-      override fun shouldInterceptRequest(
-        view: WebView?,
-        request: WebResourceRequest?
-      ): WebResourceResponse? {
-        // TODO refactor this to work for video streaming
-        /*
-        // LEFTOVER iOS WORKAROUND CODE
-        if (request!!.requestHeaders.containsKey("x-user-agent")) {
-          with (URL(request!!.url.toString()).openConnection() as HttpURLConnection) {
-            requestMethod = request.method
-            val isClient5 = request.requestHeaders.containsKey("x-youtube-client-name") && request.requestHeaders["x-youtube-client-name"] == "5"
-            // map headers
-            for (header in request!!.requestHeaders) {
-              fun getReal(key: String, value: String): Array<String>? {
-                if (key == "x-user-agent") {
-                  return arrayOf("User-Agent", value)
-                }
-                if (key == "User-Agent") {
-                  return null
-                }
-                if (key == "x-fta-request-id") {
-                  return null
-                }
-                if (isClient5) {
-                  if (key == "referrer") {
-                    return null
-                  }
-                  if (key == "origin") {
-                    return null
-                  }
-                  if (key == "Sec-Fetch-Site") {
-                    return null
-                  }
-                  if (key == "Sec-Fetch-Mode") {
-                    return null
-                  }
-                  if (key == "Sec-Fetch-Dest") {
-                    return null
-                  }
-                  if (key == "sec-ch-ua") {
-                    return null
-                  }
-                  if (key == "sec-ch-ua-mobile") {
-                    return null
-                  }
-                  if (key == "sec-ch-ua-platform") {
-                    return null
-                  }
-                }
-                return arrayOf(key, value)
-              }
-              val real = getReal(header.key, header.value)
-              if (real !== null) {
-                setRequestProperty(real[0], real[1])
-              }
-            }
-            if (request.requestHeaders.containsKey("x-fta-request-id")) {
-              if (pendingRequestBodies.containsKey(request.requestHeaders["x-fta-request-id"])) {
-                val body = pendingRequestBodies[request.requestHeaders["x-fta-request-id"]]
-                pendingRequestBodies.remove(request.requestHeaders["x-fta-request-id"])
-                outputStream.write(body!!.toByteArray())
-              }
-            }
-            // 🧝‍♀️ magic
-            return WebResourceResponse(this.contentType, this.contentEncoding, inputStream!!)
-          }
-        }
-        */
-        return super.shouldInterceptRequest(view, request)
-      }
-      override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        if (request!!.url!!.scheme == "file") {
-          // don't send file url requests to a web browser (it will crash the app)
-          return true
-        }
-        val regex = """^https?:\/\/((www\.)?youtube\.com(\/embed)?|youtu\.be)\/.*$"""
-
-        if (Regex(regex).containsMatchIn(request!!.url!!.toString())) {
-          webView.dispatchEvent("youtube-link", "link", request!!.url!!.toString())
-          return true
-        }
-        // send all requests to a real web browser
-        val intent = Intent(Intent.ACTION_VIEW, request!!.url)
-        this@MainActivity.startActivity(intent)
-        return true
-      }
-    }
     if (intent!!.data !== null) {
       val url = intent!!.data.toString()
       val host = intent!!.data!!.host.toString()
