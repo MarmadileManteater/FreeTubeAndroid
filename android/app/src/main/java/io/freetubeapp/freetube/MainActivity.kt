@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 
   // region JS interfaces
   private lateinit var jsInterface: FreeTubeJavaScriptInterface
-  lateinit var bgJsInterface: BotGuardJavascriptInterface
   // endregion
 
   // region Bindings
@@ -176,9 +175,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     bgWebView = binding.botGuardWebView
-    bgJsInterface = BotGuardJavascriptInterface(this)
-    bgWebView.addJavascriptInterface(bgJsInterface, "Android")
-    bgWebView.settings.javaScriptEnabled = true
 
     jsInterface = FreeTubeJavaScriptInterface(
       this,

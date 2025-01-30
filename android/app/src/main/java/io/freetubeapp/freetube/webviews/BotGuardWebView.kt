@@ -1,12 +1,15 @@
 package io.freetubeapp.freetube.webviews
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.webkit.JavascriptInterface
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.readText
+import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
 import java.util.concurrent.ThreadPoolExecutor
+
 
 class BotGuardWebView @JvmOverloads constructor(
   givenContext: Context, attrs: AttributeSet? = null
@@ -14,6 +17,14 @@ class BotGuardWebView @JvmOverloads constructor(
 // no need to communicate window visibility to botguard
   BackgroundPlayWebView(givenContext, attrs) {
   private val context: MainActivity = givenContext as MainActivity
+  private val jsInterface: BotGuardJavascriptInterface
+  init {
+    @Suppress("SetJavaScriptEnabled")
+    settings.javaScriptEnabled = true
+
+    jsInterface = BotGuardJavascriptInterface(context)
+    addJavascriptInterface(jsInterface, "Android")
+  }
 
   fun generatePOTokenFromVisitorData(visitorData: String): Promise<String, Exception> {
     return Promise(context.threadPoolExecutor, {
@@ -23,7 +34,7 @@ class BotGuardWebView @JvmOverloads constructor(
       try {
         val functionName = script.split("export{")[1].split(" as default};")[0]
         val exportSection = "export{${functionName} as default};"
-        context.bgJsInterface.onReturnToken {
+        jsInterface.onReturnToken {
           run {
             context.runOnUiThread {
               resolve(it)
