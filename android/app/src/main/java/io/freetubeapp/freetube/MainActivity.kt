@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity() {
   var darkMode: Boolean = false
   var paused: Boolean = false
   var isInAPrompt: Boolean = false
+  private var keepScreenOn: Boolean = false
   // endregion
 
   // region Thread Pool Executor
@@ -212,6 +214,12 @@ class MainActivity : AppCompatActivity() {
       },
       {
         hideSplashScreen()
+      },
+      {
+        enableKeepScreenOn()
+      },
+      {
+        disableKeepScreenOn()
       }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
@@ -375,5 +383,23 @@ class MainActivity : AppCompatActivity() {
 
   private fun hideSplashScreen() {
     showSplashScreen = false
+  }
+
+  fun enableKeepScreenOn() {
+    if (!keepScreenOn) {
+      keepScreenOn = true
+      runOnUiThread {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
+    }
+  }
+
+  fun disableKeepScreenOn() {
+    if (keepScreenOn) {
+      keepScreenOn = false
+      runOnUiThread {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
+    }
   }
 }

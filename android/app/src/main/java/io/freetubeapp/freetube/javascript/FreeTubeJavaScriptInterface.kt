@@ -51,7 +51,6 @@ class FreeTubeJavaScriptInterface {
   private var lastPosition: Long
   private var lastState: Int
   private var lastNotification: Notification? = null
-  private var keepScreenOn: Boolean = false
   private val jsCommunicator: AsyncJSCommunicator
 
   // region Methods from MainActivity
@@ -63,6 +62,8 @@ class FreeTubeJavaScriptInterface {
   private val setIntentClass: (intent: Intent, cls: Class<*>) -> Intent
   private val restart: () -> Unit
   private val hideSplashScreen: () -> Unit
+  private val enableKeepScreenOn: () -> Unit
+  private val disableKeepScreenOn: () -> Unit
   // endregion
 
   companion object {
@@ -85,7 +86,10 @@ class FreeTubeJavaScriptInterface {
     givenThemeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit,
     givenGetLogs: () -> String,
     givenRestart: () -> Unit,
-    givenHideSplashScreen: () -> Unit
+    givenHideSplashScreen: () -> Unit,
+    givenEnableKeepScreenOn: () -> Unit,
+    givenDisableKeepScreenOn: () -> Unit,
+
   )  {
     context = main
     webView = givenWebView
@@ -100,6 +104,8 @@ class FreeTubeJavaScriptInterface {
     setIntentClass = givenSetIntentClass
     restart = givenRestart
     hideSplashScreen = givenHideSplashScreen
+    enableKeepScreenOn = givenEnableKeepScreenOn
+    disableKeepScreenOn = givenDisableKeepScreenOn
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -635,22 +641,12 @@ class FreeTubeJavaScriptInterface {
 
   @JavascriptInterface
   fun enableKeepScreenOn() {
-    if (!keepScreenOn) {
-      keepScreenOn = true
-      context.runOnUiThread {
-        context.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      }
-    }
+    enableKeepScreenOn.invoke()
   }
 
   @JavascriptInterface
   fun disableKeepScreenOn() {
-    if (keepScreenOn) {
-      keepScreenOn = false
-      context.runOnUiThread {
-        context.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      }
-    }
+    disableKeepScreenOn.invoke()
   }
 
   /**
