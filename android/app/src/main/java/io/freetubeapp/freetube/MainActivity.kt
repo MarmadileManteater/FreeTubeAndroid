@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
-import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.widget.FrameLayout
 import androidx.activity.addCallback
@@ -97,14 +96,16 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-      Configuration.UI_MODE_NIGHT_NO -> {
-        darkMode = false
-      }
-      Configuration.UI_MODE_NIGHT_YES -> {
-        darkMode = true
-      }
-    }
+
+    // BEWARE, if this region moves, it usually breaks something
+    // region keep android from turning the screen off while a video is playing
+    keepAliveService = KeepAliveService()
+    keepAliveIntent = Intent(this, keepAliveService.javaClass)
+    startService(keepAliveIntent)
+    // endregion
+
+    // ensure theme is either light or dark
+    changeThemeConfiguration(resources.configuration)
 
     content = findViewById(android.R.id.content)
     content.viewTreeObserver.addOnPreDrawListener(
@@ -137,11 +138,6 @@ class MainActivity : AppCompatActivity() {
         action ->
       webView.dispatchEvent("media-$action")
     }
-
-    // this keeps android from shutting off the app to conserve battery
-    keepAliveService = KeepAliveService()
-    keepAliveIntent = Intent(this, keepAliveService.javaClass)
-    startService(keepAliveIntent)
 
     // this gets the controller for hiding and showing the system bars
     WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -274,16 +270,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    when (newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-      Configuration.UI_MODE_NIGHT_NO -> {
-        darkMode = false
-        webView.dispatchEvent("enabled-light-mode")
-      }
-      Configuration.UI_MODE_NIGHT_YES -> {
-        darkMode = true
-        webView.dispatchEvent("enabled-dark-mode")
-      }
-    }
+    changeThemeConfiguration(newConfig, webView)
   }
 
   /**
@@ -397,6 +384,19 @@ class MainActivity : AppCompatActivity() {
       keepScreenOn = false
       runOnUiThread {
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      }
+    }
+  }
+
+  private fun changeThemeConfiguration(configuration: Configuration, webView: MainWebView? = null) {
+    when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+      Configuration.UI_MODE_NIGHT_NO -> {
+        darkMode = false
+        webView?.dispatchEvent("enabled-dark-mode")
+      }
+      Configuration.UI_MODE_NIGHT_YES -> {
+        darkMode = true
+        webView?.dispatchEvent("enabled-dark-mode")
       }
     }
   }
