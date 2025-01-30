@@ -39,6 +39,10 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
+  // region resource string arrays
+  private lateinit var ytDomains: Array<String>
+  // endregion
+
   // region Keep Alive service
   private lateinit var keepAliveService: KeepAliveService
   private lateinit var keepAliveIntent: Intent
@@ -96,6 +100,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    ytDomains = resources.getStringArray(R.array.youtube_domains)
 
     // BEWARE, if this region moves, it usually breaks something
     // region keep android from turning the screen off while a video is playing
@@ -259,7 +264,7 @@ class MainActivity : AppCompatActivity() {
     if (intent!!.data !== null) {
       val url = intent!!.data.toString()
       val host = intent!!.data!!.host.toString()
-      val intentPath = if (host != "youtube.com" && host != "youtu.be" && host != "m.youtube.com" && host != "www.youtube.com") {
+      val intentPath = if (!ytDomains.contains(host)) {
         url.replace("${intent!!.data!!.host}", "youtube.com")
       } else {
         url
@@ -283,8 +288,7 @@ class MainActivity : AppCompatActivity() {
   override fun onNewIntent(intent: Intent?) {
     if (intent!!.data !== null) {
       val uri = intent!!.data
-      val isYT =
-        uri!!.host!! == "www.youtube.com" || uri!!.host!! == "youtube.com" || uri!!.host!! == "m.youtube.com" || uri!!.host!! == "youtu.be"
+      val isYT = ytDomains.contains(uri!!.host!!)
       val url = if (!isYT) {
         uri.toString().replace(uri.host.toString(), "www.youtube.com")
       } else {

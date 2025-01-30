@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">FreeTube Android</string>
+    <string-array name="youtube_domains">
+      <item>youtube.com</item>
+      <item>youtu.be</item>
+      <item>m.youtube.com</item>
+      <item>www.youtube.com</item>
+    </string-array>
 </resources>
