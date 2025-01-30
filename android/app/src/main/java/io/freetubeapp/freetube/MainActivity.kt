@@ -107,6 +107,13 @@ class MainActivity : AppCompatActivity() {
     // ensure theme is either light or dark
     changeThemeConfiguration(resources.configuration)
 
+    // this gets the controller for hiding and showing the system bars
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    val windowInsetsController =
+      WindowCompat.getInsetsController(window, window.decorView)
+    windowInsetsController.systemBarsBehavior =
+      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
     content = findViewById(android.R.id.content)
     content.viewTreeObserver.addOnPreDrawListener(
       object : ViewTreeObserver.OnPreDrawListener {
@@ -124,8 +131,10 @@ class MainActivity : AppCompatActivity() {
       }
     )
 
+    // region Callbacks
     activityResultListeners = mutableListOf()
 
+    // listen to activity results (used for `launchIntent`
     activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
       for (listener in activityResultListeners) {
         listener(it)
@@ -134,21 +143,11 @@ class MainActivity : AppCompatActivity() {
       activityResultListeners = mutableListOf()
     }
 
+    // bind to the media controls receiver
     MediaControlsReceiver.notifyMediaSessionListeners = {
         action ->
       webView.dispatchEvent("media-$action")
     }
-
-    // this gets the controller for hiding and showing the system bars
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    val windowInsetsController =
-      WindowCompat.getInsetsController(window, window.decorView)
-    windowInsetsController.systemBarsBehavior =
-      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
-    webView = binding.webView
 
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
@@ -163,7 +162,11 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
+    // endregion
 
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
+    webView = binding.webView
     bgWebView = binding.botGuardWebView
 
     jsInterface = FreeTubeJavaScriptInterface(
