@@ -33,6 +33,7 @@ import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
 import io.freetubeapp.freetube.webviews.BotGuardWebView
+import io.freetubeapp.freetube.webviews.MainWebView
 import org.json.JSONObject
 import java.net.URLEncoder
 import java.util.UUID
@@ -56,9 +57,9 @@ class MainActivity : AppCompatActivity() {
 
   // region Bindings
   private lateinit var binding: ActivityMainBinding
-  lateinit var webView: BackgroundPlayWebView
-  lateinit var bgWebView: BotGuardWebView
-  lateinit var content: View
+  private lateinit var webView: MainWebView
+  private lateinit var bgWebView: BotGuardWebView
+  private lateinit var content: View
   private var fullscreenView: View? = null
   // endregion
 
@@ -159,7 +160,6 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     webView = binding.webView
-    webView.setBackgroundColor(Color.TRANSPARENT)
 
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
@@ -174,14 +174,6 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
-
-    webView.settings.javaScriptEnabled = true
-
-    // this is the 🥃 special sauce that makes local api streaming a possibility
-    webView.settings.allowUniversalAccessFromFileURLs = true
-    webView.settings.allowFileAccessFromFileURLs = true
-    // allow playlist ▶auto-play in background
-    webView.settings.mediaPlaybackRequiresUserGesture = false
 
     bgWebView = binding.botGuardWebView
     bgJsInterface = BotGuardJavascriptInterface(this)
