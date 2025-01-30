@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.widget.FrameLayout
 import androidx.activity.addCallback
@@ -208,6 +209,9 @@ class MainActivity : AppCompatActivity() {
       },
       {
         restart()
+      },
+      {
+        hideSplashScreen()
       }
     )
     webView.addJavascriptInterface(jsInterface, "Android")
@@ -367,5 +371,9 @@ class MainActivity : AppCompatActivity() {
         .addCategory(Intent.CATEGORY_LAUNCHER)
         .setClass(this, MainActivity::class.java)
     )
+  }
+
+  private fun hideSplashScreen() {
+    showSplashScreen = false
   }
 }

@@ -19,6 +19,7 @@ import android.provider.OpenableColumns
 import android.view.WindowManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import android.window.SplashScreen
 import androidx.activity.result.ActivityResult
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
@@ -61,6 +62,7 @@ class FreeTubeJavaScriptInterface {
   private val getLogs: () -> String
   private val setIntentClass: (intent: Intent, cls: Class<*>) -> Intent
   private val restart: () -> Unit
+  private val hideSplashScreen: () -> Unit
   // endregion
 
   companion object {
@@ -82,7 +84,8 @@ class FreeTubeJavaScriptInterface {
     givenFromTreeUri: (uri: Uri) -> DocumentFile?,
     givenThemeSystemUi: (navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) -> Unit,
     givenGetLogs: () -> String,
-    givenRestart: () -> Unit
+    givenRestart: () -> Unit,
+    givenHideSplashScreen: () -> Unit
   )  {
     context = main
     webView = givenWebView
@@ -96,6 +99,7 @@ class FreeTubeJavaScriptInterface {
     getLogs = givenGetLogs
     setIntentClass = givenSetIntentClass
     restart = givenRestart
+    hideSplashScreen = givenHideSplashScreen
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
@@ -626,7 +630,7 @@ class FreeTubeJavaScriptInterface {
    */
   @JavascriptInterface
   fun hideSplashScreen() {
-    context.showSplashScreen = false
+    hideSplashScreen.invoke()
   }
 
   @JavascriptInterface
