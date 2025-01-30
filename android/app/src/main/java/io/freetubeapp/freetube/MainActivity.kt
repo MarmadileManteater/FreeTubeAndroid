@@ -95,8 +95,6 @@ class MainActivity : AppCompatActivity() {
 
   // region Overridden methods
 
-  @SuppressLint("SetJavaScriptEnabled")
-  @Suppress("DEPRECATION")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
