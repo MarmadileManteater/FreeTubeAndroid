@@ -33,7 +33,7 @@ Forward: 'Áfram'
 # Anything shared among components / views should be put here
 Global:
   Videos: 'Myndskeið'
-  Shorts: Stuttmyndir
+  Shorts: Símamyndir
   Live: Í beinni
   Community: Samfélag
   Sort By: Raða eftir
@@ -332,6 +332,12 @@ Settings:
       Gruvbox Dark: Gruvbox dökkt
       Gruvbox Light: Gruvbox ljóst
       Catppuccin Frappe: Catppuccin Frappe
+      Everforest Light Low: Everforest Ljóst-lítið
+      Everforest Dark Hard: Everforest Dökkt-skarpt
+      Everforest Dark Medium: Everforest Dökkt-miðlungs
+      Everforest Dark Low: Everforest Dökkt-lítið
+      Everforest Light Hard: Everforest Ljóst-skarpt
+      Everforest Light Medium: Everforest Ljóst-miðlungs
     Main Color Theme:
       Main Color Theme: 'Aðallitur þema'
       Red: 'Rautt'
@@ -403,6 +409,20 @@ Settings:
       Catppuccin Frappe Sky: Catppuccin Frappe himinblátt
       Catppuccin Frappe Sapphire: Catppuccin Frappe safír
       Catppuccin Frappe Blue: Catppuccin Frappe blátt
+      Everforest Dark Red: Everforest Dökkrautt
+      Everforest Dark Orange: Everforest Dökkappelsínugult
+      Everforest Dark Yellow: Everforest Dökkgult
+      Everforest Dark Green: Everforest Dökkgrænt
+      Everforest Dark Aqua: Everforest Dökksægrænt
+      Everforest Dark Purple: Everforest Dökkpurpuralitað
+      Everforest Dark Blue: Everforest Dökkblátt
+      Everforest Light Red: Everforest Ljósrautt
+      Everforest Light Orange: Everforest Ljósappelsínugult
+      Everforest Light Yellow: Everforest Ljósgult
+      Everforest Light Green: Everforest Ljósgrænt
+      Everforest Light Aqua: Everforest Ljóssægrænt
+      Everforest Light Blue: Everforest Ljósblátt
+      Everforest Light Purple: Everforest Ljóspurpuralitað
     Secondary Color Theme: 'Aukalitur þema'
         #* Main Color Theme
     Hide Side Bar Labels: Fela skýringar á hliðarstiku
@@ -530,13 +550,13 @@ Settings:
       Watch Page: Áhorfssíða
       General: Almennt
       Subscriptions Page: Áskriftasíða
-    Hide Channel Shorts: Fela stuttmyndaflipa rása
+    Hide Channel Shorts: Fela símamyndaflipa rása
     Hide Channel Playlists: Fela spilunarlistaflipa rása
     Hide Channel Community: Fela samfélagsflipa rása
     Hide Featured Channels: Fela rásir í deiglunni
     Hide Channel Podcasts: Fela hlaðvarpsflipa rása
     Hide Channel Releases: Fela útgáfuflipa rása
-    Hide Subscriptions Shorts: Fela stuttmyndir áskrifta
+    Hide Subscriptions Shorts: Fela símamyndir áskrifta
     Hide Subscriptions Live: Fela bein streymi áskrifta
     Hide Subscriptions Videos: Fela myndskeið áskrifta
     Hide Profile Pictures in Comments: Fela auðkennismyndir í athugasemdum
@@ -814,7 +834,7 @@ Channel:
       færslur á Invidious. Farðu á samfélagsflipa rásar til að skoða efni þar án Invidious.
   Shorts:
     This channel does not currently have any shorts: Þessi rás er í augnablikinu ekki
-      með neinar stuttmyndir
+      með neinar símamyndir
   Releases:
     Releases: Útgáfur
     This channel does not currently have any releases: Þessi rás er ekki með neinar

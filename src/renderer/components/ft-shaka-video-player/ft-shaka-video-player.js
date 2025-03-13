@@ -1,6 +1,3 @@
-import fs from 'fs/promises'
-import path from 'path'
-
 import { computed, defineComponent, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import shaka from 'shaka-player'
 import { useI18n } from '../../composables/use-i18n-polyfill'
@@ -24,11 +21,9 @@ import {
 } from '../../helpers/player/utils'
 import {
   addKeyboardShortcutToActionTitle,
-  getPicturesPath,
   showToast,
   writeFileWithPicker
 } from '../../helpers/utils'
-import { pathExists } from '../../helpers/filesystem'
 
 /** @typedef {import('../../helpers/sponsorblock').SponsorBlockCategory} SponsorBlockCategory */
 
@@ -70,7 +65,7 @@ export default defineComponent({
     },
     manifestSrc: {
       type: String,
-      required: true
+      default: null
     },
     manifestMimeType: {
       type: String,
@@ -296,6 +291,11 @@ export default defineComponent({
       })
     })
 
+    /** @type {import('vue').ComputedRef<number>} */
+    const defaultPlaybackRate = computed(() => {
+      return store.getters.getDefaultPlayback
+    })
+
     const maxVideoPlaybackRate = computed(() => {
       return parseInt(store.getters.getMaxVideoPlaybackRate)
     })
@@ -342,11 +342,6 @@ export default defineComponent({
     /** @type {import('vue').ComputedRef<boolean>} */
     const screenshotAskPath = computed(() => {
       return store.getters.getScreenshotAskPath
-    })
-
-    /** @type {import('vue').ComputedRef<string>} */
-    const screenshotFolder = computed(() => {
-      return store.getters.getScreenshotFolderPath
     })
 
     /** @type {import('vue').ComputedRef<boolean>} */
@@ -636,6 +631,7 @@ export default defineComponent({
       const periods = mpdNode.children?.filter(child => typeof child !== 'string' && child.tagName === 'Period') ?? []
 
       sortAdapationSetsByCodec(periods)
+      sortAudioAdaptationSetsByBitrate(periods)
 
       if (mpdNode.attributes.type === 'dynamic') {
         // fix live stream loading issues
@@ -738,6 +734,34 @@ export default defineComponent({
             const codecsPrefixB = getCodecsPrefix(b)
 
             return codecPriorities.indexOf(codecsPrefixA) - codecPriorities.indexOf(codecsPrefixB)
+          })
+      }
+    }
+
+    /**
+     * Sort audio AdaptationSets so that streams with higher bitrates come first.
+     * Workaround that makes the player select high-quality audio.
+     * @param {shaka.extern.xml.Node[]} periods
+     */
+    function sortAudioAdaptationSetsByBitrate(periods) {
+      for (const period of periods) {
+        period.children
+          ?.filter(child => typeof child !== 'string' && child.tagName === 'AdaptationSet' &&
+            (child.attributes.contentType === 'audio' || child.attributes.mimeType.startsWith('audio/')))
+          .forEach(adaptationSet => {
+            adaptationSet.children.sort((a, b) => {
+              if (a.tagName === 'AudioChannelConfiguration' && b.tagName !== 'AudioChannelConfiguration') {
+                // Push AudioChannelConfiguration to the front (where it seems to already be) so that it doesn't
+                // block sorting Representations if it's in the middle instead
+                return -1
+              } else if (b.tagName === 'AudioChannelConfiguration' && a.tagName !== 'AudioChannelConfiguration') {
+                return 1
+              } else if (a.tagName === 'Representation' && b.tagName === 'Representation') {
+                return b.attributes.bandwidth - a.attributes.bandwidth
+              } else {
+                return 0
+              }
+            })
           })
       }
     }
@@ -934,8 +958,12 @@ export default defineComponent({
         // stop shaka-player's click handler firing
         event.stopPropagation()
 
-        video.value.playbackRate = props.currentPlaybackRate
-        video.value.defaultPlaybackRate = props.currentPlaybackRate
+        const newPlaybackRate = defaultPlaybackRate.value
+
+        video.value.playbackRate = newPlaybackRate
+        video.value.defaultPlaybackRate = newPlaybackRate
+
+        showValueChange(`${newPlaybackRate}x`)
       }
     }
 
@@ -1602,16 +1630,16 @@ export default defineComponent({
 
       const filenameWithExtension = `${filename}.${format}`
 
-      if (!process.env.IS_ELECTRON || screenshotAskPath.value) {
-        const wasPlaying = !video_.paused
-        if (wasPlaying) {
-          video_.pause()
-        }
+      const wasPlaying = !video_.paused
+      if ((!process.env.IS_ELECTRON || screenshotAskPath.value) && wasPlaying) {
+        video_.pause()
+      }
 
-        try {
-          /** @type {Blob} */
-          const blob = await new Promise((resolve) => canvas.toBlob(resolve, mimeType, imageQuality))
+      try {
+        /** @type {Blob} */
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, mimeType, imageQuality))
 
+        if (!process.env.IS_ELECTRON || screenshotAskPath.value) {
           const saved = await writeFileWithPicker(
             filenameWithExtension,
             blob,
@@ -1625,53 +1653,24 @@ export default defineComponent({
           if (saved) {
             showToast(t('Screenshot Success'))
           }
-        } catch (error) {
-          console.error(error)
-          showToast(t('Screenshot Error', { error }))
-        }
+        } else {
+          const arrayBuffer = await blob.arrayBuffer()
 
+          const { ipcRenderer } = require('electron')
+
+          await ipcRenderer.invoke(IpcChannels.WRITE_SCREENSHOT, filenameWithExtension, arrayBuffer)
+
+          showToast(t('Screenshot Success'))
+        }
+      } catch (error) {
+        console.error(error)
+        showToast(t('Screenshot Error', { error }))
+      } finally {
         canvas.remove()
 
-        if (wasPlaying) {
+        if ((!process.env.IS_ELECTRON || screenshotAskPath.value) && wasPlaying) {
           video_.play()
         }
-      } else {
-        let dirPath
-
-        if (screenshotFolder.value === '') {
-          dirPath = path.join(await getPicturesPath(), 'Freetube')
-        } else {
-          dirPath = screenshotFolder.value
-        }
-
-        if (!(await pathExists(dirPath))) {
-          try {
-            await fs.mkdir(dirPath, { recursive: true })
-          } catch (err) {
-            console.error(err)
-            showToast(t('Screenshot Error', { error: err }))
-            canvas.remove()
-            return
-          }
-        }
-
-        const filePath = path.join(dirPath, filenameWithExtension)
-
-        canvas.toBlob((result) => {
-          result.arrayBuffer().then(ab => {
-            const arr = new Uint8Array(ab)
-
-            fs.writeFile(filePath, arr)
-              .then(() => {
-                showToast(t('Screenshot Success'))
-              })
-              .catch((err) => {
-                console.error(err)
-                showToast(t('Screenshot Error', { error: err }))
-              })
-          })
-        }, mimeType, imageQuality)
-        canvas.remove()
       }
     }
 

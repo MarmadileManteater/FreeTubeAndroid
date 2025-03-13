@@ -63,13 +63,14 @@ async function createInnertube({ withPlayer = false, location = undefined, safet
   })
 }
 
+/** @type {Innertube | null} */
 let searchSuggestionsSession = null
 
 export async function getLocalSearchSuggestions(query) {
+  // The search suggestions endpoint does not like search queries larger than SEARCH_CHAR_LIMIT
+  // so return an empty array instead
   if (query.length > SEARCH_CHAR_LIMIT) {
-    // There's an event handler on the search input so avoid displaying an exception
-    console.error(`Query is over ${SEARCH_CHAR_LIMIT} characters`)
-    return
+    return []
   }
 
   // reuse innertube instance to keep the search suggestions snappy
@@ -271,7 +272,12 @@ export async function getLocalVideoInfo(id) {
 
   if (info.streaming_data) {
     decipherFormats(info.streaming_data.formats, webInnertube.session.player)
-    decipherFormats(info.streaming_data.adaptive_formats, webInnertube.session.player)
+
+    const firstFormat = info.streaming_data.adaptive_formats[0]
+
+    if (firstFormat.url || firstFormat.signature_cipher || firstFormat.cipher) {
+      decipherFormats(info.streaming_data.adaptive_formats, webInnertube.session.player)
+    }
 
     if (info.streaming_data.dash_manifest_url) {
       let url = info.streaming_data.dash_manifest_url
@@ -291,11 +297,10 @@ export async function getLocalVideoInfo(id) {
 
 /**
  * @param {string} id
- * @param {boolean | undefined} sortByNewest
  */
-export async function getLocalComments(id, sortByNewest = false) {
+export async function getLocalComments(id) {
   const innertube = await createInnertube()
-  return innertube.getComments(id, sortByNewest ? 'NEWEST_FIRST' : 'TOP_COMMENTS')
+  return innertube.getComments(id)
 }
 
 // I know `type & type` is typescript syntax and not valid jsdoc but I couldn't get @extends or @augments to work

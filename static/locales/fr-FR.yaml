@@ -311,8 +311,8 @@ Settings:
     Auto Load Next Page:
       Label: Chargement automatique de la page suivante
       Tooltip: Chargement automatique des pages supplémentaires et des commentaires.
-    Open Deep Links In New Window: Les URL ouvertes ont été transmises à FreeTube
-      dans une nouvelle fenêtre
+    Open Deep Links In New Window: Ouvrir les URL transmises à FreeTube dans une nouvelle
+      fenêtre
   Theme Settings:
     Theme Settings: 'Thème'
     Match Top Bar with Main Color: 'Faire correspondre la barre supérieure à la couleur
@@ -333,6 +333,12 @@ Settings:
       Gruvbox Light: Gruvbox Clair
       Gruvbox Dark: Gruvbox Sombre
       Catppuccin Frappe: Catppuccin Frappe
+      Everforest Light Hard: Jungle Dur Clair
+      Everforest Light Low: Jungle Faible Clair
+      Everforest Dark Low: Jungle Bas Sombre
+      Everforest Light Medium: Jungle Médian Clair
+      Everforest Dark Hard: Jungle Dur Sombre
+      Everforest Dark Medium: Jungle Médian Sombre
     Main Color Theme:
       Main Color Theme: 'Couleur principale du thème'
       Red: 'Rouge'
@@ -384,13 +390,13 @@ Settings:
       Gruvbox Dark Purple: Gruvbox Violet Sombre
       Gruvbox Dark Aqua: Gruvbox Eau Sombre
       Gruvbox Dark Orange: Gruvbox Orange Sombre
-      Gruvbox Light Red: Gruvbox Rouge Sombre
+      Gruvbox Light Red: Gruvbox Rouge Clair
       Gruvbox Light Blue: Gruvbox Bleu Clair
       Gruvbox Light Purple: Gruvbox Violet Clair
       Gruvbox Light Orange: Gruvbox Orange Clair
       Gruvbox Dark Green: Gruvbox Vert Sombre
       Gruvbox Dark Blue: Gruvbox Bleu Sombre
-      Catppuccin Frappe Flamingo: Catppuccin Frappe Flamingo
+      Catppuccin Frappe Flamingo: Catppuccin Frappe Flamant Rose
       Catppuccin Frappe Pink: Catppuccin Frappe Rose
       Catppuccin Frappe Rosewater: Catppuccin Frappe Eau de rose
       Catppuccin Frappe Mauve: Catppuccin Frappe Mauve
@@ -404,6 +410,20 @@ Settings:
       Catppuccin Frappe Sapphire: Catppuccin Frappe Saphir
       Catppuccin Frappe Blue: Catppuccin Frappe Bleu
       Catppuccin Frappe Lavender: Catppuccin Frappe Lavande
+      Everforest Dark Yellow: Jungle Jaune Sombre
+      Everforest Dark Aqua: Jungle Cyan Sombre
+      Everforest Light Red: Jungle Rouge Clair
+      Everforest Light Orange: Jungle Orange Clair
+      Everforest Light Green: Jungle Vert Clair
+      Everforest Light Aqua: Jungle Cyan Clair
+      Everforest Light Blue: Jungle Bleu Clair
+      Everforest Dark Purple: Jungle Violet Sombre
+      Everforest Dark Green: Jungle Vert Sombre
+      Everforest Dark Orange: Jungle Orange Sombre
+      Everforest Dark Blue: Jungle Bleu Sombre
+      Everforest Light Purple: Jungle Violet Clair
+      Everforest Dark Red: Jungle Rouge Sombre
+      Everforest Light Yellow: Jungle Jaune Clair
     Secondary Color Theme: 'Couleur secondaire du thème'
         #* Main Color Theme
     UI Scale: Échelle de l'interface utilisateur
@@ -438,9 +458,9 @@ Settings:
       1440p: '1440p'
       4k: '4k'
       8k: '8k'
-    Next Video Interval: Minuteur de lecture automatique
-    Scroll Volume Over Video Player: Contrôler le niveau du volume avec la molette
-      au dessus du lecteur vidéo
+    Next Video Interval: Décompte de la lecture automatique
+    Scroll Volume Over Video Player: Contrôler le volume via la molette au dessus
+      du lecteur vidéo
     Display Play Button In Video Player: Afficher le bouton de lecture dans le lecteur
       vidéo
     Fast-Forward / Rewind Interval: Intervalle d'avance / de recul rapide
@@ -468,10 +488,10 @@ Settings:
     Autoplay Interruption Timer: Minuteur d'arrêt de la lecture automatique
     Default Viewing Mode:
       Default Viewing Mode: Mode d'affichage par défaut
-      Picture in Picture: Image dans l'image
-      External Player: Logiciel externe ({externalPlayerName})
+      Picture in Picture: Mode image dans l’image
+      External Player: Lecteur externe ({externalPlayerName})
       Full Screen: Plein écran
-      Theater: Théâtre
+      Theater: Mode cinéma
   Subscription Settings:
     Subscription Settings: 'Abonnements'
     Hide Videos on Watch: 'Masquer les vidéos visionnées'
@@ -505,7 +525,7 @@ Settings:
     Are you sure you want to remove all your playlists?: Êtes-vous sûr de vouloir
       supprimer toutes vos listes de lecture ?
     Remember Search History: Conserver l'historique de recherche
-    Are you sure you want to clear out your search history and cache?: Êtes-vous sûr
+    Are you sure you want to clear out your search history and cache?: Êtes-vous sûr(e)
       de vouloir effacer votre historique de recherche et votre cache ?
     Clear Search History and Cache: Effacer l'historique de recherche et le cache
     Search history and cache have been cleared: L'historique de recherche et le cache
@@ -585,18 +605,18 @@ Settings:
     Hide Channels Placeholder: Identifiant de la chaîne
     Display Titles Without Excessive Capitalisation: Afficher les titres sans majuscules
       ni ponctuation excessives
-    Hide Channel Playlists: Masquer l'onglet de la chaîne "Listes de lecture"
+    Hide Channel Playlists: Masquer l'onglet de la chaîne « Listes de lecture »
     Hide Featured Channels: Masquer les chaînes en vedette
-    Hide Channel Community: Masquer l'onglet de la chaîne "Communauté"
-    Hide Channel Shorts: Masquer l'onglet "Shorts" de la chaîne
+    Hide Channel Community: Masquer l'onglet de la chaîne « Communauté »
+    Hide Channel Shorts: Masquer l'onglet « Shorts » de la chaîne
     Sections:
       Channel Page: Page de la chaîne
       Side Bar: Barre latérale
       Watch Page: Page de lecture
       General: Général
       Subscriptions Page: Page Abonnements
-    Hide Channel Podcasts: Masquer l'onglet de la chaîne "Podcasts"
-    Hide Channel Releases: Masquer l'onglet de la chaîne "Publications"
+    Hide Channel Podcasts: Masquer l'onglet de la chaîne « Podcasts »
+    Hide Channel Releases: Masquer l'onglet de la chaîne « Publications »
     Hide Subscriptions Videos: Masquer les vidéos des abonnements
     Hide Subscriptions Shorts: Masquer les shorts des abonnements
     Hide Subscriptions Live: Masquer les diffusions en direct des abonnements
@@ -613,8 +633,9 @@ Settings:
       lecture contenant du texte
     Hide Videos and Playlists Containing Text Placeholder: Mot, fragment de mot ou
       phrase
-    Hide Channel Home: Masquer l'onglet "Accueil" de la chaîne
+    Hide Channel Home: Masquer l'onglet « Accueil » de la chaîne
     Show Added Items: Afficher les éléments ajoutés
+    Hide Channel Courses: Masquer l'onglet de la chaîne "Cours"
   The app needs to restart for changes to take effect. Restart and apply change?: L'application
     doit être redémarrée pour que les changements prennent effet. Redémarrer et appliquer
     les changements ?
@@ -673,8 +694,8 @@ Settings:
     Download Settings: 'Téléchargement'
     Ask Download Path: 'Demander l''emplacement de téléchargement'
     Choose Path: 'Choisir l''emplacement'
-    Download Behavior: Comportement de téléchargement
-    Download in app: Télécharger dans l'application
+    Download Behavior: Méthode de téléchargement
+    Download in app: Via l'application
     Open in web browser: Ouvrir dans le navigateur web
   Parental Control Settings:
     Hide Unsubscribe Button: Masquer le bouton de désabonnement
@@ -800,6 +821,10 @@ Channel:
   Home:
     Home: Accueil
     View Playlist: Afficher la liste de lecture
+  Courses:
+    Courses: Cours
+    This channel does not currently have any courses: Cette chaîne n'a actuellement
+      pas de cours
 Video:
   Mark As Watched: 'Marquer comme vu'
   Remove From History: 'Supprimer de l''historique'
@@ -988,7 +1013,7 @@ Share:
 Mini Player: 'Mini Lecteur'
 Comments:
   Comments: 'Commentaires'
-  Click to View Comments: 'Cliquer pour voir les commentaires'
+  Click to View Comments: 'Afficher les commentaires'
   Getting comment replies, please wait: 'Récupération des commentaires, veuillez patienter'
   Hide Comments: 'Masquer les commentaires'
   # Context: View 10 Replies, View 1 Reply
@@ -1131,9 +1156,9 @@ Tooltips:
     External Link Handling: "Choisissez le comportement par défaut quand on clique
       sur un lien qui ne peut être ouvert dans FreeTube.\nPar défaut, FreeTube ouvrira
       le lien dans votre navigateur par défaut.\n"
-    Open Deep Links In New Window: Les URL transmises à FreeTube, par des extensions
-      de redirection d'un navigateur ou par les arguments de la ligne de commande,
-      sont ouvertes dans une nouvelle fenêtre.
+    Open Deep Links In New Window: Les URL transmises à FreeTube, par exemple via
+      des extensions de redirection d'un navigateur web ou via des arguments en ligne
+      de commande, seront ouvertes dans une nouvelle fenêtre.
   External Player Settings:
     Custom External Player Arguments: Tous les arguments de ligne de commande personnalisés,
       que vous souhaitez transmettre au lecteur externe.

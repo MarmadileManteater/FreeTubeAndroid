@@ -1,6 +1,6 @@
 import { defineComponent, nextTick } from 'vue'
 import { mapActions } from 'vuex'
-import FtShareButton from '../ft-share-button/ft-share-button.vue'
+import FtShareButton from '../FtShareButton/FtShareButton.vue'
 import FtFlexBox from '../ft-flex-box/ft-flex-box.vue'
 import FtIconButton from '../ft-icon-button/ft-icon-button.vue'
 import FtInput from '../ft-input/ft-input.vue'
@@ -425,7 +425,7 @@ export default defineComponent({
 
     handlePlaylistExport: async function () {
       const dateStr = getTodayDateStrLocalTimezone()
-      const title = this.selectedUserPlaylist.playlistName.replaceAll(' ', '_').replaceAll(/["%*/:<>?\\|]/g, '_')
+      const title = this.selectedUserPlaylist.playlistName.replaceAll(/[ "%*/:<>?\\|]/g, '_')
       const exportFileName = 'freetube-playlist-' + title + '-' + dateStr + '.db'
 
       const data = JSON.stringify(this.selectedUserPlaylist) + '\n'

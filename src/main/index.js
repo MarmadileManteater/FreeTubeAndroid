@@ -12,6 +12,7 @@ import {
   SyncEvents,
   ABOUT_BITCOIN_ADDRESS,
   KeyboardShortcuts,
+  DefaultFolderKind,
 } from '../constants'
 import * as baseHandlers from '../datastores/handlers/base'
 import { extractExpiryTimestamp, ImageCache } from './ImageCache'
@@ -34,7 +35,14 @@ if (process.argv.includes('--version')) {
   printHelp()
   app.exit()
 } else {
-  runApp()
+  // Only allow single instance of the application
+  // Exit if we didn't get the lock, because another instance already has it
+  if (process.env.NODE_ENV !== 'development' && !app.requestSingleInstanceLock()) {
+    app.exit()
+  } else {
+    baseHandlers.loadDatastores()
+    runApp()
+  }
 }
 
 function printHelp() {
@@ -254,12 +262,6 @@ function runApp() {
   }
 
   if (process.env.NODE_ENV !== 'development') {
-    // Only allow single instance of the application
-    const gotTheLock = app.requestSingleInstanceLock()
-    if (!gotTheLock) {
-      app.quit()
-    }
-
     app.on('second-instance', (_, commandLine, __) => {
       // Someone tried to run a second instance
       if (typeof commandLine !== 'undefined') {
@@ -286,6 +288,8 @@ function runApp() {
       }
     })
   }
+
+  let proxyUrl
 
   app.on('ready', async (_, __) => {
     if (process.env.NODE_ENV === 'production') {
@@ -400,8 +404,10 @@ function runApp() {
     }
 
     if (useProxy) {
+      proxyUrl = `${proxyProtocol}://${proxyHostname}:${proxyPort}`
+
       session.defaultSession.setProxy({
-        proxyRules: `${proxyProtocol}://${proxyHostname}:${proxyPort}`
+        proxyRules: proxyUrl
       })
     }
 
@@ -642,7 +648,7 @@ function runApp() {
       searchQueryText = null
     } = { }) {
     // Syncing new window background to theme choice.
-    const windowBackground = await baseHandlers.settings._findTheme().then((setting) => {
+    const windowBackground = await baseHandlers.settings._findOne('baseTheme').then((setting) => {
       if (!setting) {
         return nativeTheme.shouldUseDarkColors ? '#212121' : '#f1f1f1'
       }
@@ -676,6 +682,18 @@ function runApp() {
           return '#fbf1c7'
         case 'catppuccin-frappe':
           return '#303446'
+        case 'everforest-dark-hard':
+          return '#272e33'
+        case 'everforest-dark-medium':
+          return '#2d353b'
+        case 'everforest-dark-low':
+          return '#333c43'
+        case 'everforest-light-hard':
+          return '#fffbef'
+        case 'everforest-light-medium':
+          return '#fdf6e3'
+        case 'everforest-light-low':
+          return '#f3ead3'
         case 'system':
         default:
           return nativeTheme.shouldUseDarkColors ? '#212121' : '#f1f1f1'
@@ -744,7 +762,7 @@ function runApp() {
       height: 800
     })
 
-    const boundsDoc = await baseHandlers.settings._findBounds()
+    const boundsDoc = await baseHandlers.settings._findOne('bounds')
     if (typeof boundsDoc?.value === 'object') {
       const { maximized, fullScreen, ...bounds } = boundsDoc.value
       const windowVisible = screen.getAllDisplays().some(display => {
@@ -884,18 +902,20 @@ function runApp() {
   })
 
   ipcMain.handle(IpcChannels.GENERATE_PO_TOKEN, (_, visitorData) => {
-    return generatePoToken(visitorData)
+    return generatePoToken(visitorData, proxyUrl)
   })
 
   ipcMain.on(IpcChannels.ENABLE_PROXY, (_, url) => {
     session.defaultSession.setProxy({
       proxyRules: url
     })
+    proxyUrl = url
     session.defaultSession.closeAllConnections()
   })
 
   ipcMain.on(IpcChannels.DISABLE_PROXY, () => {
     session.defaultSession.setProxy({})
+    proxyUrl = undefined
     session.defaultSession.closeAllConnections()
   })
 
@@ -972,10 +992,6 @@ function runApp() {
     return app.getSystemLocale()
   })
 
-  ipcMain.handle(IpcChannels.GET_PICTURES_PATH, () => {
-    return app.getPath('pictures')
-  })
-
   // Allows programmatic toggling of fullscreen without accompanying user interaction.
   // See: https://developer.mozilla.org/en-US/docs/Web/Security/User_activation#transient_activation
   ipcMain.on(IpcChannels.REQUEST_FULLSCREEN, ({ sender }) => {
@@ -986,14 +1002,6 @@ function runApp() {
   // See: https://developer.mozilla.org/en-US/docs/Web/Security/User_activation#transient_activation
   ipcMain.on(IpcChannels.REQUEST_PIP, ({ sender }) => {
     sender.executeJavaScript('document.querySelector("video.player").ui.getControls().togglePiP()', true)
-  })
-
-  ipcMain.handle(IpcChannels.SHOW_OPEN_DIALOG, async ({ sender }, options) => {
-    const senderWindow = findSenderWindow(sender)
-    if (senderWindow) {
-      return await dialog.showOpenDialog(senderWindow, options)
-    }
-    return await dialog.showOpenDialog(options)
   })
 
   ipcMain.handle(IpcChannels.SHOW_SAVE_DIALOG, async ({ sender }, options) => {
@@ -1009,6 +1017,94 @@ function runApp() {
       return window.webContents.id === sender.id
     })
   }
+
+  ipcMain.handle(IpcChannels.GET_SCREENSHOT_FALLBACK_FOLDER, (event) => {
+    if (!isFreeTubeUrl(event.senderFrame.url)) {
+      return
+    }
+
+    return path.join(app.getPath('pictures'), 'Freetube')
+  })
+
+  ipcMain.on(IpcChannels.CHOOSE_DEFAULT_FOLDER, async (event, kind) => {
+    if (!isFreeTubeUrl(event.senderFrame.url) || (kind !== DefaultFolderKind.DOWNLOADS && kind !== DefaultFolderKind.SCREENSHOTS)) {
+      return
+    }
+
+    const settingId = kind === DefaultFolderKind.DOWNLOADS ? 'downloadFolderPath' : 'screenshotFolderPath'
+
+    let currentPath = (await baseHandlers.settings._findOne(settingId))?.value
+
+    if (typeof currentPath !== 'string' || currentPath.length === 0) {
+      currentPath = app.getPath(kind === DefaultFolderKind.DOWNLOADS ? 'downloads' : 'pictures')
+    }
+
+    const dialogOptions = {
+      defaultPath: currentPath,
+      properties: ['openDirectory']
+    }
+
+    let result
+
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (window) {
+      result = await dialog.showOpenDialog(window, dialogOptions)
+    } else {
+      result = await dialog.showOpenDialog(dialogOptions)
+    }
+
+    if (result.canceled) {
+      return
+    }
+
+    await baseHandlers.settings.upsert(settingId, result.filePaths[0])
+
+    const syncPayload = {
+      event: SyncEvents.GENERAL.UPSERT,
+      data: {
+        _id: settingId,
+        value: result.filePaths[0]
+      }
+    }
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(IpcChannels.SYNC_SETTINGS, syncPayload)
+    })
+  })
+
+  ipcMain.handle(IpcChannels.WRITE_SCREENSHOT, async (event, filename, arrayBuffer) => {
+    if (!isFreeTubeUrl(event.senderFrame.url) || typeof filename !== 'string' || !(arrayBuffer instanceof ArrayBuffer)) {
+      return
+    }
+
+    const screenshotFolderPath = await baseHandlers.settings._findOne('screenshotFolderPath')
+
+    let directory
+    if (screenshotFolderPath && screenshotFolderPath.value.length > 0) {
+      directory = screenshotFolderPath.value
+    } else {
+      directory = path.join(app.getPath('pictures'), 'FreeTube')
+    }
+
+    directory = path.normalize(directory)
+
+    const filePath = path.resolve(directory, filename)
+
+    // Ensure that we are only writing inside of the expected directory
+    if (path.dirname(filePath) !== directory) {
+      throw new Error('Invalid save location')
+    }
+
+    try {
+      await asyncFs.mkdir(directory, { recursive: true })
+
+      await asyncFs.writeFile(filePath, new DataView(arrayBuffer))
+    } catch (error) {
+      console.error('WRITE_SCREENSHOT failed', error)
+      // throw a new error so that we don't expose the real error to the renderer
+      throw new Error('Failed to save')
+    }
+  })
 
   ipcMain.on(IpcChannels.STOP_POWER_SAVE_BLOCKER, (_, id) => {
     powerSaveBlocker.stop(id)
@@ -1092,7 +1188,12 @@ function runApp() {
 
       return contents.buffer
     } catch (e) {
-      console.error(e)
+      // Don't log the error if the file doesn't exist as we'll just fetch it from YouTube
+      // this usually happens when YouTube updates their player JavaScript
+      if (e.code !== 'ENOENT') {
+        console.error(e)
+      }
+
       return undefined
     }
   })
@@ -1132,6 +1233,12 @@ function runApp() {
           return await baseHandlers.settings.find()
 
         case DBActions.GENERAL.UPSERT:
+          // These two are only allowed to be changed by the CHOOSE_DEFAULT_FOLDER IPC action
+          // to avoid the "write to default folder" IPC calls being abused to write to arbitrary locations
+          if (data._id === 'downloadFolderPath' || data._id === 'screenshotFolderPath') {
+            return null
+          }
+
           await baseHandlers.settings.upsert(data._id, data.value)
           syncOtherWindows(
             IpcChannels.SYNC_SETTINGS,
@@ -1698,6 +1805,24 @@ function runApp() {
     const hidePlaylists = (await sidenavSettings.hidePlaylists)?.value
 
     const template = [
+      ...process.platform === 'darwin'
+        ? [
+            {
+              label: app.getName(),
+              submenu: [
+                { role: 'about' },
+                { type: 'separator' },
+                { role: 'services' },
+                { type: 'separator' },
+                { role: 'hide' },
+                { role: 'hideothers' },
+                { role: 'unhide' },
+                { type: 'separator' },
+                { role: 'quit' }
+              ]
+            }
+          ]
+        : [],
       {
         label: 'File',
         submenu: [
@@ -1905,31 +2030,15 @@ function runApp() {
           { role: 'minimize' },
           { role: 'close' }
         ]
-      }
+      },
+      ...process.platform === 'darwin'
+        ? [
+            { role: 'window' },
+            { role: 'help' },
+            { role: 'services' }
+          ]
+        : []
     ]
-
-    if (process.platform === 'darwin') {
-      template.unshift({
-        label: app.getName(),
-        submenu: [
-          { role: 'about' },
-          { type: 'separator' },
-          { role: 'services' },
-          { type: 'separator' },
-          { role: 'hide' },
-          { role: 'hideothers' },
-          { role: 'unhide' },
-          { type: 'separator' },
-          { role: 'quit' }
-        ]
-      })
-
-      template.push(
-        { role: 'window' },
-        { role: 'help' },
-        { role: 'services' }
-      )
-    }
 
     const menu = Menu.buildFromTemplate(template)
     Menu.setApplicationMenu(menu)
