@@ -73,7 +73,7 @@
             - {{ $tc('Global.Counts.View Count', viewCount, {count: parsedViewCount}) }}
           </span>
           <span v-if="totalPlaylistDuration !== 0">
-            - {{ durationFormatted }}
+            - {{ $t('User Playlists.TotalTimePlaylist', { duration: durationFormatted }) }}
           </span>
           <span>- </span>
           <span v-if="infoSource !== 'local'">
