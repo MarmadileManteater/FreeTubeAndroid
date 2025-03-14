@@ -247,7 +247,7 @@ export default defineComponent({
       const totalSeconds = this.playlistItems.reduce((acc, video) => {
         return acc + (video.lengthSeconds || 0)
       }, 0)
-      return this.formatDuration(totalSeconds)
+      return totalSeconds
     },
   },
   watch: {
@@ -683,16 +683,6 @@ export default defineComponent({
 
         throw failure
       }
-    },
-
-    formatDuration(totalSeconds, locale = 'en') {
-      const duration = {
-        hours: Math.floor(totalSeconds / 3600),
-        minutes: Math.floor((totalSeconds % 3600) / 60),
-        seconds: totalSeconds % 60,
-      }
-
-      return new Intl.DurationFormat(locale, { style: 'short' }).format(duration)
     },
 
     getIconForSortPreference: (s) => getIconForSortPreference(s),
