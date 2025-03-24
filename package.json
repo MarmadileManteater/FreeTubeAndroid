@@ -112,7 +112,7 @@
     "npm-run-all2": "^7.0.2",
     "postcss": "^8.5.3",
     "postcss-scss": "^4.0.9",
-    "sass": "^1.85.1",
+    "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
     "string-width": "4.2.3",
     "strip-ansi": "6.0.1",
