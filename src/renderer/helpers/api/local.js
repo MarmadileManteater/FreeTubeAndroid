@@ -60,7 +60,13 @@ async function createInnertube({ withPlayer = false, location = undefined, safet
     client_type: clientType,
 
     // use browser fetch
-    fetch: (input, init) => fetch(input, init),
+    fetch: (input, init) => {
+      if (input.url?.startsWith('https://www.youtube.com/youtubei/v1/player')) {
+        init.body = init.body.replace('"videoId":', '"params":"8AEB","videoId":')
+      }
+
+      return fetch(input, init)
+    },
     cache,
     generate_session_locally: !!generateSessionLocally
   })
@@ -303,22 +309,22 @@ export async function getLocalVideoInfo(id) {
 
   try {
     if (info.streaming_data) {
-    decipherFormats(info.streaming_data.formats, webInnertube.session.player)
+      decipherFormats(info.streaming_data.formats, webInnertube.session.player)
 
-    const firstFormat = info.streaming_data.adaptive_formats[0]
+      const firstFormat = info.streaming_data.adaptive_formats[0]
 
-    if (firstFormat.url || firstFormat.signature_cipher || firstFormat.cipher) {
-      decipherFormats(info.streaming_data.adaptive_formats, webInnertube.session.player)
-    }
+      if (firstFormat.url || firstFormat.signature_cipher || firstFormat.cipher) {
+        decipherFormats(info.streaming_data.adaptive_formats, webInnertube.session.player)
+      }
 
       if (info.streaming_data.dash_manifest_url) {
         let url = info.streaming_data.dash_manifest_url
 
-      if (url.includes('?')) {
-        url += `&pot=${encodeURIComponent(sessionPoToken)}&mpd_version=7`
-      } else {
-        url += `${url.endsWith('/') ? '' : '/'}pot/${encodeURIComponent(sessionPoToken)}/mpd_version/7`
-      }
+        if (url.includes('?')) {
+          url += `&pot=${encodeURIComponent(sessionPoToken)}&mpd_version=7`
+        } else {
+          url += `${url.endsWith('/') ? '' : '/'}pot/${encodeURIComponent(sessionPoToken)}/mpd_version/7`
+        }
 
         info.streaming_data.dash_manifest_url = url
       }
