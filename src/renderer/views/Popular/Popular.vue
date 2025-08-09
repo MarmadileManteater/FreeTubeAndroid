@@ -8,7 +8,14 @@
       v-else
       class="card"
     >
-      <h2>{{ $t("Most Popular") }}</h2>
+      <h2>
+        <FontAwesomeIcon
+          :icon="['fas', 'users']"
+          class="headingIcon"
+          fixed-width
+        />
+        {{ $t("Most Popular") }}
+      </h2>
       <ft-element-list
         :data="shownResults"
       />
@@ -23,13 +30,13 @@
 </template>
 
 <script setup>
-
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 
-import FtLoader from '../../components/ft-loader/ft-loader.vue'
+import FtLoader from '../../components/FtLoader/FtLoader.vue'
 import FtCard from '../../components/ft-card/ft-card.vue'
 import FtElementList from '../../components/FtElementList/FtElementList.vue'
-import FtRefreshWidget from '../../components/ft-refresh-widget/ft-refresh-widget.vue'
+import FtRefreshWidget from '../../components/FtRefreshWidget/FtRefreshWidget.vue'
 import store from '../../store/index'
 
 import { getInvidiousPopularFeed } from '../../helpers/api/invidious'

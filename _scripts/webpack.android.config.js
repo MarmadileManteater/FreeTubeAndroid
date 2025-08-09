@@ -176,7 +176,6 @@ const config = {
     },
     fallback: {
       'fs/promises': path.resolve(__dirname, '_empty.js'),
-      path: require.resolve('path-browserify'),
     },
     extensions: ['.js', '.vue']
   },

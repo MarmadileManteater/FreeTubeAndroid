@@ -1,7 +1,14 @@
 <template>
   <div>
     <FtCard class="card">
-      <h2>{{ $t("Subscriptions.Subscriptions") }}</h2>
+      <h2>
+        <FontAwesomeIcon
+          :icon="['fas', 'rss']"
+          class="subscriptionIcon"
+          fixed-width
+        />
+        {{ $t("Subscriptions.Subscriptions") }}
+      </h2>
       <FtFlexBox
         class="tabs"
         role="tablist"
@@ -21,6 +28,11 @@
           @keydown.space.enter.prevent="changeTab('videos')"
           @keydown.left.right="focusTab($event, 'videos')"
         >
+          <FontAwesomeIcon
+            :icon="['fa', 'video']"
+            class="subscriptionIcon"
+            fixed-width
+          />
           {{ $t("Global.Videos") }}
         </div>
         <!-- eslint-disable-next-line vuejs-accessibility/interactive-supports-focus -->
@@ -37,6 +49,11 @@
           @keydown.space.enter.prevent="changeTab('shorts')"
           @keydown.left.right="focusTab($event, 'shorts')"
         >
+          <FontAwesomeIcon
+            :icon="['fa', 'clapperboard']"
+            class="subscriptionIcon"
+            fixed-width
+          />
           {{ $t("Global.Shorts") }}
         </div>
         <!-- eslint-disable-next-line vuejs-accessibility/interactive-supports-focus -->
@@ -53,6 +70,11 @@
           @keydown.space.enter.prevent="changeTab('live')"
           @keydown.left.right="focusTab($event, 'live')"
         >
+          <FontAwesomeIcon
+            :icon="['fa', 'tower-broadcast']"
+            class="subscriptionIcon"
+            fixed-width
+          />
           {{ $t("Global.Live") }}
         </div>
         <!-- eslint-disable-next-line vuejs-accessibility/interactive-supports-focus -->
@@ -69,7 +91,12 @@
           @keydown.space.enter.prevent="changeTab('community')"
           @keydown.left.right="focusTab($event, 'community')"
         >
-          {{ $t("Global.Community") }}
+          <FontAwesomeIcon
+            :icon="['fa', 'message']"
+            class="subscriptionIcon"
+            fixed-width
+          />
+          {{ $t("Global.Posts") }}
         </div>
       </FtFlexBox>
       <SubscriptionsVideos
@@ -87,7 +114,7 @@
         id="subscriptionsPanel"
         role="tabpanel"
       />
-      <SubscriptionsCommunity
+      <SubscriptionsPosts
         v-else-if="currentTab === 'community'"
         id="subscriptionsPanel"
         role="tabpanel"
@@ -103,14 +130,15 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, ref, watch } from 'vue'
 
 import FtCard from '../../components/ft-card/ft-card.vue'
 import FtFlexBox from '../../components/ft-flex-box/ft-flex-box.vue'
-import SubscriptionsVideos from '../../components/subscriptions-videos/subscriptions-videos.vue'
-import SubscriptionsLive from '../../components/subscriptions-live/subscriptions-live.vue'
-import SubscriptionsShorts from '../../components/subscriptions-shorts/subscriptions-shorts.vue'
-import SubscriptionsCommunity from '../../components/subscriptions-community/subscriptions-community.vue'
+import SubscriptionsVideos from '../../components/SubscriptionsVideos.vue'
+import SubscriptionsLive from '../../components/SubscriptionsLive.vue'
+import SubscriptionsShorts from '../../components/SubscriptionsShorts.vue'
+import SubscriptionsPosts from '../../components/SubscriptionsPosts.vue'
 
 import store from '../../store/index'
 

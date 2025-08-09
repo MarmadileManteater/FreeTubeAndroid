@@ -18,6 +18,7 @@ const isDevMode = process.env.NODE_ENV === 'development'
 
 const { version: swiperVersion } = JSON.parse(fs.readFileSync(path.join(__dirname, '../node_modules/swiper/package.json')))
 
+/** @type {import('webpack').Configuration} */
 const config = {
   name: 'web',
   mode: process.env.NODE_ENV,
@@ -102,6 +103,11 @@ const config = {
         }
       },
     ],
+    generator: {
+      json: {
+        JSONParse: false
+      }
+    }
   },
   // webpack defaults to only optimising the production builds, so having this here is fine
   optimization: {
@@ -119,6 +125,7 @@ const config = {
   },
   plugins: [
     new webpack.DefinePlugin({
+      'process.platform': 'undefined',
       'process.env.IS_ELECTRON': false,
       'process.env.IS_ELECTRON_MAIN': false,
       'process.env.SUPPORTS_LOCAL_API': false,
@@ -161,10 +168,6 @@ const config = {
 
       // change to "shaka-player.ui.debug.js" to get debug logs (update jsconfig to get updated types)
       'shaka-player$': 'shaka-player/dist/shaka-player.ui.js',
-    },
-    fallback: {
-      'fs/promises': path.resolve(__dirname, '_empty.js'),
-      path: require.resolve('path-browserify'),
     },
     extensions: ['.js', '.vue']
   },

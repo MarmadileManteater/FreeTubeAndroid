@@ -45,7 +45,7 @@ The APK uses a built in extractor to grab and serve data / videos, and can optio
 * Use YouTube without Google tracking you using cookies and JavaScript
 * Subscribe to channels without an account
 * Connect to an externally setup proxy such as Tor
-* View and search your local subscriptions, history, and saved videos
+* View and search your local subscriptions, playlists and history
 * Organize your subscriptions into "Profiles" to create a more focused feed
 * Export & import subscriptions
 * Youtube Trending

@@ -60,7 +60,7 @@
 .navOption .navLabel {
   margin-inline-start: 40px;
   overflow: hidden;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .navOption:hover,
@@ -94,7 +94,7 @@
 .navChannel .navLabel {
   overflow: hidden;
   margin-inline-start: 40px;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   font-size: 12px;
 }
 
@@ -249,3 +249,17 @@
     inline-size: 100%;
   }
 }
+
+@media only screen and (width <= 400px) {
+  /* Hide settings so that they appear in the more dropdown on smaller screens */
+  .smallMobileOnlyHidden {
+    display: none;
+  }
+}
+
+@media only screen and (width > 400px) {
+  .smallMobileOnlyHidden {
+    display: block;
+  }
+}
+

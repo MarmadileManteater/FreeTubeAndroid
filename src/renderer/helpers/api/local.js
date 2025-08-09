@@ -1,6 +1,6 @@
-import { ClientType, Innertube, Misc, Mixins, Parser, UniversalCache, Utils, YT, YTNodes } from 'youtubei.js'
+import { ClientType, Innertube, Misc, Parser, UniversalCache, Utils, YT, YTNodes } from 'youtubei.js'
 import Autolinker from 'autolinker'
-import { IpcChannels, SEARCH_CHAR_LIMIT } from '../../../constants'
+import { SEARCH_CHAR_LIMIT } from '../../../constants'
 
 import { PlayerCache } from './PlayerCache'
 import {
@@ -51,7 +51,7 @@ async function createInnertube({ withPlayer = false, location = undefined, safet
     // This setting is enabled by default and results in YouTube.js reusing the same session across different Innertube instances.
     // That behavior is highly undesirable for FreeTube, as we want to create a new session every time to limit tracking.
     enable_session_cache: false,
-    retrieve_innertube_config: false,
+    retrieve_innertube_config: !generateSessionLocally,
     user_agent: navigator.userAgent,
 
     retrieve_player: !!withPlayer,
@@ -60,7 +60,13 @@ async function createInnertube({ withPlayer = false, location = undefined, safet
     client_type: clientType,
 
     // use browser fetch
-    fetch: (input, init) => fetch(input, init),
+    fetch: (input, init) => {
+      if (input.url?.startsWith('https://www.youtube.com/youtubei/v1/player')) {
+        init.body = init.body.replace('"videoId":', '"params":"8AEB","videoId":')
+      }
+
+      return fetch(input, init)
+    },
     cache,
     generate_session_locally: !!generateSessionLocally
   })
@@ -201,23 +207,19 @@ export async function getLocalSearchContinuation(continuationData) {
 export async function getLocalVideoInfo(id) {
   const webInnertube = await createInnertube({ withPlayer: true, generateSessionLocally: false })
 
-  // based on the videoId (added to the body of the /player request)
+  // based on the videoId (added to the body of the /player request and to caption URLs)
   let contentPoToken
   // based on the visitor data (added to the streaming URLs)
   let sessionPoToken
 
   if (process.env.IS_ELECTRON) {
-    const { ipcRenderer } = require('electron')
-
     try {
-      ({ contentPoToken, sessionPoToken } = await ipcRenderer.invoke(
-        IpcChannels.GENERATE_PO_TOKENS,
+      ({ contentPoToken, sessionPoToken } = await window.ftElectron.generatePoTokens(
         id,
         webInnertube.session.context.client.visitorData,
         JSON.stringify(webInnertube.session.context)
       ))
 
-      webInnertube.session.po_token = contentPoToken
       webInnertube.session.player.po_token = sessionPoToken
     } catch (error) {
       console.error('Local API, poToken generation failed', error)
@@ -233,14 +235,18 @@ export async function getLocalVideoInfo(id) {
     webInnertube.session.player.po_token = sessionPoToken
   }
 
-  const info = await webInnertube.getInfo(id)
+  let clientName = webInnertube.session.context.client.clientName
+
+  const info = await webInnertube.getInfo(id, { po_token: contentPoToken })
 
   // temporary workaround for SABR-only responses
-  const mwebInfo = await webInnertube.getBasicInfo(id, 'MWEB')
+  const mwebInfo = await webInnertube.getBasicInfo(id, { client: 'MWEB', po_token: contentPoToken })
 
   if (mwebInfo.playability_status.status === 'OK' && mwebInfo.streaming_data) {
     info.playability_status = mwebInfo.playability_status
     info.streaming_data = mwebInfo.streaming_data
+
+    clientName = 'MWEB'
   }
 
   let hasTrailer = info.has_trailer
@@ -254,16 +260,12 @@ export async function getLocalVideoInfo(id) {
     const webEmbeddedInnertube = await createInnertube({ clientType: ClientType.WEB_EMBEDDED })
     webEmbeddedInnertube.session.context.client.visitorData = webInnertube.session.context.client.visitorData
 
-    if (contentPoToken) {
-      webEmbeddedInnertube.session.po_token = contentPoToken
-    }
-
     const videoId = hasTrailer && trailerIsAgeRestricted ? info.playability_status.error_screen.video_id : id
 
     // getBasicInfo needs the signature timestamp (sts) from inside the player
     webEmbeddedInnertube.session.player = webInnertube.session.player
 
-    const bypassedInfo = await webEmbeddedInnertube.getBasicInfo(videoId, 'WEB_EMBEDDED')
+    const bypassedInfo = await webEmbeddedInnertube.getBasicInfo(videoId, { client: 'WEB_EMBEDDED', po_token: contentPoToken })
 
     if (bypassedInfo.playability_status.status === 'OK' && bypassedInfo.streaming_data) {
       info.playability_status = bypassedInfo.playability_status
@@ -275,6 +277,8 @@ export async function getLocalVideoInfo(id) {
 
       hasTrailer = false
       trailerIsAgeRestricted = false
+
+      clientName = webEmbeddedInnertube.session.context.client.clientName
     }
   }
 
@@ -283,15 +287,16 @@ export async function getLocalVideoInfo(id) {
     return info
   }
 
-  if (hasTrailer) {
-    /** @type {import('youtubei.js').YTNodes.PlayerLegacyDesktopYpcTrailer} */
-    const trailerScreen = info.playability_status.error_screen
+  if (hasTrailer && info.playability_status.status !== 'OK') {
+    const trailerInfo = info.getTrailerInfo()
 
-    const trailerInfo = new Mixins.MediaInfo([{ data: trailerScreen.trailer.player_response }])
+    // don't override the timestamp of when the video will premiere for upcoming videos
+    if (info.playability_status.status !== 'LIVE_STREAM_OFFLINE') {
+      info.basic_info.start_timestamp = trailerInfo.basic_info.start_timestamp
+    }
 
     info.playability_status = trailerInfo.playability_status
     info.streaming_data = trailerInfo.streaming_data
-    info.basic_info.start_timestamp = trailerInfo.basic_info.start_timestamp
     info.basic_info.duration = trailerInfo.basic_info.duration
     info.captions = trailerInfo.captions
     info.storyboards = trailerInfo.storyboards
@@ -322,6 +327,30 @@ export async function getLocalVideoInfo(id) {
   } catch (ex) {
     // pass when legacy formats fail
     console.warn(ex)
+  }
+
+  if (info.captions?.caption_tracks) {
+    for (const captionTrack of info.captions.caption_tracks) {
+      const url = new URL(captionTrack.base_url)
+
+      url.searchParams.set('potc', '1')
+      url.searchParams.set('pot', contentPoToken)
+      url.searchParams.set('c', clientName)
+
+      captionTrack.base_url = url.toString()
+    }
+  }
+
+  if (info.captions?.caption_tracks) {
+    for (const captionTrack of info.captions.caption_tracks) {
+      const url = new URL(captionTrack.base_url)
+
+      url.searchParams.set('potc', '1')
+      url.searchParams.set('pot', contentPoToken)
+      url.searchParams.set('c', clientName)
+
+      captionTrack.base_url = url.toString()
+    }
   }
 
   return info
@@ -356,7 +385,11 @@ function decipherFormats(formats, player) {
   }
 }
 
-export async function getLocalChannelId(url) {
+/**
+ * @param {string} url
+ * @param {boolean} doLogError
+ */
+export async function getLocalChannelId(url, doLogError = false) {
   try {
     const innertube = await createInnertube()
 
@@ -371,11 +404,16 @@ export async function getLocalChannelId(url) {
       } else if (navigationEndpoint.metadata.page_type === 'WEB_PAGE_TYPE_UNKNOWN' && navigationEndpoint.payload.url?.startsWith('https://www.youtube.com/')) {
         // handle redirects like https://www.youtube.com/@wanderbots, which resolves to https://www.youtube.com/Wanderbots, which we need to resolve again
         url = navigationEndpoint.payload.url
-      } else {
-        return null
+      } else if (navigationEndpoint.payload.browseId === 'FEpost_detail') {
+        // convert base64 params to string and get the channelid
+        return atob(navigationEndpoint.payload.params).replaceAll(/[^\d\sA-Za-z-]/g, ' ').trim().split(' ').at(-1)
       }
     }
-  } catch { }
+  } catch (e) {
+    if (doLogError) {
+      console.error(e)
+    }
+  }
 
   return null
 }
@@ -515,7 +553,7 @@ export async function getLocalChannelCommunity(id) {
   try {
     const response = await innertube.actions.execute('/browse', {
       browseId: id,
-      params: 'Egljb21tdW5pdHnyBgQKAkoA'
+      params: 'EgVwb3N0c_IGBAoCSgA%3D'
       // protobuf for the community tab (this is the one that YouTube uses,
       // it has some empty fields in the protobuf but it doesn't work if you remove them)
     })
@@ -524,7 +562,7 @@ export async function getLocalChannelCommunity(id) {
 
     // if the channel doesn't have a community tab, YouTube returns the home tab instead
     // so we need to check that we got the right tab
-    if (communityTab.current_tab?.endpoint.metadata.url?.endsWith('/community')) {
+    if (communityTab.current_tab?.endpoint.metadata.url?.endsWith('/posts')) {
       return parseLocalCommunityPosts(communityTab.posts)
     } else {
       return []
@@ -760,17 +798,24 @@ export function parseLocalChannelHeader(channel, onlyIdNameThumbnail = false) {
  * @param {string} channelName
  */
 export function parseLocalChannelVideos(videos, channelId, channelName) {
-  const parsedVideos = videos.map(parseLocalListVideo)
+  const parsedVideos = []
 
-  // fix empty author info
-  parsedVideos.forEach(video => {
-    video.author = channelName
-    video.authorId = channelId
-  })
+  for (const video of videos) {
+    // `BADGE_STYLE_TYPE_MEMBERS_ONLY` used for both `members only` and `members first` videos
+    if (video.is(YTNodes.Video) && video.badges.some(badge => badge.style === 'BADGE_STYLE_TYPE_MEMBERS_ONLY')) {
+      continue
+    }
+    parsedVideos.push(parseLocalListVideo(video, channelId, channelName))
+  }
 
   return parsedVideos
 }
 
+/**
+ * @param {YTNodes.ReelItem | YTNodes.ShortsLockupView} short
+ * @param {string} [channelId]
+ * @param {string} [channelName]
+ */
 export function parseShort(short, channelId, channelName) {
   if (short.type === 'ReelItem') {
     /** @type {import('youtubei.js').YTNodes.ReelItem} */
@@ -803,8 +848,8 @@ export function parseShort(short, channelId, channelName) {
 
 /**
  * @param {(import('youtubei.js').YTNodes.ReelItem | import('youtubei.js').YTNodes.ShortsLockupView)[]} shorts
- * @param {string} channelId
- * @param {string} channelName
+ * @param {string} [channelId]
+ * @param {string} [channelName]
  */
 export function parseLocalChannelShorts(shorts, channelId, channelName) {
   return shorts.map(short => parseShort(short, channelId, channelName))
@@ -911,8 +956,10 @@ function handleSearchResponse(response) {
 
 /**
  * @param {import('youtubei.js').YT.Channel} homeTab
+ * @param {string} [channelId]
+ * @param {string} [channelName]
  */
-export function parseChannelHomeTab(homeTab) {
+export function parseChannelHomeTab(homeTab, channelId, channelName) {
   /**
    * @type {import('youtubei.js').YTNodes.ItemSection | import('youtubei.js').YTNodes.RichSection}
    */
@@ -934,7 +981,7 @@ export function parseChannelHomeTab(homeTab) {
         if (!playlistId || !playlistId.startsWith('UUMO')) {
           shelves.push({
             title: shelf.title.text,
-            content: shelf.content.items.map(parseListItem).filter(_ => _),
+            content: shelf.content.items.map((item) => parseListItem(item, channelId, channelName)).filter(_ => _),
             playlistId,
             subtitle: shelf.subtitle?.text
           })
@@ -944,14 +991,14 @@ export function parseChannelHomeTab(homeTab) {
         const shelf = itemSection.contents.at(0)
         shelves.push({
           title: shelf.title.text,
-          content: shelf.items.map(parseListItem).filter(_ => _)
+          content: shelf.items.map((item) => parseListItem(item, channelId, channelName)).filter(_ => _)
         })
       } else if (itemSection.contents.at(0).type === 'HorizontalCardList') {
         /** @type {import('youtubei.js').YTNodes.HorizontalCardList} */
         const shelf = itemSection.contents.at(0)
         shelves.push({
           title: shelf.header.title.text,
-          content: shelf.cards.map(parseListItem).filter(_ => _),
+          content: shelf.cards.map((item) => parseListItem(item, channelId, channelName)).filter(_ => _),
           subtitle: shelf.header.subtitle.text
         })
       }
@@ -961,7 +1008,7 @@ export function parseChannelHomeTab(homeTab) {
         const shelf = section.content
         shelves.push({
           title: shelf.title?.text,
-          content: shelf.contents.map(e => parseListItem(e.content)),
+          content: shelf.contents.map(e => parseListItem(e.content, channelId, channelName)),
           subtitle: shelf.subtitle?.text,
           playlistId: shelf.endpoint?.metadata.url.includes('/playlist') ? shelf.endpoint?.metadata.url.replace('/playlist?list=', '') : null
         })
@@ -1097,8 +1144,10 @@ export function parseLocalPlaylistVideo(video) {
 
 /**
  * @param {import('youtubei.js').YTNodes.Video | import('youtubei.js').YTNodes.Movie} item
+ * @param {string} [channelId]
+ * @param {string} [channelName]
  */
-export function parseLocalListVideo(item) {
+export function parseLocalListVideo(item, channelId, channelName) {
   if (item.type === 'Movie') {
     /** @type {import('youtubei.js').YTNodes.Movie} */
     const movie = item
@@ -1107,8 +1156,8 @@ export function parseLocalListVideo(item) {
       type: 'video',
       videoId: movie.id,
       title: movie.title.text,
-      author: movie.author.name,
-      authorId: movie.author.id !== 'N/A' ? movie.author.id : null,
+      author: movie.author.name !== 'N/A' ? movie.author.name : channelName,
+      authorId: movie.author.id !== 'N/A' ? movie.author.id : channelId,
       description: movie.description_snippet?.text,
       lengthSeconds: isNaN(movie.duration.seconds) ? '' : movie.duration.seconds,
       liveNow: false,
@@ -1124,6 +1173,8 @@ export function parseLocalListVideo(item) {
       publishedText = video.published.text
     }
 
+    const isLive = video.duration.text === 'LIVE'
+
     const published = calculatePublishedDate(
       publishedText,
       video.is_live,
@@ -1135,13 +1186,14 @@ export function parseLocalListVideo(item) {
       type: 'video',
       videoId: video.video_id,
       title: video.title.text,
-      author: video.author?.name,
-      authorId: video.author?.id,
+      author: video.author?.name ?? channelName,
+      authorId: video.author?.id ?? channelId,
       viewCount: video.views.text == null ? null : extractNumberFromString(video.views.text),
       published,
-      lengthSeconds: Utils.timeToSeconds(video.duration.text),
+      lengthSeconds: isLive ? '' : Utils.timeToSeconds(video.duration.text),
       isUpcoming: video.is_upcoming,
-      premiereDate: video.upcoming
+      premiereDate: video.upcoming,
+      liveNow: isLive
     }
   } else if (item.type === 'GridMovie') {
     /** @type {import('youtubei.js').YTNodes.GridMovie} */
@@ -1150,8 +1202,8 @@ export function parseLocalListVideo(item) {
       type: 'video',
       videoId: movie.id,
       title: movie.title.text,
-      author: movie.author.name,
-      authorId: movie.author.id !== 'N/A' ? movie.author.id : null,
+      author: movie.author.name !== 'N/A' ? movie.author.name : channelName,
+      authorId: movie.author.id !== 'N/A' ? movie.author.id : channelId,
       lengthSeconds: isNaN(movie.duration.seconds) ? '' : movie.duration.seconds,
       isUpcoming: movie.is_upcoming,
       premiereDate: movie.upcoming
@@ -1185,8 +1237,8 @@ export function parseLocalListVideo(item) {
       type: 'video',
       videoId: video.video_id,
       title: video.title.text,
-      author: video.author.name,
-      authorId: video.author.id,
+      author: video.author.name !== 'N/A' ? video.author.name : channelName,
+      authorId: video.author.id !== 'N/A' ? video.author.id : channelId,
       description: video.description,
       viewCount,
       published,
@@ -1244,6 +1296,52 @@ function parseLockupView(lockupView, channelId = undefined, channelName = undefi
         videoCount: extractNumberFromString(thumbnailOverlayBadgeView.badges[0].text)
       }
     }
+    case 'VIDEO': {
+      let publishedText
+      let lengthSeconds = ''
+      let liveNow = false
+
+      /** @type {YTNodes.ThumbnailOverlayBadgeView | undefined} */
+      const thumbnailOverlayBadgeView = lockupView.content_image?.overlays?.firstOfType(YTNodes.ThumbnailOverlayBadgeView)
+
+      if (thumbnailOverlayBadgeView) {
+        if (thumbnailOverlayBadgeView.badges.some(badge => badge.badge_style === 'THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE')) {
+          liveNow = true
+        } else {
+          const durationBadge = thumbnailOverlayBadgeView.badges.find(badge => /^[\d:]+$/.test(badge.text))
+
+          if (durationBadge) {
+            lengthSeconds = Utils.timeToSeconds(durationBadge.text)
+          }
+
+          publishedText = lockupView.metadata.metadata?.metadata_rows[1].metadata_parts?.[1].text?.text
+        }
+      }
+
+      let viewCount = null
+
+      const viewsText = lockupView.metadata.metadata?.metadata_rows[1]?.metadata_parts?.[0].text?.text
+
+      if (viewsText) {
+        const views = parseLocalSubscriberCount(viewsText)
+
+        if (!isNaN(views)) {
+          viewCount = views
+        }
+      }
+
+      return {
+        type: 'video',
+        videoId: lockupView.content_id,
+        title: lockupView.metadata.title.text,
+        author: lockupView.metadata.metadata?.metadata_rows[0].metadata_parts?.[0].text?.text,
+        authorId: lockupView.metadata.image?.renderer_context?.command_context?.on_tap?.payload.browseId,
+        viewCount,
+        published: calculatePublishedDate(publishedText, liveNow),
+        lengthSeconds,
+        liveNow
+      }
+    }
     default:
       console.warn(`Unknown lockup content type: ${lockupView.content_type}`, lockupView)
       return null
@@ -1252,15 +1350,17 @@ function parseLockupView(lockupView, channelId = undefined, channelName = undefi
 
 /**
  * @param {import('youtubei.js').Helpers.YTNode} item
+ * @param {string} [channelId]
+ * @param {string} [channelName]
  */
-function parseListItem(item) {
+function parseListItem(item, channelId, channelName) {
   switch (item.type) {
     case 'Movie':
     case 'Video':
     case 'GridVideo':
     case 'GridMovie':
     case 'VideoCard':
-      return parseLocalListVideo(item)
+      return parseLocalListVideo(item, channelId, channelName)
     case 'GameCard': {
       /** @type {import('youtubei.js').YTNodes.GameCard} */
       const channel = item
@@ -1281,7 +1381,10 @@ function parseListItem(item) {
       let subscribers = null
       let videos = null
 
-      subscribers = parseLocalSubscriberCount(channel.subscribers.text)
+      if (channel.subscribers?.text) {
+        subscribers = parseLocalSubscriberCount(channel.subscribers.text)
+      }
+
       videos = extractNumberFromString(channel.video_count.text)
 
       return {
@@ -1346,44 +1449,57 @@ function parseListItem(item) {
     }
     case 'ReelItem':
     case 'ShortsLockupView': {
-      return parseShort(item)
+      return parseShort(item, channelId, channelName)
     }
     case 'CompactStation':
     case 'GridPlaylist':
     case 'Playlist': {
-      return parseLocalListPlaylist(item)
+      return parseLocalListPlaylist(item, channelId, channelName)
     }
     case 'Post': {
       return parseLocalCommunityPost(item)
     }
     case 'LockupView':
-      return parseLockupView(item)
+      return parseLockupView(item, channelId, channelName)
   }
 }
 
 /**
- * @param {import('youtubei.js').YTNodes.CompactVideo} video
+ * @param {YTNodes.CompactVideo | YTNodes.CompactMovie | YTNodes.LockupView} video
  */
 export function parseLocalWatchNextVideo(video) {
-  let publishedText
+  if (video.is(YTNodes.CompactMovie)) {
+    return {
+      type: 'video',
+      videoId: video.id,
+      title: video.title.text,
+      author: video.author.name,
+      authorId: video.author.id,
+      lengthSeconds: video.duration.seconds
+    }
+  } else if (video.is(YTNodes.LockupView)) {
+    return parseLockupView(video)
+  } else {
+    let publishedText
 
-  if (video.published != null && !video.published.isEmpty()) {
-    publishedText = video.published.text
-  }
+    if (video.published != null && !video.published.isEmpty()) {
+      publishedText = video.published.text
+    }
 
-  const published = calculatePublishedDate(publishedText, video.is_live, video.is_premiere)
+    const published = calculatePublishedDate(publishedText, video.is_live, video.is_premiere)
 
-  return {
-    type: 'video',
-    videoId: video.video_id,
-    title: video.title.text,
-    author: video.author.name,
-    authorId: video.author.id,
-    viewCount: video.view_count == null ? null : extractNumberFromString(video.view_count.text),
-    published,
-    lengthSeconds: isNaN(video.duration.seconds) ? '' : video.duration.seconds,
-    liveNow: video.is_live,
-    isUpcoming: video.is_premiere
+    return {
+      type: 'video',
+      videoId: video.video_id,
+      title: video.title.text,
+      author: video.author.name,
+      authorId: video.author.id,
+      viewCount: video.view_count == null ? null : extractNumberFromString(video.view_count.text),
+      published,
+      lengthSeconds: isNaN(video.duration.seconds) ? '' : video.duration.seconds,
+      liveNow: video.is_live,
+      isUpcoming: video.is_premiere
+    }
   }
 }
 
@@ -1574,6 +1690,8 @@ export function parseLocalComment(comment, commentThread = undefined) {
     hasReplyToken = true
   }
 
+  const commentTextRuns = comment.voice_reply_container?.transcript_text ? comment.voice_reply_container.transcript_text.runs : comment.content.runs
+
   return {
     id: comment.comment_id,
     dataType: 'local',
@@ -1584,7 +1702,7 @@ export function parseLocalComment(comment, commentThread = undefined) {
     isPinned: comment.is_pinned,
     isOwner: !!comment.author_is_channel_owner,
     isMember: !!comment.is_member,
-    text: Autolinker.link(parseLocalTextRuns(comment.content.runs, 16, { looseChannelNameDetection: true })),
+    text: Autolinker.link(parseLocalTextRuns(commentTextRuns, 16, { looseChannelNameDetection: true })),
     isHearted: !!comment.is_hearted,
     hasOwnerReplied,
     hasReplyToken,
@@ -1738,4 +1856,24 @@ function parseLocalAttachment(attachment) {
 export async function getHashtagLocal(hashtag) {
   const innertube = await createInnertube()
   return await innertube.getHashtag(hashtag)
+}
+
+export async function getLocalCommunityPost(postId, channelId) {
+  const innertube = await createInnertube()
+  if (channelId == null) {
+    channelId = await getLocalChannelId('https://www.youtube.com/post/' + postId, true)
+  }
+
+  const postPage = await innertube.getPost(postId, channelId)
+  return parseLocalCommunityPost(postPage.posts[0])
+}
+
+/**
+ * @param {string} postId
+ * @param {string} channelId
+ */
+export async function getLocalCommunityPostComments(postId, channelId) {
+  const innertube = await createInnertube()
+
+  return await innertube.getPostComments(postId, channelId)
 }

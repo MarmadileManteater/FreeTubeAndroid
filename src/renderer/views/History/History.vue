@@ -8,15 +8,22 @@
       v-show="!isLoading"
       class="card"
     >
-      <h2>{{ $t("History.History") }}</h2>
+      <h2>
+        <FontAwesomeIcon
+          :icon="['fas', 'history']"
+          class="headingIcon"
+          fixed-width
+        />
+        {{ $t("History.History") }}
+      </h2>
       <ft-input
-        v-show="fullData.length > 0"
+        v-show="fullData.length > 1"
         ref="searchBar"
         :placeholder="$t('History.Search bar placeholder')"
         :show-clear-text-button="true"
         :show-action-button="false"
         :value="query"
-        @input="(input) => handleQueryChange(input)"
+        @input="handleQueryChange"
         @clear="() => handleQueryChange('')"
       />
       <div
@@ -28,6 +35,16 @@
           :compact="true"
           :default-value="doCaseSensitiveSearch"
           @change="doCaseSensitiveSearch = !doCaseSensitiveSearch"
+        />
+        <ft-select
+          v-if="fullData.length > 1"
+          class="sortSelect"
+          :placeholder="$t('Global.Sort By')"
+          :value="sortBy"
+          :select-names="sortByNames"
+          :select-values="sortByValues"
+          :icon="getIconForSortPreference(sortBy)"
+          @change="sortBy = $event"
         />
       </div>
       <ft-flex-box

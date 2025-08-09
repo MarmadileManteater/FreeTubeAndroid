@@ -1,16 +1,23 @@
 <template>
   <div>
     <ft-card class="card">
-      <h2>{{ $t('Channels.Title') }}</h2>
+      <h2>
+        <FontAwesomeIcon
+          :icon="['fas', 'user-check']"
+          class="headingIcon"
+          fixed-width
+        />
+        {{ $t('Channels.Title') }}
+      </h2>
       <ft-input
-        v-show="subscribedChannels.length > 0"
+        v-show="subscribedChannels.length > 1"
         ref="searchBarChannels"
         :placeholder="$t('Channels.Search bar placeholder')"
         :value="query"
         :show-clear-text-button="true"
         :show-action-button="false"
         :maxlength="255"
-        @input="(input) => handleQueryChange(input)"
+        @input="handleQueryChange"
         @clear="() => handleQueryChange('')"
       />
       <ft-flex-box
@@ -74,6 +81,7 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { isNavigationFailure, NavigationFailureType } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router/composables'

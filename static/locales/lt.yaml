@@ -1,8 +1,5 @@
 # Put the name of your locale in the same language
 Locale Name: 'lietuvių'
-# Currently on Subscriptions, Playlists, and History
-'This part of the app is not ready yet. Come back later when progress has been made.': >-
-  Ši programėlės dalis dar neparengta. Grįžkite vėliau, kai bus padaryta pažanga.
 
 # Webkit Menu Bar
 File: 'Failas'
@@ -36,7 +33,7 @@ Global:
 
   Live: Tiesiogiai
   Shorts: Šortai
-  Community: Bendruomenė
+  Posts: Įrašai
   Sort By: 'Rūšiuoti pagal'
   Counts:
     Subscriber Count: 1 prenumeruoti | {count} prenumeratorių
@@ -307,7 +304,6 @@ Settings:
       Naudodami Paskutinį Žiūrėtą Grojaraštį
   Subscription Settings:
     Subscription Settings: 'Prenumeratų nustatymai'
-    Hide Videos on Watch: 'Slėpti vaizdo įrašus po peržiūros'
     Fetch Feeds from RSS: 'Gauti kanalus iš RSS'
     Fetch Automatically: Gauti sklaidos kanalą automatiškai
   Distraction Free Settings:
@@ -326,6 +322,7 @@ Settings:
     Hide Comments: Slėpti komentarus
     Hide Live Streams: Slėpti tiesiogines transliacijas
     Hide Sharing Actions: Slėpti bendrinimo veiksmus
+    Hide Videos on Watch: 'Slėpti vaizdo įrašus po peržiūros'
     Hide Chapters: Slėpti skirsnius
     Hide Upcoming Premieres: Slėpti būsimas premjeras
     Sections:
@@ -339,7 +336,6 @@ Settings:
     Hide Channels Placeholder: Kanalo pavadinimas arba ID
     Hide Featured Channels: Slėpti Teminiai kanalai
     Hide Channel Playlists: Slėpti Kanalo Grojaraščiai
-    Hide Channel Community: Slėpti Kanalo Bendruomenę
     Hide Channel Shorts: Slėpti Kanalo Šortus
   Data Settings:
     Data Settings: 'Duomenų nustatymai'
@@ -786,3 +782,12 @@ Clipboard:
 Preferences: Nuostatos
 Go to page: Eiti į {page}
 Close Banner: Uždaryti baneris
+Search Listing:
+  Label:
+    4K: 4K
+    8K: 8K
+KeyboardShortcutPrompt:
+  Toggle Developer Tools: Įjungti kūrėjo įrankius
+  Zoom In: Pritraukti
+  Zoom Out: Atitolinti
+  Fullscreen: Viso ekrano rėžimas

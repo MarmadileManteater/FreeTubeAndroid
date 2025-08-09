@@ -24,6 +24,7 @@ const processLocalesPlugin = new ProcessLocalesPlugin({
   outputDir: 'static/locales',
 })
 
+/** @type {import('webpack').Configuration} */
 const config = {
   name: 'renderer',
   mode: process.env.NODE_ENV,
@@ -38,7 +39,7 @@ const config = {
     level: isDevMode ? 'info' : 'none'
   },
   output: {
-    libraryTarget: 'commonjs2',
+    scriptType: 'text/javascript',
     path: path.join(__dirname, '../dist'),
     filename: '[name].js',
   },
@@ -107,6 +108,11 @@ const config = {
         }
       },
     ],
+    generator: {
+      json: {
+        JSONParse: false
+      }
+    }
   },
   // webpack defaults to only optimising the production builds, so having this here is fine
   optimization: {
@@ -122,6 +128,7 @@ const config = {
   plugins: [
     processLocalesPlugin,
     new webpack.DefinePlugin({
+      'process.platform': `'${process.platform}'`,
       'process.env.IS_ELECTRON': true,
       'process.env.IS_ELECTRON_MAIN': false,
       'process.env.SUPPORTS_LOCAL_API': true,
@@ -184,7 +191,7 @@ const config = {
     },
     extensions: ['.js', '.vue']
   },
-  target: 'electron-renderer',
+  target: 'web',
 }
 
 if (isDevMode) {

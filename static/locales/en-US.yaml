@@ -1,8 +1,5 @@
 # Put the name of your locale in the same language
 Locale Name: English (US)
-# Currently on Subscriptions, Playlists, and History
-'This part of the app is not ready yet. Come back later when progress has been made.': >-
-  This part of the app is not ready yet. Come back later when progress has been made.
 
 # Webkit Menu Bar
 File: File
@@ -47,7 +44,7 @@ Global:
   Videos: Videos
   Shorts: Shorts
   Live: Live
-  Community: Community
+  Posts: Posts
   Sort By: Sort By
   Counts:
     Video Count: 1 video | {count} videos
@@ -121,6 +118,7 @@ Search Filters:
   Fetching results. Please wait: Fetching results. Please wait
   Fetch more results: Fetch more results
   There are no more results for this search: There are no more results for this search
+  Clear Filters: Clear Filters
 # Sidebar
 Subscriptions:
     # On Subscriptions Page
@@ -195,6 +193,8 @@ User Playlists:
   Cannot delete the quick bookmark target playlist.: Cannot delete the quick bookmark target playlist.
   Are you sure you want to delete this playlist? This cannot be undone: Are you sure you want to delete this playlist? This cannot be undone.
 
+  TotalTimePlaylist: "Total time: {duration}"
+
   Sort By:
     NameAscending: 'A-Z'
     NameDescending: 'Z-A'
@@ -265,6 +265,8 @@ History:
   Empty Search Message: There are no videos in your history that match your search
   Search bar placeholder: "Search in History"
   Case Sensitive Search: Case Sensitive Search
+  DateOldestHistory: Earliest Watched First
+  DateNewestHistory: Latest Watched First
 Settings:
   # On Settings Page
   Settings: Settings
@@ -340,6 +342,12 @@ Settings:
       Gruvbox Light: Gruvbox Light
       Solarized Dark: Solarized Dark
       Solarized Light: Solarized Light
+      Everforest Dark Hard: Everforest Dark Hard
+      Everforest Dark Medium: Everforest Dark Medium
+      Everforest Dark Low: Everforest Dark Low
+      Everforest Light Hard: Everforest Light Hard
+      Everforest Light Medium: Everforest Light Medium
+      Everforest Light Low: Everforest Light Low
     Main Color Theme:
       Main Color Theme: Main Color Theme
       Red: Red
@@ -411,6 +419,20 @@ Settings:
       Solarized Blue: Solarized Blue
       Solarized Cyan: Solarized Cyan
       Solarized Green: Solarized Green
+      Everforest Dark Red: Everforest Dark Red
+      Everforest Dark Orange: Everforest Dark Orange
+      Everforest Dark Yellow: Everforest Dark Yellow
+      Everforest Dark Green: Everforest Dark Green
+      Everforest Dark Aqua: Everforest Dark Aqua
+      Everforest Dark Blue: Everforest Dark Blue
+      Everforest Dark Purple: Everforest Dark Purple
+      Everforest Light Red: Everforest Light Red
+      Everforest Light Orange: Everforest Light Orange
+      Everforest Light Yellow: Everforest Light Yellow
+      Everforest Light Green: Everforest Light Green
+      Everforest Light Aqua: Everforest Light Aqua
+      Everforest Light Blue: Everforest Light Blue
+      Everforest Light Purple: Everforest Light Purple
     Secondary Color Theme: Secondary Color Theme
         #* Main Color Theme
   Player Settings:
@@ -484,6 +506,13 @@ Settings:
     Remember History: Remember Watch History
     Remember Search History: Remember Search History
     Save Watched Progress: Save Watched Progress
+    Watched Progress Saving Mode:
+      Modes:
+        Auto: Auto
+        Semi-auto: Semi-auto
+        Never: Never
+      Tooltip:
+        Auto = Save on every video page exit, when video ended and error encountered (e.g. ratelimited and watch session expired). Semi-auto = Like Auto except on video page exit and can save progress manually via a button called Save Watched Progress, located beneath the video player.
     Save Watched Videos With Last Viewed Playlist: Save Watched Videos With Last Viewed Playlist
     Clear Search History and Cache: Clear Search History and Cache
     Are you sure you want to clear out your search history and cache?: Are you sure you want to
@@ -502,7 +531,6 @@ Settings:
     Are you sure you want to remove all your playlists?: Are you sure you want to remove all your playlists?
   Subscription Settings:
     Subscription Settings: Subscription
-    Hide Videos on Watch: Hide Videos on Watch
     Fetch Feeds from RSS: Fetch Feeds from RSS
     Fetch Automatically: Fetch Feed Automatically
     'Limit the number of videos displayed for each channel': 'Limit the number of videos displayed for each channel'
@@ -533,6 +561,7 @@ Settings:
     Hide Live Streams: Hide Live Streams
     Hide Upcoming Premieres: Hide Upcoming Premieres
     Hide Sharing Actions: Hide Sharing Actions
+    Hide Videos on Watch: Hide Videos on Watch
     Hide Chapters: Hide Chapters
     Hide Channels: Hide Videos From Channels
     Hide Channels Disabled Message: Some channels were blocked using ID and weren't processed. Feature is blocked while those IDs are updating
@@ -542,17 +571,18 @@ Settings:
     Hide Channels Already Exists: Channel ID already exists
     Hide Featured Channels: Hide Featured Channels
     Hide Channel Playlists: Hide Channel "Playlists" Tab
-    Hide Channel Community: Hide Channel "Community" Tab
+    Hide Channel Posts: Hide Channel "Posts" Tab
     Hide Channel Home: Hide Channel "Home" Tab
     Hide Channel Shorts: Hide Channel "Shorts" Tab
     Hide Channel Podcasts: Hide Channel "Podcasts" Tab
     Hide Channel Releases: Hide Channel "Releases" Tab
+    Hide Channel Courses: Hide Channel "Courses" Tab
     Hide Videos and Playlists Containing Text: Hide Videos and Playlists Containing Text
     Hide Videos and Playlists Containing Text Placeholder: Word, Word Fragment, or Phrase
     Hide Subscriptions Videos: Hide Subscriptions Videos
     Hide Subscriptions Shorts: Hide Subscriptions Shorts
     Hide Subscriptions Live: Hide Subscriptions Live
-    Hide Subscriptions Community: Hide Subscriptions Community
+    Hide Subscriptions Posts: Hide Subscriptions Posts
     Show Added Items: Show Added Items
   Data Settings:
     Data Settings: Data
@@ -569,15 +599,6 @@ Settings:
     Export History: Export History
     Import Playlists: Import Playlists
     Export Playlists: Export Playlists
-    Export Playlists For Older FreeTube Versions:
-      Label: Export Playlists For Older FreeTube Versions
-      # |- = Keep newlines, No newline at end
-      Tooltip: |-
-        This option exports videos from all playlists into one playlist named 'Favorites'.
-        How to export & import videos in playlists for an older version of FreeTube:
-        1. Export your playlists with this option enabled.
-        2. Delete all of your existing playlists using the Remove All Playlists option under Privacy Settings.
-        3. Launch the older version of FreeTube and import the exported playlists."
     Profile object has insufficient data, skipping item: Profile object has insufficient
       data, skipping item
     All subscriptions and profiles have been successfully imported: All subscriptions
@@ -637,6 +658,7 @@ Settings:
   Parental Control Settings:
     Parental Control Settings: Parental Control
     Hide Unsubscribe Button: Hide Unsubscribe Button
+    Hide Uploader on Watch page: Hide Uploader on Watch page
     Show Family Friendly Only: Show Family Friendly Only
     Hide Search Bar: Hide Search Bar
   Download Settings:
@@ -780,6 +802,9 @@ Channel:
   Releases:
     Releases: Releases
     This channel does not currently have any releases: This channel does not currently have any releases
+  Courses:
+    Courses: Courses
+    This channel does not currently have any courses: This channel does not currently have any courses
   About:
     About: About
     Channel Description: Channel Description
@@ -790,14 +815,13 @@ Channel:
     Joined: Joined
     Location: Location
     Featured Channels: Featured Channels
-  Community:
+  Posts:
     This channel currently does not have any posts: This channel currently does not have any posts
     votes: '{votes} votes'
     View Full Post: View Full Post
     Reveal Answers: Reveal Answers
     Hide Answers: Hide Answers
     Video hidden by FreeTube: Video hidden by FreeTube
-    Viewing Posts Only Supported By Invidious: Viewing Posts is only supported by Invidious. Head to a channel's community tab to view content there without Invidious.
 Video:
   IP block: 'YouTube has blocked your IP address from watching videos. Please try switching to a different VPN or proxy.'
   MembersOnly: Members-only videos cannot be watched with FreeTube as they require Google login and paid membership to the uploader's channel.
@@ -808,6 +832,8 @@ Video:
   Remove From History: Remove From History
   Video has been marked as watched: Video has been marked as watched
   Video has been removed from your history: Video has been removed from your history
+  Save Watched Progress: Save Watched Progress
+  Watched Progress Saved: Watched Progress Saved
   Save Video: Save Video
   Video has been saved: Video has been saved
   Video has been removed from your saved list: Video has been removed from your saved list
@@ -1015,7 +1041,7 @@ Tooltips:
       FreeTube will automatically attempt to use your non-preferred API as a fallback
       method when enabled.
     Thumbnail Preference: All thumbnails throughout FreeTube will be replaced with
-      a frame of the video instead of the default thumbnail.
+      a frame of the video, blurred or hidden instead of the default thumbnail.
     Invidious Instance: The Invidious instance that FreeTube will connect to for API
       calls.
     Region for Trending: The region of trends allows you to pick which country's trending
@@ -1029,7 +1055,7 @@ Tooltips:
     Proxy Videos Through Invidious: Will connect to Invidious to serve videos instead
       of making a direct connection to YouTube.
     Default Video Format: Set the formats used when a video plays. DASH formats can
-      play higher qualities. Legacy formats are limited to a max of 720p but use less
+      play higher qualities. Legacy formats are limited to a max of 360p but use less
       bandwidth. Audio formats are audio only streams.
     Scroll Playback Rate Over Video Player: While the cursor is over the video, press and
       hold the Control key (Command Key on Mac) and scroll the mouse wheel forwards or backwards to control
@@ -1054,12 +1080,13 @@ Tooltips:
        The channel ID entered must be a complete match and is case sensitive.
     Hide Subscriptions Live: 'This setting is overridden by the app-wide "{appWideSetting}" setting, in the "{subsection}" section of the "{settingsSection}"'
     Hide Videos and Playlists Containing Text: Enter a word, word fragment, or phrase (case insensitive) to hide all videos & playlists whose original titles contain it throughout all of FreeTube, excluding only History, Your Playlists, and videos inside of playlists.
+    Hide Videos on Watch: 'Hides watched videos from the Videos, Shorts, and Live tabs on the Subscription and Channel pages. This does not affect the Home tab on Channel pages'
   Subscription Settings:
     Fetch Feeds from RSS: When enabled, FreeTube will use RSS instead of its default
       method for grabbing your subscription feed. RSS is faster and prevents IP blocking,
-      but doesn't provide certain information like video duration, live status or community posts
+      but doesn't provide certain information like video duration, live status or posts
     Fetch Automatically: When enabled, FreeTube will automatically fetch
-      your subscription feed when a new window is opened and when switching profile.
+      your subscription feed on startup and when a new window is opened.
   Experimental Settings:
     Replace HTTP Cache: Disables Electron's disk based HTTP cache and enables a custom in-memory image cache. Will lead to increased RAM usage.
   SponsorBlock Settings:
@@ -1094,7 +1121,6 @@ Age Restricted:
   This channel is age restricted: This channel is age restricted
   This video is age restricted: This video is age restricted
 External link opening has been disabled in the general settings: 'External link opening has been disabled in the general settings'
-'Blocked opening potentially unsafe URL': 'Blocked opening potentially unsafe URL: "{url}".'
 Downloading has completed: '"{videoTitle}" has finished downloading'
 Starting download: 'Starting download of "{videoTitle}"'
 Downloading failed: 'There was an issue downloading "{videoTitle}"'
@@ -1183,3 +1209,7 @@ KeyboardShortcutPrompt:
   Last Chapter: Last Chapter
   Next Chapter: Next Chapter
   Skip by Tenths: Skip through video by percentage (3 skips to 30% of duration)
+  Home: Seek to the beginning of the video
+  End: Seek to the end of the video
+  Skip to Next Video: Skip to the next video in a playlist or next recommended video
+  Skip to Previous Video: Skip to the previous video in a playlist

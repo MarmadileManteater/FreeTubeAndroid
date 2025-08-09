@@ -1,9 +1,14 @@
 <template>
   <div>
     <FtCard class="card">
-      <h1>
+      <h2>
+        <FontAwesomeIcon
+          :icon="['fas', 'info-circle']"
+          class="headingIcon"
+          fixed-width
+        />
         {{ $t("About.About") }}
-      </h1>
+      </h2>
       <section class="brand">
         <FtLogoFull class="logo" />
         <div class="version">
@@ -92,7 +97,7 @@ const chunks = computed(() => [
   {
     icon: ['fas', 'comment-dots'],
     title: t('About.Chat on Matrix'),
-    content: `<a href="https://matrix.to/#/#freetube:matrix.org?via=matrix.org&via=privacytools.io&via=tchncs.de">#freetube:matrix.org</a><br>${t('About.Please read the')} <a href="https://docs.freetubeapp.io/community/matrix/">${t('About.room rules')}</a>`
+    content: `<a href="https://matrix.to/#/#freetube:matrix.org">#freetube:matrix.org</a><br>${t('About.Please read the')} <a href="https://docs.freetubeapp.io/community/matrix/">${t('About.room rules')}</a>`
   },
   {
     icon: ['fas', 'language'],
@@ -105,8 +110,13 @@ const chunks = computed(() => [
     content: `${t('About.FreeTube is made possible by')} <a href="https://docs.freetubeapp.io/credits/">${t('About.these people and projects')}</a>`
   },
   {
+    icon: ['fas', 'money-check-dollar'],
+    title: `${t('About.Donate')}`,
+    content: `<a href="https://liberapay.com/MarmadileManteater/">Liberapay</a>`
+  },
+  {
     icon: ['fab', 'bitcoin'],
-    title: `${t('About.Donate')} - BTC`,
+    title: `${t('About FTA.Donate Upstream')} - BTC`,
     content: `<a href="bitcoin:${ABOUT_BITCOIN_ADDRESS}">${ABOUT_BITCOIN_ADDRESS}</a>`
   }
 ])

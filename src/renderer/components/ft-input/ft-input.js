@@ -1,7 +1,7 @@
 import { defineComponent } from 'vue'
 import { mapActions } from 'vuex'
 
-import FtTooltip from '../ft-tooltip/ft-tooltip.vue'
+import FtTooltip from '../FtTooltip/FtTooltip.vue'
 import { isKeyboardEventKeyPrintableChar, isNullOrEmpty } from '../../helpers/strings'
 
 export default defineComponent({
@@ -158,6 +158,9 @@ export default defineComponent({
   },
   methods: {
     handleClick: function (e) {
+      const selectedValue = this.searchStateKeyboardSelectedOptionValue
+      const query = (selectedValue != null && selectedValue !== '') ? selectedValue : this.inputData
+      this.inputData = query
       // No action if no input text
       if (!this.inputDataPresent) {
         return
@@ -167,8 +170,8 @@ export default defineComponent({
       this.searchState.selectedOption = -1
       this.searchState.keyboardSelectedOptionIndex = -1
       this.removeButtonSelectedIndex = -1
-      this.$emit('input', this.inputData)
-      this.$emit('click', this.inputData, { event: e })
+      this.$emit('input', query)
+      this.$emit('click', query, { event: e })
     },
 
     handleInput: function (val) {
@@ -220,6 +223,10 @@ export default defineComponent({
             case 'channel':
             case 'hashtag':
             case 'post':
+            case 'trending':
+            case 'subscriptions':
+            case 'history':
+            case 'userplaylists':
               isYoutubeLink = true
               break
 
@@ -273,7 +280,7 @@ export default defineComponent({
      */
     handleKeyDown: function (event) {
       // Update Input box value if enter key was pressed and option selected
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && !event.isComposing) {
         if (this.removeButtonSelectedIndex !== -1) {
           this.handleRemoveClick(this.removeButtonSelectedIndex)
         } else if (this.searchState.selectedOption !== -1) {

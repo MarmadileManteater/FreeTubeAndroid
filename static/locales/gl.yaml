@@ -1,9 +1,5 @@
 # Put the name of your locale in the same language
 Locale Name: 'galego'
-# Currently on Subscriptions, Playlists, and History
-'This part of the app is not ready yet. Come back later when progress has been made.': >-
-  Esta parte da aplicación non está lista aínda. Volve máis adiante, cando se avance
-  no desenvolvemento.
 
 # Webkit Menu Bar
 File: 'Arquivo'
@@ -33,7 +29,7 @@ Forward: 'Adiante'
 # Anything shared among components / views should be put here
 Global:
   Videos: 'Vídeos'
-  Community: Comunidade
+  Posts: Publicacións
 
   Shorts: Cortos
   Live: En vivo
@@ -290,7 +286,6 @@ Settings:
       lista de reprodución vista
   Subscription Settings:
     Subscription Settings: 'Axustes de subscricións'
-    Hide Videos on Watch: 'Agochar vídeos visualizados'
     Fetch Feeds from RSS: 'Obter subscricións a través de RSS'
     Fetch Automatically: Obter feed automaticamente
   Distraction Free Settings:
@@ -307,6 +302,7 @@ Settings:
     Hide Playlists: Agochar listas de reprodución
     Hide Live Streams: Ocultalas emisións en directo
     Hide Sharing Actions: Ocultalas accións do uso compartido
+    Hide Videos on Watch: 'Agochar vídeos visualizados'
     Hide Video Description: Ocultala descrición do vídeo
     Hide Comments: Ocultar comentarios
     Hide Chapters: Agochalos capítulos
@@ -536,7 +532,7 @@ Channel:
   This channel is age-restricted and currently cannot be viewed in FreeTube.: Esta
     canle ten unha limitación de idade e actualmente non se pode ver en FreeTube.
   Channel Tabs: Pestanas das canles
-  Community:
+  Posts:
     This channel currently does not have any posts: Esta canle actualmente non ten
       publicacións
 Video:
@@ -808,3 +804,12 @@ Chapters:
 Screenshot Success: Captura da pantalla gardada como "{filePath}"
 Ok: De acordo
 Go to page: Ir a {page}
+KeyboardShortcutPrompt:
+  Toggle Developer Tools: Activar Ferramentas de Desenvolvedor
+  Zoom Out: Reducir
+  Zoom In: Agrandar
+  Fullscreen: Activar pantalla completa
+Search Listing:
+  Label:
+    8K: 8K
+    4K: 4K

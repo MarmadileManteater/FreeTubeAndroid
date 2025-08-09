@@ -61,7 +61,8 @@ export async function generatePoToken(videoId, visitorData, context, proxyUrl) {
       v8CacheOptions: 'none',
       session: theSession,
       offscreen: true,
-      webSecurity: false
+      webSecurity: false,
+      disableBlinkFeatures: 'ElectronCSSCornerSmoothing'
     }
   })
 
@@ -117,8 +118,7 @@ async function getScript(videoId, visitorData, context) {
   if (!cachedScript) {
     const pathToScript = process.env.NODE_ENV === 'development'
       ? join(__dirname, '../../dist/botGuardScript.js')
-      /* eslint-disable-next-line n/no-path-concat */
-      : `${__dirname}/botGuardScript.js`
+      : join(__dirname, 'botGuardScript.js')
 
     const content = await readFile(pathToScript, 'utf-8')
 

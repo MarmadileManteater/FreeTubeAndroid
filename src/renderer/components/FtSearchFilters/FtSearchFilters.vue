@@ -52,9 +52,15 @@
     </FtFlexBox>
     <div class="searchFilterCloseButtonContainer">
       <FtButton
+        :label="$t('Search Filters.Clear Filters')"
+        background-color="var(--accent-color)"
+        text-color="var(--text-with-accent-color)"
+        @click="clearFilters"
+      />
+      <FtButton
         :label="$t('Close')"
-        background-color="var(--primary-color)"
-        text-color="var(--text-with-main-color)"
+        background-color="null"
+        text-color="null"
         @click="hideSearchFilters"
       />
     </div>
@@ -68,7 +74,7 @@ import { useI18n } from '../../composables/use-i18n-polyfill'
 import FtFlexBox from '../ft-flex-box/ft-flex-box.vue'
 import FtRadioButton from '../FtRadioButton/FtRadioButton.vue'
 import FtPrompt from '../FtPrompt/FtPrompt.vue'
-import FtButton from '../ft-button/ft-button.vue'
+import FtButton from '../FtButton/FtButton.vue'
 import FtCheckboxList from '../FtCheckboxList/FtCheckboxList.vue'
 
 import store from '../../store/index'
@@ -256,6 +262,15 @@ function hideSearchFilters() {
 function isVideoOrMovieOrAll(type) {
   return type === 'video' || type === 'movie' || type === 'all'
 }
+
+function clearFilters() {
+  sortByValue.value = SORT_BY_VALUES[0]
+  timeValue.value = TIME_VALUES[0]
+  typeValue.value = TYPE_VALUES[0]
+  durationValue.value = DURATION_VALUES[0]
+  featuresValue.value = []
+}
+
 </script>
 
 <style scoped src="./FtSearchFilters.css" />

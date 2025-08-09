@@ -4,7 +4,7 @@ import shaka from 'shaka-player'
 import { useI18n } from '../../composables/use-i18n-polyfill'
 
 import store from '../../store/index'
-import { IpcChannels, KeyboardShortcuts } from '../../../constants'
+import { DefaultFolderKind, KeyboardShortcuts } from '../../../constants'
 import { AudioTrackSelection } from './player-components/AudioTrackSelection'
 import { FullWindowButton } from './player-components/FullWindowButton'
 import { LegacyQualitySelection } from './player-components/LegacyQualitySelection'
@@ -23,7 +23,8 @@ import {
 import {
   addKeyboardShortcutToActionTitle,
   showToast,
-  writeFileWithPicker
+  writeFileWithPicker,
+  throttle,
 } from '../../helpers/utils'
 import { STATE_PAUSED, STATE_PLAYING, updateMediaSessionState } from '../../helpers/android'
 import android from 'android'
@@ -156,7 +157,9 @@ export default defineComponent({
     'timeupdate',
     'toggle-autoplay',
     'toggle-theatre-mode',
-    'playback-rate-updated'
+    'playback-rate-updated',
+    'skip-to-next',
+    'skip-to-prev',
   ],
   setup: function (props, { emit, expose }) {
     const { locale, t } = useI18n()
@@ -314,6 +317,17 @@ export default defineComponent({
     window.addEventListener('app-pause', onAppPause)
 
     window.addEventListener('app-resume', onAppResume)
+
+    /** @type {import('vue').ComputedRef<number>} */
+    const defaultPlaybackRate = computed(() => {
+      return store.getters.getDefaultPlayback
+    })
+
+    watch(defaultPlaybackRate, (newValue) => {
+      if (video.value) {
+        video.value.defaultPlaybackRate = newValue
+      }
+    })
 
     const maxVideoPlaybackRate = computed(() => {
       return parseInt(store.getters.getMaxVideoPlaybackRate)
@@ -650,6 +664,7 @@ export default defineComponent({
       const periods = mpdNode.children?.filter(child => typeof child !== 'string' && child.tagName === 'Period') ?? []
 
       sortAdapationSetsByCodec(periods)
+      sortAudioAdaptationSetsByBitrate(periods)
 
       if (mpdNode.attributes.type === 'dynamic') {
         // fix live stream loading issues
@@ -752,6 +767,34 @@ export default defineComponent({
             const codecsPrefixB = getCodecsPrefix(b)
 
             return codecPriorities.indexOf(codecsPrefixA) - codecPriorities.indexOf(codecsPrefixB)
+          })
+      }
+    }
+
+    /**
+     * Sort audio AdaptationSets so that streams with higher bitrates come first.
+     * Workaround that makes the player select high-quality audio.
+     * @param {shaka.extern.xml.Node[]} periods
+     */
+    function sortAudioAdaptationSetsByBitrate(periods) {
+      for (const period of periods) {
+        period.children
+          ?.filter(child => typeof child !== 'string' && child.tagName === 'AdaptationSet' &&
+            (child.attributes.contentType === 'audio' || child.attributes.mimeType.startsWith('audio/')))
+          .forEach(adaptationSet => {
+            adaptationSet.children.sort((a, b) => {
+              if (a.tagName === 'AudioChannelConfiguration' && b.tagName !== 'AudioChannelConfiguration') {
+                // Push AudioChannelConfiguration to the front (where it seems to already be) so that it doesn't
+                // block sorting Representations if it's in the middle instead
+                return -1
+              } else if (b.tagName === 'AudioChannelConfiguration' && a.tagName !== 'AudioChannelConfiguration') {
+                return 1
+              } else if (a.tagName === 'Representation' && b.tagName === 'Representation') {
+                return b.attributes.bandwidth - a.attributes.bandwidth
+              } else {
+                return 0
+              }
+            })
           })
       }
     }
@@ -928,13 +971,13 @@ export default defineComponent({
 
         if (event.ctrlKey || event.metaKey) {
           if (videoPlaybackRateMouseScroll.value) {
-            mouseScrollPlaybackRate(event)
+            mouseScrollPlaybackRateHandler(event)
           }
         } else {
           if (videoVolumeMouseScroll.value) {
-            mouseScrollVolume(event)
+            mouseScrollVolumeHandler(event)
           } else if (videoSkipMouseScroll.value) {
-            mouseScrollSkip(event)
+            mouseScrollSkipHandler(event)
           }
         }
       }
@@ -948,8 +991,9 @@ export default defineComponent({
         // stop shaka-player's click handler firing
         event.stopPropagation()
 
-        video.value.playbackRate = props.currentPlaybackRate
-        video.value.defaultPlaybackRate = props.currentPlaybackRate
+        player.cancelTrickPlay()
+
+        showValueChange(`${defaultPlaybackRate.value}x`)
       }
     }
 
@@ -971,7 +1015,7 @@ export default defineComponent({
       }
 
       // make scrolling over volume slider change the volume
-      container.value.querySelector('.shaka-volume-bar').addEventListener('wheel', mouseScrollVolume)
+      container.value.querySelector('.shaka-volume-bar').addEventListener('wheel', mouseScrollVolumeHandler)
 
       // title overlay when the video is fullscreened
       // placing this inside the controls container so that we can fade it in and out at the same time as the controls
@@ -1100,20 +1144,15 @@ export default defineComponent({
 
     // #region power save blocker
 
-    let powerSaveBlocker = null
-
-    async function startPowerSaveBlocker() {
-      if (process.env.IS_ELECTRON && powerSaveBlocker === null) {
-        const { ipcRenderer } = require('electron')
-        powerSaveBlocker = await ipcRenderer.invoke(IpcChannels.START_POWER_SAVE_BLOCKER)
+    function startPowerSaveBlocker() {
+      if (process.env.IS_ELECTRON) {
+        window.ftElectron.startPowerSaveBlocker()
       }
     }
 
     function stopPowerSaveBlocker() {
-      if (process.env.IS_ELECTRON && powerSaveBlocker !== null) {
-        const { ipcRenderer } = require('electron')
-        ipcRenderer.send(IpcChannels.STOP_POWER_SAVE_BLOCKER, powerSaveBlocker)
-        powerSaveBlocker = null
+      if (process.env.IS_ELECTRON) {
+        window.ftElectron.stopPowerSaveBlocker()
       }
     }
 
@@ -1151,8 +1190,7 @@ export default defineComponent({
       // PiP can only be activated once the video's readState and video track are populated
       if (startInPip && props.format !== 'audio' && ui.getControls().isPiPAllowed() && process.env.IS_ELECTRON) {
         startInPip = false
-        const { ipcRenderer } = require('electron')
-        ipcRenderer.send(IpcChannels.REQUEST_PIP)
+        window.ftElectron.requestPiP()
       }
     }
 
@@ -1329,7 +1367,11 @@ export default defineComponent({
         variants = variants.filter(variant => variant.label === label)
       } else if (hasMultipleAudioTracks.value) {
         // default audio track
-        variants = variants.filter(variant => variant.audioRoles.includes('main'))
+        const filteredVariants = variants.filter(variant => variant.audioRoles.includes('main'))
+        // Sometimes there is nothing marked as main, don't filter in this case
+        if (filteredVariants.length > 0) {
+          variants = filteredVariants
+        }
       }
 
       const isPortrait = variants[0].height > variants[0].width
@@ -1617,7 +1659,7 @@ export default defineComponent({
       const filenameWithExtension = `${filename}.${format}`
 
       const wasPlaying = !video_.paused
-      if (wasPlaying) {
+      if ((!process.env.IS_ELECTRON || screenshotAskPath.value) && wasPlaying) {
         video_.pause()
       }
 
@@ -1642,9 +1684,7 @@ export default defineComponent({
         } else {
           const arrayBuffer = await blob.arrayBuffer()
 
-          const { ipcRenderer } = require('electron')
-
-          await ipcRenderer.invoke(IpcChannels.WRITE_SCREENSHOT, filenameWithExtension, arrayBuffer)
+          await window.ftElectron.writeToDefaultFolder(DefaultFolderKind.SCREENSHOTS, filenameWithExtension, arrayBuffer)
 
           showToast(t('Screenshot Success'))
         }
@@ -1654,7 +1694,7 @@ export default defineComponent({
       } finally {
         canvas.remove()
 
-        if (wasPlaying) {
+        if ((!process.env.IS_ELECTRON || screenshotAskPath.value) && wasPlaying) {
           video_.play()
         }
       }
@@ -1887,15 +1927,17 @@ export default defineComponent({
      * @param {number} step
      */
     function changePlayBackRate(step) {
-      const video_ = video.value
-      const newPlaybackRateString = (video_.playbackRate + step).toFixed(2)
+      const newPlaybackRateString = (player.getPlaybackRate() + step).toFixed(2)
       const newPlaybackRate = parseFloat(newPlaybackRateString)
 
       // The following error is thrown if you go below 0.07:
       // The provided playback rate (0.05) is not in the supported playback range.
       if (newPlaybackRate > 0.07 && newPlaybackRate <= maxVideoPlaybackRate.value) {
-        video_.playbackRate = newPlaybackRate
-        video_.defaultPlaybackRate = newPlaybackRate
+        if (newPlaybackRate === defaultPlaybackRate.value) {
+          player.cancelTrickPlay()
+        } else {
+          player.trickPlay(newPlaybackRate, false)
+        }
 
         showValueChange(`${newPlaybackRateString}x`)
       }
@@ -1919,8 +1961,9 @@ export default defineComponent({
     /**
      * @param {number} seconds The number of seconds to seek by, positive values seek forwards, negative ones seek backwards
      * @param {boolean} canSeekResult Allow functions that have already checked whether seeking is possible, to skip the extra check (e.g. frameByFrame)
+     * @param {boolean} showPopUp Whether to show a pop-up with the seconds seeked
      */
-    function seekBySeconds(seconds, canSeekResult = false) {
+    function seekBySeconds(seconds, canSeekResult = false, showPopUp = false) {
       if (!(canSeekResult || canSeek())) {
         return
       }
@@ -1943,22 +1986,43 @@ export default defineComponent({
       } else {
         video_.currentTime = newTime
       }
+      if (showPopUp) {
+        const popUpLayout = seconds > 0
+          ? { icon: 'arrow-right', invertContentOrder: true }
+          : { icon: 'arrow-left', invertContentOrder: false }
+        const formattedSeconds = Math.abs(seconds)
+        showValueChange(`${formattedSeconds}s`, popUpLayout.icon, popUpLayout.invertContentOrder)
+      }
     }
 
     // #endregion mouse and keyboard helpers
 
     // #region mouse scroll handlers
 
+    const mouseScrollThrottleWaitMs = 200
+
     /**
      * @param {WheelEvent} event
      */
     function mouseScrollPlaybackRate(event) {
-      event.preventDefault()
-
       if ((event.deltaY < 0 || event.deltaX > 0)) {
         changePlayBackRate(0.05)
       } else if ((event.deltaY > 0 || event.deltaX < 0)) {
         changePlayBackRate(-0.05)
+      }
+    }
+    const mouseScrollPlaybackRateThrottle = throttle(mouseScrollPlaybackRate, mouseScrollThrottleWaitMs)
+    /**
+     * @param {WheelEvent} event
+     */
+    function mouseScrollPlaybackRateHandler(event) {
+      event.preventDefault()
+
+      // Touchpad scroll = small deltaX/deltaY
+      if (Math.abs(event.deltaX) <= 5 && Math.abs(event.deltaY) <= 5) {
+        mouseScrollPlaybackRateThrottle(event)
+      } else {
+        mouseScrollPlaybackRate(event)
       }
     }
 
@@ -1966,13 +2030,25 @@ export default defineComponent({
      * @param {WheelEvent} event
      */
     function mouseScrollSkip(event) {
+      if ((event.deltaY < 0 || event.deltaX > 0)) {
+        seekBySeconds(defaultSkipInterval.value * player.getPlaybackRate(), true)
+      } else if ((event.deltaY > 0 || event.deltaX < 0)) {
+        seekBySeconds(-defaultSkipInterval.value * player.getPlaybackRate(), true)
+      }
+    }
+    const mouseScrollSkipThrottle = throttle(mouseScrollSkip, mouseScrollThrottleWaitMs)
+    /**
+     * @param {WheelEvent} event
+     */
+    function mouseScrollSkipHandler(event) {
       if (canSeek()) {
         event.preventDefault()
 
-        if ((event.deltaY < 0 || event.deltaX > 0)) {
-          seekBySeconds(defaultSkipInterval.value * video.value.playbackRate, true)
-        } else if ((event.deltaY > 0 || event.deltaX < 0)) {
-          seekBySeconds(-defaultSkipInterval.value * video.value.playbackRate, true)
+        // Touchpad scroll = small deltaX/deltaY
+        if (Math.abs(event.deltaX) <= 5 && Math.abs(event.deltaY) <= 5) {
+          mouseScrollSkipThrottle(event)
+        } else {
+          mouseScrollSkip(event)
         }
       }
     }
@@ -1981,23 +2057,35 @@ export default defineComponent({
      * @param {WheelEvent} event
      */
     function mouseScrollVolume(event) {
+      const video_ = video.value
+
+      if (video_.muted && (event.deltaY < 0 || event.deltaX > 0)) {
+        video_.muted = false
+        video_.volume = 0
+      }
+
+      if (!video_.muted) {
+        if ((event.deltaY < 0 || event.deltaX > 0)) {
+          changeVolume(0.05)
+        } else if ((event.deltaY > 0 || event.deltaX < 0)) {
+          changeVolume(-0.05)
+        }
+      }
+    }
+    const mouseScrollVolumeThrottle = throttle(mouseScrollVolume, mouseScrollThrottleWaitMs)
+    /**
+     * @param {WheelEvent} event
+     */
+    function mouseScrollVolumeHandler(event) {
       if (!event.ctrlKey && !event.metaKey) {
         event.preventDefault()
         event.stopPropagation()
 
-        const video_ = video.value
-
-        if (video_.muted && (event.deltaY < 0 || event.deltaX > 0)) {
-          video_.muted = false
-          video_.volume = 0
-        }
-
-        if (!video_.muted) {
-          if ((event.deltaY < 0 || event.deltaX > 0)) {
-            changeVolume(0.05)
-          } else if ((event.deltaY > 0 || event.deltaX < 0)) {
-            changeVolume(-0.05)
-          }
+        // Touchpad scroll = small deltaX/deltaY
+        if (Math.abs(event.deltaX) <= 5 && Math.abs(event.deltaY) <= 5) {
+          mouseScrollVolumeThrottle(event)
+        } else {
+          mouseScrollVolume(event)
         }
       }
     }
@@ -2086,6 +2174,18 @@ export default defineComponent({
 
       const video_ = video.value
 
+      // Skip to next video in playlist or recommended
+      if (event.shiftKey && event.key.toLowerCase() === 'n') {
+        emit('skip-to-next')
+        return
+      }
+
+      // Skip to previous video in playlist
+      if (event.shiftKey && event.key.toLowerCase() === 'p') {
+        emit('skip-to-prev')
+        return
+      }
+
       switch (event.key.toLowerCase()) {
         case ' ':
         case 'spacebar': // older browsers might return spacebar instead of a space character
@@ -2097,19 +2197,21 @@ export default defineComponent({
         case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.LARGE_REWIND:
           // Rewind by 2x the time-skip interval (in seconds)
           event.preventDefault()
-          seekBySeconds(-defaultSkipInterval.value * video_.playbackRate * 2)
+          seekBySeconds(-defaultSkipInterval.value * player.getPlaybackRate() * 2, false, true)
           break
         case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.LARGE_FAST_FORWARD:
           // Fast-Forward by 2x the time-skip interval (in seconds)
           event.preventDefault()
-          seekBySeconds(defaultSkipInterval.value * video_.playbackRate * 2)
+          seekBySeconds(defaultSkipInterval.value * player.getPlaybackRate() * 2, false, true)
           break
         case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.DECREASE_VIDEO_SPEED:
+        case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.DECREASE_VIDEO_SPEED_ALT:
           // Decrease playback rate by user configured interval
           event.preventDefault()
           changePlayBackRate(-videoPlaybackRateInterval.value)
           break
         case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.INCREASE_VIDEO_SPEED:
+        case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.INCREASE_VIDEO_SPEED_ALT:
           // Increase playback rate by user configured interval
           event.preventDefault()
           changePlayBackRate(videoPlaybackRateInterval.value)
@@ -2157,7 +2259,7 @@ export default defineComponent({
             video_.currentTime = props.chapters[props.currentChapterIndex - 1].startSeconds
           } else {
             // Rewind by the time-skip interval (in seconds)
-            seekBySeconds(-defaultSkipInterval.value * video_.playbackRate)
+            seekBySeconds(-defaultSkipInterval.value * player.getPlaybackRate(), false, true)
           }
           break
         case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.SMALL_FAST_FORWARD:
@@ -2167,7 +2269,7 @@ export default defineComponent({
             video_.currentTime = (props.chapters[props.currentChapterIndex + 1].startSeconds)
           } else {
             // Fast-Forward by the time-skip interval (in seconds)
-            seekBySeconds(defaultSkipInterval.value * video_.playbackRate)
+            seekBySeconds(defaultSkipInterval.value * player.getPlaybackRate(), false, true)
           }
           break
         case KeyboardShortcuts.VIDEO_PLAYER.GENERAL.PICTURE_IN_PICTURE:
@@ -2223,6 +2325,24 @@ export default defineComponent({
           events.dispatchEvent(new CustomEvent('setStatsVisibility', {
             detail: !showStats.value
           }))
+          break
+        case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.HOME:
+          // Jump to beginning of video
+          if (canSeek()) {
+            event.preventDefault()
+            // use seek range instead of duration so that it works for live streams too
+            const seekRange = player.seekRange()
+            video_.currentTime = seekRange.start
+          }
+          break
+        case KeyboardShortcuts.VIDEO_PLAYER.PLAYBACK.END:
+          // Jump to end of video
+          if (canSeek()) {
+            event.preventDefault()
+            // use seek range instead of duration so that it works for live streams too
+            const seekRange = player.seekRange()
+            video_.currentTime = seekRange.end
+          }
           break
         case 'escape':
           // Exit full window
@@ -2281,7 +2401,11 @@ export default defineComponent({
 
       // text related errors aren't serious (captions and seek bar thumbnails), so we should just log them
       // TODO: consider only emitting when the severity is crititcal?
-      if (!ignoreErrors && error.category !== shaka.util.Error.Category.TEXT) {
+      if (
+        !ignoreErrors &&
+        error.category !== shaka.util.Error.Category.TEXT &&
+        !(error.code === shaka.util.Error.Code.BAD_HTTP_STATUS && error.data[0].startsWith('https://www.youtube.com/api/timedtext'))
+      ) {
         // don't react to multiple consecutive errors, otherwise we don't give the format fallback from the previous error a chance to work
         ignoreErrors = true
 
@@ -2674,8 +2798,7 @@ export default defineComponent({
 
       if (startInFullscreen && process.env.IS_ELECTRON) {
         startInFullscreen = false
-        const { ipcRenderer } = require('electron')
-        ipcRenderer.send(IpcChannels.REQUEST_FULLSCREEN)
+        window.ftElectron.requestFullscreen()
       }
     }
 
@@ -2947,12 +3070,20 @@ export default defineComponent({
     const showValueChangePopup = ref(false)
     const valueChangeMessage = ref('')
     const valueChangeIcon = ref(null)
+    const invertValueChangeContentOrder = ref(false)
     let valueChangeTimeout = null
 
-    function showValueChange(message, icon = null) {
+    /**
+     * Shows a popup with a message and an icon on top of the video player.
+     * @param {string} message - The message to display.
+     * @param {string} icon - The icon to display.
+     * @param {boolean} invertContentOrder - Whether to invert the order of the icon and message.
+     */
+    function showValueChange(message, icon = null, invertContentOrder = false) {
       valueChangeMessage.value = message
       valueChangeIcon.value = icon
       showValueChangePopup.value = true
+      invertValueChangeContentOrder.value = invertContentOrder
 
       if (valueChangeTimeout) {
         clearTimeout(valueChangeTimeout)
@@ -2990,7 +3121,8 @@ export default defineComponent({
 
       valueChangeMessage,
       valueChangeIcon,
-      showValueChangePopup
+      showValueChangePopup,
+      invertValueChangeContentOrder,
     }
   },
   destroyed: function () {

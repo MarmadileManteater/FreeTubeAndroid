@@ -119,6 +119,10 @@ export default defineComponent({
     }
   },
   computed: {
+    usingElectron: function () {
+      return process.env.IS_ELECTRON
+    },
+
     historyEntry: function () {
       return this.$store.getters.getHistoryCacheById[this.id]
     },
@@ -128,7 +132,7 @@ export default defineComponent({
     },
 
     watchProgress: function () {
-      if (!this.historyEntryExists || !this.saveWatchedProgress) {
+      if (!this.historyEntryExists || !this.watchedProgressSavingEnabled) {
         return 0
       }
 
@@ -231,11 +235,11 @@ export default defineComponent({
     },
 
     progressPercentage: function () {
-      if (typeof this.lengthSeconds !== 'number') {
+      if (typeof this.lengthSeconds !== 'number' || this.lengthSeconds === 0) {
         return 0
       }
-
-      return (this.watchProgress / this.lengthSeconds) * 100
+      const percentage = (this.watchProgress / this.lengthSeconds) * 100
+      return Math.min(percentage, 100)
     },
 
     hideSharingActions: function() {
@@ -388,8 +392,11 @@ export default defineComponent({
       return this.$store.getters.getDefaultPlayback
     },
 
-    saveWatchedProgress: function () {
-      return this.$store.getters.getSaveWatchedProgress
+    watchedProgressSavingEnabled: function () {
+      return ['auto', 'semi-auto'].includes(this.$store.getters.getWatchedProgressSavingMode)
+    },
+    autosaveWatchedProgress: function () {
+      return this.$store.getters.getWatchedProgressSavingMode === 'auto'
     },
 
     saveVideoHistoryWithLastViewedPlaylist: function () {
@@ -639,9 +646,7 @@ export default defineComponent({
       }
       this.openInExternalPlayer(payload)
 
-      if (this.saveWatchedProgress && !this.historyEntryExists) {
-        this.markAsWatched()
-      }
+      this.markAsWatched()
     },
 
     handleOptionsClick: function (option) {
@@ -771,7 +776,10 @@ export default defineComponent({
         type: 'video'
       }
       this.updateHistory(videoData)
-      showToast(this.$t('Video.Video has been marked as watched'))
+
+      if (!this.historyEntryExists) {
+        showToast(this.$t('Video.Video has been marked as watched'))
+      }
     },
 
     removeFromWatched: function () {
@@ -865,15 +873,15 @@ export default defineComponent({
       showToast(this.$t('Video.Video has been removed from your saved list'))
     },
     moveVideoUp: function() {
-      this.$emit('move-video-up')
+      this.$emit('move-video-up', this.id, this.playlistItemId)
     },
 
     moveVideoDown: function() {
-      this.$emit('move-video-down')
+      this.$emit('move-video-down', this.id, this.playlistItemId)
     },
 
     removeFromPlaylist: function() {
-      this.$emit('remove-from-playlist')
+      this.$emit('remove-from-playlist', this.id, this.playlistItemId)
     },
 
     ...mapActions([

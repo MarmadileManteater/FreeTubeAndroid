@@ -1,8 +1,5 @@
 # Put the name of your locale in the same language
 Locale Name: '한국어'
-# Currently on Subscriptions, Playlists, and History
-'This part of the app is not ready yet. Come back later when progress has been made.': >-
-  아직 구현 되지 않은 기능입니다. 개발이 완료된 후 다시 시도해주세요.
 
 # Webkit Menu Bar
 File: '파일'
@@ -31,12 +28,20 @@ Forward: '앞으로가기'
 # Global
 # Anything shared among components / views should be put here
 Global:
-  Videos: '비디오'
+  Videos: '동영상'
 
-  Live: 실시간
-  Community: 커뮤니티
+  Live: 라이브
+  Posts: 게시물
   Shorts: 쇼츠
   Sort By: '정렬하기'
+  Counts:
+    Subscriber Count: 1명 구독자 | {count}명 구독
+    View Count: 1회 조회 | {count}회 조회
+    Watching Count: 1명 시청 중 | {count}명 시청 중
+    Video Count: 1개 동영상 | {count} 개 동영상
+    Channel Count: 1개 채널 | {count}개 채널
+    Comment Count: 1개 댓글 | {count}개 댓글
+    Like Count: 1개 좋아요 | {count}개 좋아요
 Version {versionNumber} is now available!  Click for more details: '{versionNumber}
   버전이 사용가능합니다! 클릭하여 자세한 정보를 확인하세요'
 Download From Site: '사이트로부터 다운로드'
@@ -80,17 +85,34 @@ Search Filters:
   Fetch more results: '검색 결과 더 보기'
 # Sidebar
   There are no more results for this search: 이 검색 결과에 대한 항목이 더 없습니다
+  Features:
+    Creative Commons: 크리에이티브 커먼즈
+    Location: 위치
+    Features: 기능
+    3D: 3D
+    Live: 라이브
+    4K: 4K
+    360 Video: 360도 영상
+    HDR: HDR
+    VR180: VR180
+    HD: HD
+    Subtitles: 자막
 Subscriptions:
     # On Subscriptions Page
   Subscriptions: '구독'
   This profile has a large number of subscriptions. Forcing RSS to avoid rate limiting: '이
     프로필에는 많은 구독이 있습니다. RSS가 속도 제한을 피하도록 강요합니다'
-  'Your Subscription list is currently empty. Start adding subscriptions to see them here.': '구독한
-    채널이 없습니다. 구독 피드를 보려면 원하시는 채널을 구독하세요'
+  'Your Subscription list is currently empty. Start adding subscriptions to see them here.': '구독
+    목록이 현재 비어 있습니다. 구독을 가져오려면 데이터 설정으로 이동하여 구독 가져오기를 선택하거나, 채널을 검색하여 구독할 수 있습니다'
   Load More Videos: '더 많은 동영상 불러오기'
   Error Channels: 오류가 있는 채널
   Disabled Automatic Fetching: 자동 구독 정보 수집이 비활성화 되어 있습니다. 구독을 새로고침해주세요.
   Empty Channels: 구독한 채널들에 업로드 된 영상이 없습니다.
+  Empty Posts: 구독한 채널에 현재 게시물이 없습니다.
+  Subscriptions Tabs: 구독 탭
+  Load More Posts: 더 많은 게시물 불러오기
+  All Subscription Tabs Hidden: 모든 구독 탭이 숨겨져 있습니다. 여기에 콘텐츠를 보려면 "{settingsSection}"의
+    "{subsection}" 섹션에서 일부 탭을 표시해 주세요.
 Trending:
   Trending: '트렌딩'
   Trending Tabs: 트렌딩 탭
@@ -102,8 +124,14 @@ Most Popular: '인기 동영상'
 Playlists: '재생 목록'
 User Playlists:
   Your Playlists: '나의 재생 목록'
-  Search bar placeholder: 재생 목록에서 검색
-  Empty Search Message: 이 재생 목록에 검색과 일치하는 동영상이 없습니다
+  Search bar placeholder: 재생목록 검색
+  Empty Search Message: 이 재생목록에는 검색어와 일치하는 동영상이 없습니다
+  This playlist currently has no videos.: 이 재생목록에는 현재 동영상이 없습니다.
+  Playlists with Matching Videos: 일치하는 동영상이 포함된 재생목록
+  You have no playlists. Click on the create new playlist button to create a new one.: 재생목록이
+    없습니다. 새 재생목록을 만들려면 새 재생목록 만들기 버튼을 클릭하세요.
+  Add to Playlist: 재생목록에 추가
+  Create New Playlist: 새 재생목록 만들기
 History:
   # On History Page
   History: '재생 기록'
@@ -274,7 +302,6 @@ Settings:
       모든 구독채널과 프로필을 삭제하시겠습니까? 삭제하면 복구가되지않습니다.'
   Subscription Settings:
     Subscription Settings: '구독 설정'
-    Hide Videos on Watch: '시청한 동영상 숨기기'
     Fetch Feeds from RSS: 'RSS에서 피드 가져오기'
     Fetch Automatically: 자동으로 피드 수집하기
   Distraction Free Settings:
@@ -290,6 +317,7 @@ Settings:
     Hide Playlists: 재생 목록 숨기기
     Hide Active Subscriptions: 활성 구독 숨기기
     Hide Sharing Actions: 공유 작업 숨기기
+    Hide Videos on Watch: '시청한 동영상 숨기기'
     Hide Live Streams: 라이브 스트림 숨기기
     Hide Video Description: 비디오 설명 숨기기
     Hide Comments: 주석 숨기기
@@ -468,7 +496,7 @@ Channel:
   Search Channel: '채널 검색'
   Your search results have returned 0 results: '0 건이 검색되었습니다'
   Videos:
-    Videos: '비디오'
+    Videos: '동영상'
     This channel does not currently have any videos: '이 채널에는 현재 비디오가 없습니다'
     Sort Types:
       Newest: '새로운 영상부터'
@@ -689,6 +717,7 @@ Default Invidious instance has been cleared: 기본 Invidious 인스턴스가 �
 Are you sure you want to open this link?: 이 링크를 여시겠습니까?
 Search Bar:
   Clear Input: 입력 지우기
+  Remove: 삭제
 New Window: 새 창
 Channels:
   Channels: 채널
@@ -710,3 +739,35 @@ Chapters:
   'Chapters list visible, current chapter: {chapterName}': '챕터 목록 보임, 현재 챕터: {chapterName}'
   Chapters: 챕터
 Preferences: 설정
+Close Banner: 배너 닫기
+Search Listing:
+  Label:
+    4K: 4K
+    New: 새로운
+    Subtitles: 자막
+    8K: 8K
+    VR180: VR180
+    360 Video: 360°
+    3D: 3D
+    Closed Captions: 자막 해설
+Search character limit: 검색 쿼리가 {searchCharacterLimit}자 제한을 초과했습니다
+KeyboardShortcutPrompt:
+  Focus Search: 검색창에 포커스
+  Last Frame: 이전 프레임 (일시정지 중)
+  Small Fast Forward: 현재 비디오 재생 속도와 빨리 감기 간격을 기준으로 X초 빨리 감기
+  Next Frame: 다음 프레임 (일시정지 중)
+  Volume Up: 볼륨 높이기
+  Force Restart Window: 강제 재시작 창
+  Toggle Developer Tools: 개발자 도구 전환
+  Reset Zoom: 확대/축소 수준 / UI 크기 초기화
+  Zoom In: 확대
+  Zoom Out: 축소
+  Volume Down: 볼륨 낮추기
+  Small Rewind: 현재 비디오 재생 속도와 되감기 간격을 기준으로 X초 되감기
+  Search in New Window: 새 창에서 검색
+  Fullscreen: 전체화면
+Right-click or hold to see history: 우클릭하거나 길게 눌러 기록을 확인하세요
+Go to page: '{page}로 이동'
+Feed:
+  Feed Last Updated: '{feedName} 피드 마지막 업데이트: {date}'
+  Refresh Feed: '{subscriptionName} 새로 고침'

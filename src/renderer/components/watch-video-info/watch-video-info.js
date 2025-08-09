@@ -2,7 +2,7 @@ import { defineComponent, nextTick } from 'vue'
 import { mapActions } from 'vuex'
 import FtCard from '../ft-card/ft-card.vue'
 import FtIconButton from '../ft-icon-button/ft-icon-button.vue'
-import FtShareButton from '../ft-share-button/ft-share-button.vue'
+import FtShareButton from '../FtShareButton/FtShareButton.vue'
 import FtSubscribeButton from '../FtSubscribeButton/FtSubscribeButton.vue'
 import { formatNumber, openExternalLink, showToast } from '../../helpers/utils'
 
@@ -114,9 +114,19 @@ export default defineComponent({
     isUnlisted: {
       type: Boolean,
       required: false
-    }
+    },
+    canSaveWatchedProgress: {
+      type: Boolean,
+      required: true
+    },
   },
-  emits: ['change-format', 'pause-player', 'set-info-area-sticky', 'scroll-to-info-area'],
+  emits: [
+    'change-format',
+    'pause-player',
+    'set-info-area-sticky',
+    'scroll-to-info-area',
+    'save-watched-progress',
+  ],
   computed: {
     usingElectron: function () {
       return process.env.IS_ELECTRON
@@ -141,17 +151,16 @@ export default defineComponent({
       return this.$store.getters.getHideVideoViews
     },
 
+    hideUploader: function () {
+      return this.$store.getters.getHideUploader
+    },
+
     showPlaylists: function () {
       return !this.$store.getters.getHidePlaylists
     },
 
-    downloadLinkOptions: function () {
-      return this.downloadLinks.map((download) => {
-        return {
-          label: download.label,
-          value: download.url
-        }
-      })
+    watchedProgressSavingInSemiAutoMode() {
+      return this.$store.getters.getWatchedProgressSavingMode === 'semi-auto'
     },
 
     downloadBehavior: function () {
@@ -226,6 +235,14 @@ export default defineComponent({
 
     externalPlayer: function () {
       return this.$store.getters.getExternalPlayer
+    },
+
+    historyEntry: function () {
+      return this.$store.getters.getHistoryCacheById[this.id]
+    },
+
+    historyEntryExists: function () {
+      return typeof this.historyEntry !== 'undefined'
     },
 
     defaultPlayback: function () {
@@ -317,22 +334,43 @@ export default defineComponent({
           playlistLoop: null,
         })
       }
+
       this.openInExternalPlayer(payload)
+
+      // Marking as watched
+      const videoData = {
+        videoId: this.id,
+        title: this.title,
+        author: this.channelName,
+        authorId: this.channelId,
+        published: this.published,
+        description: this.description,
+        viewCount: this.viewCount,
+        lengthSeconds: this.lengthSeconds,
+        watchProgress: 0,
+        timeWatched: Date.now(),
+        isLive: false,
+        type: 'video'
+      }
+
+      this.updateHistory(videoData)
+
+      if (!this.historyEntryExists) {
+        showToast(this.$t('Video.Video has been marked as watched'))
+      }
     },
 
     handleDownload: function (index) {
-      const selectedDownloadLinkOption = this.downloadLinkOptions[index]
-      const url = selectedDownloadLinkOption.value
-      const linkName = selectedDownloadLinkOption.label
-      const extension = this.grabExtensionFromUrl(linkName)
+      const selectedDownloadLinkOption = this.downloadLinks[index]
+      const mimeTypeUrl = selectedDownloadLinkOption.value.split('||')
 
-      if (this.downloadBehavior === 'open' || !process.env.IS_ELECTRON) {
-        openExternalLink(url)
+      if (!process.env.IS_ELECTRON || this.downloadBehavior === 'open') {
+        openExternalLink(mimeTypeUrl[1])
       } else {
         this.downloadMedia({
-          url: url,
+          url: mimeTypeUrl[1],
           title: this.title,
-          extension: extension
+          mimeType: mimeTypeUrl[0]
         })
       }
     },
@@ -412,12 +450,17 @@ export default defineComponent({
       this.$emit('change-format', value)
     },
 
+    saveWatchedProgressManually() {
+      this.$emit('save-watched-progress')
+    },
+
     ...mapActions([
       'openInExternalPlayer',
       'downloadMedia',
       'showAddToPlaylistPromptForManyVideos',
       'addVideo',
       'updatePlaylist',
+      'updateHistory',
       'removeVideo',
     ])
   }

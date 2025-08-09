@@ -1,9 +1,5 @@
 # Put the name of your locale in the same language
 Locale Name: 'Norsk nynorsk'
-# Currently on Subscriptions, Playlists, and History
-'This part of the app is not ready yet. Come back later when progress has been made.': >-
-  Denne delen av programmet er ikkje klar enda. Ver venleg og kom tilbake på eit seinare
-  tidspunkt.
 
 # Webkit Menu Bar
 File: 'Fil'
@@ -40,9 +36,9 @@ Global:
     Channel Count: 1 kanal | {count} kanalar
     Subscriber Count: 1 abonnent | {count} abonnentar
     View Count: 1 visning | {count} visningar
-  Shorts: Shorts
+  Shorts: Shorts-videoer
   Live: Direkte
-  Community: Fellesskap
+  Posts: Innlegg
   Sort By: 'Sorter etter'
 Version {versionNumber} is now available!  Click for more details: 'Versjon {versionNumber}
   er no tilgjengeleg! Klikk for meir informasjon'
@@ -295,7 +291,6 @@ Settings:
       ugjort.'
   Subscription Settings:
     Subscription Settings: 'Abonnementinnstillingar'
-    Hide Videos on Watch: 'Skjul sette videoar'
     Fetch Feeds from RSS: 'Hent informasjonkanalar frå RSS'
     Fetch Automatically: Hent informasjonkanalar automatisk
   Distraction Free Settings:
@@ -312,6 +307,7 @@ Settings:
     Hide Playlists: Skjul spelelister
     Hide Upcoming Premieres: Skjul komande premierar
     Hide Sharing Actions: Skjul delehandlingar
+    Hide Videos on Watch: 'Skjul sette videoar'
     Hide Comments: Skjul kommentarar
     Hide Live Streams: Skjul direktesendingar
     Hide Video Description: Skjul videobeskriving
@@ -798,3 +794,8 @@ Search Listing:
     4K: 4K
     Subtitles: Undertekstar
     Closed Captions: Undertekstar
+KeyboardShortcutPrompt:
+  Toggle Developer Tools: Veksle utviklarverktøy
+  Zoom Out: Forminsk
+  Zoom In: Forstørr
+  Fullscreen: Veksle fullskjerm

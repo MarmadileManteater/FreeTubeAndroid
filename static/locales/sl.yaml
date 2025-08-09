@@ -1,9 +1,5 @@
 # Put the name of your locale in the same language
 Locale Name: 'slovenščina'
-# Currently on Subscriptions, Playlists, and History
-'This part of the app is not ready yet. Come back later when progress has been made.': >-
-  Ta del programa še ni pripravljen za uporabo. Prosimo, pridite nazaj kasneje, ko
-  bo posodobljen.
 
 # Webkit Menu Bar
 File: 'Datoteka'
@@ -35,6 +31,7 @@ Global:
   Videos: 'Videoposnetki'
   Sort By: 'Razvrstitev'
 
+  Live: V živo
 Version {versionNumber} is now available!  Click for more details: 'Na voljo je različica
   {versionNumber}!·  Za več podrobnosti kliknite tukaj'
 Download From Site: 'Prenesi iz spletne strani'
@@ -281,7 +278,6 @@ Settings:
       nazadnje ogledanim seznamom predvajanja
   Subscription Settings:
     Subscription Settings: 'Nastavitve naročnin'
-    Hide Videos on Watch: 'Skrij gledane videoposnetke'
     Fetch Feeds from RSS: 'Pridobi vire iz RSS'
   Data Settings:
     Data Settings: 'Podatkovne nastavitve'
@@ -335,6 +331,7 @@ Settings:
     Hide Channels: Skrij videoposnetke iz kanalov
     Hide Video Description: Skrij opis videoposnetka
     Hide Upcoming Premieres: Skrij prihajajoče premiere
+    Hide Videos on Watch: 'Skrij gledane videoposnetke'
   The app needs to restart for changes to take effect. Restart and apply change?: Program
     se mora ponovno zagnati, preden bodo spremembe uveljavljene. Ga želite ponovno
     zagnati zdaj?
@@ -618,3 +615,12 @@ Search Bar:
 Open New Window: Odpri novo okno
 Chapters:
   Chapters: Poglavja
+Search Listing:
+  Label:
+    8K: 8K
+    4K: 4K
+KeyboardShortcutPrompt:
+  Toggle Developer Tools: Preklopi razvijalska orodja
+  Zoom In: Povečaj
+  Zoom Out: Zmanjšaj
+  Fullscreen: Preklopi celoten zaslon

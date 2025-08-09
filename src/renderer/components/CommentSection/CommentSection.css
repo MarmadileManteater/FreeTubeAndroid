@@ -28,7 +28,7 @@
 }
 
 .commentSort {
-  float: var(--float-right-ltr-rtl-value);
+  float: inline-end;
 }
 
 @media only screen and (width <= 1000px) {
@@ -50,14 +50,14 @@
 }
 
 .commentThumbnail {
-  float: var(--float-left-ltr-rtl-value);
+  float: inline-start;
   inline-size: 60px;
   block-size: 60px;
   border-radius: 200px;
 }
 
 .commentThumbnailHidden {
-  float: var(--float-left-ltr-rtl-value);
+  float: inline-start;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -76,7 +76,7 @@
   font-size: 14px;
   margin-inline-start: 68px;
   margin-block-start: 0;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .commentOwner {
@@ -96,7 +96,7 @@
   font-size: 14px;
   margin-block-start: -10px;
   margin-inline-start: 70px;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .commentPinned {

@@ -1,28 +1,25 @@
 import { defineComponent } from 'vue'
 import { mapActions, mapMutations } from 'vuex'
 import FtFlexBox from './components/ft-flex-box/ft-flex-box.vue'
-import TopNav from './components/top-nav/top-nav.vue'
+import TopNav from './components/TopNav/TopNav.vue'
 import SideNav from './components/SideNav/SideNav.vue'
-import FtNotificationBanner from './components/ft-notification-banner/ft-notification-banner.vue'
+import FtNotificationBanner from './components/FtNotificationBanner/FtNotificationBanner.vue'
 import FtPrompt from './components/FtPrompt/FtPrompt.vue'
-import FtButton from './components/ft-button/ft-button.vue'
-import FtToast from './components/ft-toast/ft-toast.vue'
+import FtButton from './components/FtButton/FtButton.vue'
+import FtToast from './components/FtToast/FtToast.vue'
 import FtProgressBar from './components/FtProgressBar/FtProgressBar.vue'
-import FtPlaylistAddVideoPrompt from './components/ft-playlist-add-video-prompt/ft-playlist-add-video-prompt.vue'
-import FtCreatePlaylistPrompt from './components/ft-create-playlist-prompt/ft-create-playlist-prompt.vue'
+import FtPlaylistAddVideoPrompt from './components/FtPlaylistAddVideoPrompt/FtPlaylistAddVideoPrompt.vue'
+import FtCreatePlaylistPrompt from './components/FtCreatePlaylistPrompt/FtCreatePlaylistPrompt.vue'
 import FtKeyboardShortcutPrompt from './components/FtKeyboardShortcutPrompt/FtKeyboardShortcutPrompt.vue'
 import FtSearchFilters from './components/FtSearchFilters/FtSearchFilters.vue'
 import FtaLogViewer from './components/fta-log-viewer/fta-log-viewer.vue'
 import { marked } from 'marked'
-import { IpcChannels } from '../constants'
 import packageDetails from '../../package.json'
 import { openExternalLink, openInternalPath, showToast } from './helpers/utils'
 import { translateWindowTitle } from './helpers/strings'
 import 'core-js'
 import android from 'android'
 import { updateAndroidTheme } from './helpers/android'
-
-let ipcRenderer = null
 
 export default defineComponent({
   name: 'App',
@@ -159,10 +156,6 @@ export default defineComponent({
     appTitle: function () {
       return this.$store.getters.getAppTitle
     },
-
-    openDeepLinksInNewWindow: function () {
-      return this.$store.getters.getOpenDeepLinksInNewWindow
-    }
   },
   watch: {
     windowTitle: 'setWindowTitle',
@@ -205,13 +198,10 @@ export default defineComponent({
         this.grabSearchHistoryEntries()
 
         if (process.env.IS_ELECTRON) {
-          ipcRenderer = require('electron').ipcRenderer
           this.setupListenersToSyncWindows()
           this.activateKeyboardShortcuts()
           this.openAllLinksExternally()
-          this.enableSetSearchQueryText()
           this.enableOpenUrl()
-          this.watchSystemTheme()
           await this.checkExternalPlayer()
         }
         if (process.env.IS_ANDROID) {
@@ -251,7 +241,6 @@ export default defineComponent({
   methods: {
     setDocumentTitle: function(value) {
       document.title = value
-      this.$nextTick(() => this.$refs.topNav?.setActiveNavigationHistoryEntryTitle(value))
     },
     checkThemeSettings: function () {
       const theme = {
@@ -422,25 +411,8 @@ export default defineComponent({
         this.$store.commit('setIsKeyboardShortcutPromptShown', !this.isKeyboardShortcutPromptShown)
       }
 
-      if (event.altKey) {
-        switch (event.key) {
-          case 'D':
-          case 'd':
-            this.$refs.topNav.focusSearch()
-            break
-        }
-      }
-      switch (event.key) {
-        case 'Tab':
-          this.showOutlines()
-          break
-        case 'L':
-        case 'l':
-          if ((process.platform !== 'darwin' && event.ctrlKey) ||
-            (process.platform === 'darwin' && event.metaKey)) {
-            this.$refs.topNav.focusSearch()
-          }
-          break
+      if (event.key === 'Tab') {
+        this.showOutlines()
       }
     },
 
@@ -569,6 +541,16 @@ export default defineComponent({
             break
           }
 
+          case 'trending':
+          case 'subscriptions':
+          case 'history':
+          case 'userplaylists':
+            openInternalPath({
+              path: `/${result.urlType}`,
+              doCreateNewWindow
+            })
+            break
+
           case 'invalid_url': {
             // Do nothing
             break
@@ -582,34 +564,12 @@ export default defineComponent({
       })
     },
 
-    /**
-     * Linux fix for dynamically updating theme preference, this works on
-     * all systems running the electron app.
-     */
-    watchSystemTheme: function () {
-      ipcRenderer.on(IpcChannels.NATIVE_THEME_UPDATE, (event, shouldUseDarkColors) => {
-        document.body.dataset.systemTheme = shouldUseDarkColors ? 'dark' : 'light'
-      })
-    },
-
-    enableSetSearchQueryText: function () {
-      ipcRenderer.on(IpcChannels.UPDATE_SEARCH_INPUT_TEXT, (event, searchQueryText) => {
-        if (searchQueryText) {
-          this.$refs.topNav.updateSearchInputText(searchQueryText)
-        }
-      })
-
-      ipcRenderer.send(IpcChannels.SEARCH_INPUT_HANDLING_READY)
-    },
-
     enableOpenUrl: function () {
-      ipcRenderer.on(IpcChannels.OPEN_URL, (event, url, { isLaunchLink = false } = { }) => {
+      window.ftElectron.handleOpenUrl((url) => {
         if (url) {
-          this.handleYoutubeLink(url, { doCreateNewWindow: this.openDeepLinksInNewWindow && !isLaunchLink })
+          this.handleYoutubeLink(url)
         }
       })
-
-      ipcRenderer.send(IpcChannels.APP_READY)
     },
 
     handleExternalLinkOpeningPromptAnswer: function (option) {
@@ -631,7 +591,7 @@ export default defineComponent({
     },
 
     setLocale: function() {
-      document.documentElement.setAttribute('lang', this.locale)
+      document.documentElement.lang = this.locale
       if (this.isLocaleRightToLeft) {
         document.body.dir = 'rtl'
       } else {
