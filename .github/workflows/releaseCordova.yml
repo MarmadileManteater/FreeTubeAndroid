@@ -37,7 +37,7 @@ jobs:
         result-encoding: string
         script: |
           // TODO✏ automate this
-          var run_number = ${{ github.run_number }} - 121
+          var run_number = ${{ github.run_number }} - 138
           var version = '${{ steps.pkg.outputs.version }}'
           var version_number = version + '.' + run_number
           return version_number
