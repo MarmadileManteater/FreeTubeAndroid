@@ -3722,11 +3722,6 @@ electron@^37.2.6:
     "@types/node" "^22.7.7"
     extract-zip "^2.0.1"
 
-eme-encryption-scheme-polyfill@^2.2.3:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.2.3.tgz#420608d56b995dfc440cfefba3cc06faaf02a95d"
-  integrity sha512-N0nlJZVaBqGWzvvFb6ZAxvTVeZ4v9cXCzrSFE0zCbNbviiygWI0gDJiRc4o5SqFrPVYBSQr5z5SzKjIvvxL+Vw==
-
 emoji-regex@^10.0.0, emoji-regex@^10.3.0:
   version "10.4.0"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-10.4.0.tgz#03553afea80b3975749cfcb36f776ca268e413d4"
@@ -6778,7 +6773,7 @@ picocolors@^0.2.1:
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-0.2.1.tgz#570670f793646851d1ba135996962abad587859f"
   integrity sha512-cMlDqaLEqfSaW8Z7N5Jw+lyIW869EzT73/F5lhtY9cLGoVxSXznfgfXMO0Z5K0o0Q2TkTXq+0KFsdnSe3jDViA==
 
-picocolors@^1.0.0, picocolors@^1.1.0, picocolors@^1.1.1:
+picocolors@^1.0.0, picocolors@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.1.1.tgz#3d321af3eab939b083c8f929a1d12cda81c26b6b"
   integrity sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==
@@ -7760,12 +7755,10 @@ setprototypeof@1.2.0:
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.2.0.tgz#66c9a24a73f9fc28cbe66b09fed3d33dcaf1b424"
   integrity sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==
 
-shaka-player@^4.14.26:
-  version "4.14.26"
-  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-4.14.26.tgz#0e620b1a60a9e317afb5a3f01a021c7e16692ab4"
-  integrity sha512-OIN/IN64ApQ18vZzEHsKH2i4mnU/+Dt58kDOpNqt1BCACLxWaPgGsuRESrdZTO2ZRJ///ZqsEYA0INEYkuMKWg==
-  dependencies:
-    eme-encryption-scheme-polyfill "^2.2.3"
+shaka-player@^4.15.9:
+  version "4.15.9"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-4.15.9.tgz#4f890f3ac59a504390f46477e08795ed1504fda2"
+  integrity sha512-x8TElKG1eaj3nlcO9whvH1SbGvJ1gwSdgYlbvcJBNWsMJal70C2ZLk4w8qi8uXpcDjzSR8p28gYgD7WfOdHDGA==
 
 shallow-clone@^3.0.0:
   version "3.0.1"
