@@ -32,6 +32,7 @@
         :info-source="infoSource"
         :more-video-data-available="moreVideoDataAvailable"
         :search-video-mode-allowed="isUserPlaylistRequested && shownVideoCount > 1"
+        :search-video-mode-enabled="playlistInVideoSearchMode"
         :search-query-text="searchQueryTextRequested"
         :theme="listType === 'list' ? 'base' : 'top-bar'"
         class="playlistInfo"
