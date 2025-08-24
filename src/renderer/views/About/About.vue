@@ -57,7 +57,7 @@ const chunks = computed(() => [
   {
     icon: ['fab', 'github'],
     title: t('About.Source code'),
-    content: `<a href="https://github.com/MarmadileManteater/FreeTubeCordova">GitHub: FreeTubeAndroid</a><br>${t('About.Licensed under the')} <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">${t('About.AGPLv3')}</a>.<br/> This is a fork of the official <a href="https://github.com/FreeTubeApp/FreeTube">FreeTube</a> repo with modifications to work better in a browser and on phones.`
+    content: `<a href="https://github.com/MarmadileManteater/FreeTubeCordova">GitHub: FreeTubeAndroid</a><br>${t('About.Licensed under the')} <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">${t('About.AGPLv3')}</a>.<br/> This is a fork of the official <a href="https://github.com/FreeTubeApp/FreeTube">FreeTube</a> repository with modifications to work better in a browser and on phones.`
   },
   {
     icon: ['fas', 'file-download'],
