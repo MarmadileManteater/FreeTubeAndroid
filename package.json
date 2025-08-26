@@ -113,7 +113,7 @@
     "sass": "^1.90.0",
     "sass-loader": "^16.0.5",
     "stylelint": "^16.23.1",
-    "string-width": "4.2.3",
+    "string-width": "8.0.0",
     "strip-ansi": "6.0.1",
     "stylelint-config-sass-guidelines": "^12.1.0",
     "stylelint-config-standard": "^39.0.0",
