@@ -41,7 +41,6 @@
         @click="importSubscriptions"
       />
       <FtButton
-const START_IN_DIRECTORY = 'downloads'
         :label="$t('Settings.Data Settings.Manage Subscriptions')"
         @click="openProfileSettings"
       />
@@ -156,8 +155,8 @@ async function resetDirectory() {
 const dataDirectory = ref('')
 if (process.env.IS_ANDROID) {
   dataDirectory.value = android.getDirectory('data://')
-  
-  getCurrentDataDirectory().then(({uri}) => {
+
+  getCurrentDataDirectory().then(({ uri }) => {
     if (uri !== 'data://') {
       dataDirectory.value = uri
     }
