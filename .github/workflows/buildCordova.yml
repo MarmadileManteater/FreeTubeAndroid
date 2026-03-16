@@ -1,5 +1,14 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+curl -fsLo "/path/to/nodejs-keyring.kbx" "https://github.com/nodejs/release-keys/raw/HEAD/gpg/pubring.kbx"
+
+docker pull ghcr.io/stacksimplify/kube-usermgmt-webapp:1.0.0-mysqldb#!/bin/sh
+
+echo "Add files and do local commit"
+git add .
+git commit -am "Welcome to StackSimplify"
+
+echo "Pushing to Github Repository"
+push This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+ For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 name: Build Android
 
