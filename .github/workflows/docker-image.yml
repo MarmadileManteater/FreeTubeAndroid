@@ -16,7 +16,6 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-docker pull ghcr.io/stacksimplify/kube-usermgmt-webapp:1.0.0-mysqldb#!/bin/sh
 
 echo "Add files and do local commit"
 git add .
