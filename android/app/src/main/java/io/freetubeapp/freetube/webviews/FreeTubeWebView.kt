@@ -98,4 +98,8 @@ class FreeTubeWebView @JvmOverloads constructor(
       }
     }
   }
+
+  fun generateBgWebview(): BotGuardWebView {
+    return BotGuardWebView(context, onConsoleMessage)
+  }
 }

@@ -44,6 +44,7 @@ import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.writeBytes
 import io.freetubeapp.freetube.helpers.writeText
+import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import org.json.JSONObject
 import java.io.File
 import java.net.URL
@@ -53,7 +54,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 
-class FreeTubeJavaScriptInterface(main: MainActivity, val webView: WebView) {
+class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebView) {
   private var context: MainActivity = main
   private var mediaSession: MediaSession?
   private var lastPosition: Long
@@ -786,7 +787,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: WebView) {
         context.runOnUiThread {
           try {
             val bgScript = getBotGuardScript(videoId, sessionContext)
-            val bgWv = context.generateBgWebview()
+            val bgWv = webView.generateBgWebview()
             bgWv.jsInterface.onReturnToken {
               run {
                 context.runOnUiThread {

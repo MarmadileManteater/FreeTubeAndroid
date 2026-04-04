@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         if (webView.canGoBack()) {
           webView.goBack()
         } else {
-          this@MainActivity.moveTaskToBack(true)
+          moveTaskToBack(true)
         }
       }
     }
@@ -269,9 +269,5 @@ class MainActivity : AppCompatActivity() {
         reject(exception)
       }
     })
-  }
-
-  fun generateBgWebview(): BotGuardWebView {
-    return BotGuardWebView(this, onConsoleMessage)
   }
 }
