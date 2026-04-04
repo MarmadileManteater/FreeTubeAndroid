@@ -104,6 +104,10 @@ class FreeTubeWebView @JvmOverloads constructor(
   }
 
   fun generateSigWebview(): SigWebView {
-    return SigWebView(context, jsInterface.jsCommunicator, onConsoleMessage)
+    val view = SigWebView(context, jsInterface.jsCommunicator, onConsoleMessage)
+    val viewGroup = (parent as ViewGroup)
+    viewGroup.addView(view)
+    view.visibility = GONE
+    return view
   }
 }

@@ -841,6 +841,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
         sigWebView.jsInterface.jsCommunicator.resolve(id, code)
         // dispatch event to read data
         sigWebView.dispatchEvent("message", "id", id)
+        // TODO figure out when to clean up web views 
       }
     }
     return id
