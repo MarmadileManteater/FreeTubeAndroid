@@ -655,7 +655,9 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: WebView) {
       logs += "${message},"
     }
     // get rid of trailing comma
-    logs = logs.substring(0, logs.length - 1)
+    if (logs.length > 1) {
+      logs = logs.substring(0, logs.length - 1)
+    }
     logs += "]"
     return logs
   }
