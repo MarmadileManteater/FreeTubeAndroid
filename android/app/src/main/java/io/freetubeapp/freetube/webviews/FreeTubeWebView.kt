@@ -17,6 +17,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.MainActivity
+import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import org.json.JSONObject
@@ -51,7 +52,8 @@ class FreeTubeWebView @JvmOverloads constructor(
           // don't send file url requests to a web browser (it will crash the app)
           return true
         }
-        val regex = """^https?:\/\/((www\.)?youtube\.com(\/embed)?|youtu\.be)\/.*$"""
+
+        val regex = context.getString(R.string.youtube_regex)
 
         if (Regex(regex).containsMatchIn(request.url!!.toString())) {
           dispatchEvent("youtube-link", "link", request.url!!.toString())
