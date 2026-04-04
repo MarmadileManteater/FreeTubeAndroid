@@ -26,13 +26,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
-import io.freetubeapp.freetube.javascript.SigWebViewJavascriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
 import io.freetubeapp.freetube.webviews.BotGuardWebView
 import io.freetubeapp.freetube.webviews.ConsoleLogChromeClient
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
-import io.freetubeapp.freetube.webviews.SigWebView
 import org.json.JSONObject
 import java.net.URLEncoder
 import java.util.UUID
@@ -48,13 +46,11 @@ class MainActivity : AppCompatActivity() {
 
   // region JS interfaces
   private lateinit var jsInterface: FreeTubeJavaScriptInterface
-  lateinit var sigJsInterface: SigWebViewJavascriptInterface
   // endregion
 
   // region Bindings
   private lateinit var binding: ActivityMainBinding
   lateinit var webView: FreeTubeWebView
-  lateinit var sigWebView: SigWebView
   // endregion
 
   // region Callbacks
@@ -185,14 +181,6 @@ class MainActivity : AppCompatActivity() {
     } else {
       webView.loadUrl("file:///android_asset/index.html")
     }
-
-
-    sigWebView = binding.sigWebView
-    sigJsInterface = SigWebViewJavascriptInterface(sigWebView, jsInterface.jsCommunicator)
-    sigWebView.addJavascriptInterface(sigJsInterface, "Android")
-    sigWebView.settings.javaScriptEnabled = true
-    sigWebView.webChromeClient = ConsoleLogChromeClient(onConsoleMessage)
-    sigWebView.loadUrl("file:///android_asset/decipher.html")
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
