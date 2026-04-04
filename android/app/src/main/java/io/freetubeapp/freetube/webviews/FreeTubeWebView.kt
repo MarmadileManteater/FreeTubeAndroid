@@ -20,7 +20,7 @@ class FreeTubeWebView @JvmOverloads constructor(
 
   init {
     setBackgroundColor(Color.TRANSPARENT)
-    
+
     @SuppressLint("SetJavaScriptEnabled")
     settings.javaScriptEnabled = true
     // add the JavaScript interface

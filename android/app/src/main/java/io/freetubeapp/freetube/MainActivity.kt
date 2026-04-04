@@ -164,21 +164,6 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     webView = binding.webView
-
-    // bind the back button to the web-view history
-    onBackPressedDispatcher.addCallback {
-      if (isInAPrompt) {
-        webView.dispatchEvent("exit-prompt")
-        jsInterface.exitPromptMode()
-      } else {
-        if (webView.canGoBack()) {
-          webView.goBack()
-        } else {
-          this@MainActivity.moveTaskToBack(true)
-        }
-      }
-    }
-
     jsInterface = webView.jsInterface
     webView.webChromeClient = object: ConsoleLogChromeClient(onConsoleMessage) {
       override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
@@ -198,6 +183,20 @@ class MainActivity : AppCompatActivity() {
         windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
         this@MainActivity.binding.root.fitsSystemWindows = true
         webView.dispatchEvent("end-fullscreen")
+      }
+    }
+
+    // bind the back button to the web-view history
+    onBackPressedDispatcher.addCallback {
+      if (isInAPrompt) {
+        webView.dispatchEvent("exit-prompt")
+        jsInterface.exitPromptMode()
+      } else {
+        if (webView.canGoBack()) {
+          webView.goBack()
+        } else {
+          this@MainActivity.moveTaskToBack(true)
+        }
       }
     }
 
