@@ -55,8 +55,6 @@ class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   lateinit var webView: FreeTubeWebView
   lateinit var sigWebView: SigWebView
-  lateinit var content: View
-  private var fullscreenView: View? = null
   // endregion
 
   // region Callbacks
@@ -122,7 +120,7 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    content = findViewById(android.R.id.content)
+    val content: View = findViewById(android.R.id.content)
     content.viewTreeObserver.addOnPreDrawListener(
       object : ViewTreeObserver.OnPreDrawListener {
         override fun onPreDraw(): Boolean {
@@ -154,37 +152,11 @@ class MainActivity : AppCompatActivity() {
       webView.dispatchEvent("media-$action")
     }
 
-    // this gets the controller for hiding and showing the system bars
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    val windowInsetsController =
-      WindowCompat.getInsetsController(window, window.decorView)
-    windowInsetsController.systemBarsBehavior =
-      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     webView = binding.webView
     jsInterface = webView.jsInterface
-    webView.webChromeClient = object: ConsoleLogChromeClient(onConsoleMessage) {
-      override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-        fullscreenView = view!!
-        view.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        this@MainActivity.binding.root.addView(view)
-        webView.visibility = View.GONE
-        this@MainActivity.binding.root.fitsSystemWindows = false
-        webView.dispatchEvent("start-fullscreen")
-      }
-
-      override fun onHideCustomView() {
-        webView.visibility = View.VISIBLE
-        this@MainActivity.binding.root.removeView(fullscreenView)
-        fullscreenView = null
-        windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
-        this@MainActivity.binding.root.fitsSystemWindows = true
-        webView.dispatchEvent("end-fullscreen")
-      }
-    }
+    webView.onConsoleMessage = onConsoleMessage
 
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
