@@ -31,6 +31,7 @@ import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
 import io.freetubeapp.freetube.webviews.BotGuardWebView
 import io.freetubeapp.freetube.webviews.ConsoleLogChromeClient
+import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import io.freetubeapp.freetube.webviews.SigWebView
 import org.json.JSONObject
 import java.net.URLEncoder
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
-  
+
   private lateinit var keepAlive: Intent
 
   // region JS interfaces
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
   // region Bindings
   private lateinit var binding: ActivityMainBinding
-  lateinit var webView: BackgroundPlayWebView
+  lateinit var webView: FreeTubeWebView
   lateinit var sigWebView: SigWebView
   lateinit var content: View
   private var fullscreenView: View? = null
@@ -179,16 +180,7 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    webView.settings.javaScriptEnabled = true
-
-    // this is the 🥃 special sauce that makes local api streaming a possibility
-    webView.settings.allowUniversalAccessFromFileURLs = true
-    webView.settings.allowFileAccessFromFileURLs = true
-    // allow playlist ▶auto-play in background
-    webView.settings.mediaPlaybackRequiresUserGesture = false
-
-    jsInterface = FreeTubeJavaScriptInterface(this)
-    webView.addJavascriptInterface(jsInterface, "Android")
+    jsInterface = webView.jsInterface
     webView.webChromeClient = object: ConsoleLogChromeClient(onConsoleMessage) {
       override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
@@ -209,24 +201,7 @@ class MainActivity : AppCompatActivity() {
         webView.dispatchEvent("end-fullscreen")
       }
     }
-    webView.webViewClient = object: WebViewClient() {
-      override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        if (request!!.url!!.scheme == "file") {
-          // don't send file url requests to a web browser (it will crash the app)
-          return true
-        }
-        val regex = """^https?:\/\/((www\.)?youtube\.com(\/embed)?|youtu\.be)\/.*$"""
 
-        if (Regex(regex).containsMatchIn(request.url!!.toString())) {
-          webView.dispatchEvent("youtube-link", "link", request.url!!.toString())
-          return true
-        }
-        // send all requests to a real web browser
-        val intent = Intent(Intent.ACTION_VIEW, request.url)
-        this@MainActivity.startActivity(intent)
-        return true
-      }
-    }
     if (intent!!.data !== null) {
       val url = intent!!.data.toString()
       val host = intent!!.data!!.host.toString()

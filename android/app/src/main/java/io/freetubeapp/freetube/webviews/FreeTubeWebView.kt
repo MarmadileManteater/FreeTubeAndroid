@@ -1,0 +1,54 @@
+package io.freetubeapp.freetube.webviews
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.util.AttributeSet
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import io.freetubeapp.freetube.MainActivity
+import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
+import io.freetubeapp.freetube.javascript.dispatchEvent
+
+class FreeTubeWebView @JvmOverloads constructor(
+  context: Context, attrs: AttributeSet? = null
+) : BackgroundPlayWebView(context, attrs) {
+  // TODO fix the coupling here with context as MainActivity
+  val jsInterface = FreeTubeJavaScriptInterface(context as MainActivity, this)
+
+  init {
+    @SuppressLint("SetJavaScriptEnabled")
+    settings.javaScriptEnabled = true
+    // add the JavaScript interface
+    addJavascriptInterface(jsInterface, "Android")
+
+    // this is the 🥃 special sauce that makes local api streaming a possibility
+    @Suppress("DEPRECATION")
+    settings.allowUniversalAccessFromFileURLs = true
+    @Suppress("DEPRECATION")
+    settings.allowFileAccessFromFileURLs = true
+    // allow playlist ▶auto-play in background
+    settings.mediaPlaybackRequiresUserGesture = false
+
+    webViewClient = object: WebViewClient() {
+      override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        if (request!!.url!!.scheme == "file") {
+          // don't send file url requests to a web browser (it will crash the app)
+          return true
+        }
+        val regex = """^https?:\/\/((www\.)?youtube\.com(\/embed)?|youtu\.be)\/.*$"""
+
+        if (Regex(regex).containsMatchIn(request.url!!.toString())) {
+          dispatchEvent("youtube-link", "link", request.url!!.toString())
+          return true
+        }
+        // send all requests to a real web browser
+        context.startActivity(
+          Intent(Intent.ACTION_VIEW, request.url)
+        )
+        return true
+      }
+    }
+  }
+}

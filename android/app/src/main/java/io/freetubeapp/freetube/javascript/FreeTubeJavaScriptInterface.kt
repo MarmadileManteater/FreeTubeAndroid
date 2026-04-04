@@ -6,6 +6,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_KEY_EVENT
 import android.graphics.BitmapFactory
@@ -43,7 +44,6 @@ import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.writeBytes
 import io.freetubeapp.freetube.helpers.writeText
-import io.freetubeapp.freetube.webviews.BotGuardWebView
 import org.json.JSONObject
 import java.io.File
 import java.net.URL
@@ -53,7 +53,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 
-class FreeTubeJavaScriptInterface(main: MainActivity) {
+class FreeTubeJavaScriptInterface(main: MainActivity, val webView: WebView) {
   private var context: MainActivity = main
   private var mediaSession: MediaSession?
   private var lastPosition: Long
@@ -73,7 +73,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity) {
     mediaSession = null
     lastPosition = 0
     lastState = PlaybackState.STATE_PLAYING
-    jsCommunicator = AsyncJSCommunicator(main.webView)
+    jsCommunicator = AsyncJSCommunicator(webView)
   }
 
   // region Media Notifications
@@ -291,16 +291,16 @@ class FreeTubeJavaScriptInterface(main: MainActivity) {
           } else {
             when (keyEvent.keyCode) {
               KEYCODE_MEDIA_PLAY -> {
-                context.webView.dispatchEvent("media-play")
+                webView.dispatchEvent("media-play")
               }
               KEYCODE_MEDIA_PAUSE -> {
-                context.webView.dispatchEvent("media-pause")
+                webView.dispatchEvent("media-pause")
               }
               KEYCODE_MEDIA_NEXT -> {
-                context.webView.dispatchEvent("media-next")
+                webView.dispatchEvent("media-next")
               }
               KEYCODE_MEDIA_PREVIOUS -> {
-                context.webView.dispatchEvent("media-previous")
+                webView.dispatchEvent("media-previous")
               }
             }
             false
@@ -309,27 +309,27 @@ class FreeTubeJavaScriptInterface(main: MainActivity) {
 
         override fun onSkipToNext() {
           super.onSkipToNext()
-          context.webView.dispatchEvent("media-next")
+          webView.dispatchEvent("media-next")
         }
 
         override fun onSkipToPrevious() {
           super.onSkipToPrevious()
-          context.webView.dispatchEvent("media-previous")
+          webView.dispatchEvent("media-previous")
         }
 
         override fun onSeekTo(pos: Long) {
           super.onSeekTo(pos)
-          context.webView.dispatchEvent("media-seek", "position", pos)
+          webView.dispatchEvent("media-seek", "position", pos)
         }
 
         override fun onPlay() {
           super.onPlay()
-          context.webView.dispatchEvent("media-play")
+          webView.dispatchEvent("media-play")
         }
 
         override fun onPause() {
           super.onPause()
-          context.webView.dispatchEvent("media-pause")
+          webView.dispatchEvent("media-pause")
         }
 
       })
@@ -742,19 +742,19 @@ class FreeTubeJavaScriptInterface(main: MainActivity) {
 
   @JavascriptInterface
   fun enterPromptMode() {
-    context.webView.isVerticalScrollBarEnabled = false
+    webView.isVerticalScrollBarEnabled = false
     context.isInAPrompt = true
   }
 
   @JavascriptInterface
   fun exitPromptMode() {
-    context.webView.isVerticalScrollBarEnabled = true
+    webView.isVerticalScrollBarEnabled = true
     context.isInAPrompt = false
   }
 
   @JavascriptInterface
   fun setScale(scale: Int) {
-    context.webView.setScale(scale / 100.0, context)
+    webView.setScale(scale / 100.0, context)
   }
 
   // endregion
