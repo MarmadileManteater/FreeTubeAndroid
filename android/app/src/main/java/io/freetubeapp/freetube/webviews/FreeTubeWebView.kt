@@ -3,6 +3,7 @@ package io.freetubeapp.freetube.webviews
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.util.AttributeSet
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -18,6 +19,8 @@ class FreeTubeWebView @JvmOverloads constructor(
   val jsInterface = FreeTubeJavaScriptInterface(context as MainActivity, this)
 
   init {
+    setBackgroundColor(Color.TRANSPARENT)
+    
     @SuppressLint("SetJavaScriptEnabled")
     settings.javaScriptEnabled = true
     // add the JavaScript interface

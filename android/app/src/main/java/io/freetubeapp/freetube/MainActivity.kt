@@ -164,7 +164,6 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     webView = binding.webView
-    webView.setBackgroundColor(Color.TRANSPARENT)
 
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
