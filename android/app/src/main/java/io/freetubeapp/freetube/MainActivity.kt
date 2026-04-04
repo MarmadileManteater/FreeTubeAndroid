@@ -185,9 +185,10 @@ class MainActivity : AppCompatActivity() {
     } else {
       webView.loadUrl("file:///android_asset/index.html")
     }
-
-
-    sigWebView = binding.sigWebView
+    
+    sigWebView = SigWebView(this)
+    sigWebView.visibility = View.GONE
+    binding.root.addView(sigWebView)
     sigJsInterface = SigWebViewJavascriptInterface(sigWebView, jsInterface.jsCommunicator)
     sigWebView.addJavascriptInterface(sigJsInterface, "Android")
     sigWebView.settings.javaScriptEnabled = true
