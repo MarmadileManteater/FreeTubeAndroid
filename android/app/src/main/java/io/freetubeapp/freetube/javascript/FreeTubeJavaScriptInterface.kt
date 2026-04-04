@@ -834,14 +834,17 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
 
   @JavascriptInterface
   fun runDecipherScript(id: String, code: String): String {
-    context.runOnUiThread {
-      val sigWebView = webView.generateSigWebview()
-      sigWebView.onLoad = {
-        // pass data to other webview
-        sigWebView.jsInterface.jsCommunicator.resolve(id, code)
-        // dispatch event to read data
-        sigWebView.dispatchEvent("message", "id", id)
-        // TODO figure out when to clean up web views 
+    webView.post {
+      webView.generateSigWebview()
+        .onLoad = {
+          // pass data to other webview
+          jsInterface.jsCommunicator.resolve(id, code)
+          // dispatch event to read data
+          dispatchEvent("message", "id", id)
+          // TODO figure out when to clean up web views
+          postDelayed({
+            destroy()
+          }, 10000)
       }
     }
     return id

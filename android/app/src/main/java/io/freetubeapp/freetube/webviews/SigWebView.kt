@@ -25,7 +25,7 @@ class SigWebView(
 ) : BackgroundPlayWebView(context, null) {
   val jsInterface = SigWebViewJavascriptInterface(this, communicator)
 
-  var onLoad: () -> Unit = {}
+  var onLoad: SigWebView.() -> Unit = {}
 
   init {
     addJavascriptInterface(jsInterface, "Android")
