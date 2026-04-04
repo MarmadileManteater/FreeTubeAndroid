@@ -2,6 +2,7 @@ package io.freetubeapp.freetube.javascript
 
 import android.content.Context
 import android.webkit.WebView
+import io.freetubeapp.freetube.helpers.Promise
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
 

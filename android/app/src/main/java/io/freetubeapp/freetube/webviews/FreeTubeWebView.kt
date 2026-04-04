@@ -102,4 +102,8 @@ class FreeTubeWebView @JvmOverloads constructor(
   fun generateBgWebview(): BotGuardWebView {
     return BotGuardWebView(context, onConsoleMessage)
   }
+
+  fun generateSigWebview(): SigWebView {
+    return SigWebView(context, jsInterface.jsCommunicator, onConsoleMessage)
+  }
 }
