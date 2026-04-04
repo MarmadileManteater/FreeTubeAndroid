@@ -1,7 +1,10 @@
 package io.freetubeapp.freetube.webviews
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -9,16 +12,23 @@ import android.webkit.WebViewClient
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
 import io.freetubeapp.freetube.javascript.consoleLog
+import io.freetubeapp.freetube.javascript.dispatchEvent
+import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 
 class BotGuardWebView @JvmOverloads constructor(
   context: Context, attrs: AttributeSet? = null
 ) :
-// no need to communicate window visibility to botguard
+  // no need to communicate window visibility to botguard
   BackgroundPlayWebView(context, attrs) {
-    val jsInterface = BotGuardJavascriptInterface(context as MainActivity)
+    val jsInterface = BotGuardJavascriptInterface()
     init {
+      @SuppressLint("SetJavaScriptEnabled")
+      settings.javaScriptEnabled = true
+      @Suppress("DEPRECATION")
+      settings.allowUniversalAccessFromFileURLs = true
       addJavascriptInterface(jsInterface, "Android")
       webViewClient = object : WebViewClient() {
         override fun shouldInterceptRequest(
@@ -67,4 +77,9 @@ class BotGuardWebView @JvmOverloads constructor(
         }
       }
     }
+
+
+  constructor(context: Context, onConsoleMessage: (JSONObject) -> Unit = {}): this(context, null) {
+    webChromeClient = ConsoleLogChromeClient(onConsoleMessage)
+  }
 }

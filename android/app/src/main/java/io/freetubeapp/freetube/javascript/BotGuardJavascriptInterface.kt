@@ -3,7 +3,7 @@ package io.freetubeapp.freetube.javascript
 import android.webkit.JavascriptInterface
 import io.freetubeapp.freetube.MainActivity
 
-class BotGuardJavascriptInterface(main: MainActivity) {
+class BotGuardJavascriptInterface {
   private var poToken: String? = null
   private var tokenListeners: MutableList<(String) -> Unit> = mutableListOf()
   val pendingRequestBodies: MutableMap<String, String> = mutableMapOf()

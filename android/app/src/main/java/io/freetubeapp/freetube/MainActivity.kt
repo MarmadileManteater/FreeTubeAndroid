@@ -30,6 +30,7 @@ import io.freetubeapp.freetube.javascript.SigWebViewJavascriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
 import io.freetubeapp.freetube.webviews.BotGuardWebView
+import io.freetubeapp.freetube.webviews.ConsoleLogChromeClient
 import io.freetubeapp.freetube.webviews.SigWebView
 import org.json.JSONObject
 import java.net.URLEncoder
@@ -94,6 +95,11 @@ class MainActivity : AppCompatActivity() {
     workQueue
   )
   // endregion
+
+  private val onConsoleMessage = { messageData: JSONObject ->
+    consoleMessages.add(messageData)
+    webView.dispatchEvent("console-message", "data", messageData)
+  }
 
   // region Overridden methods
 
@@ -185,22 +191,7 @@ class MainActivity : AppCompatActivity() {
 
     jsInterface = FreeTubeJavaScriptInterface(this)
     webView.addJavascriptInterface(jsInterface, "Android")
-    webView.webChromeClient = object: WebChromeClient() {
-
-      override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
-        val messageData = JSONObject()
-        messageData.put("content", consoleMessage.message())
-        messageData.put("level", consoleMessage.messageLevel())
-        messageData.put("timestamp", System.currentTimeMillis())
-        messageData.put("id", UUID.randomUUID())
-        messageData.put("key", "${messageData["id"]}-${messageData["timestamp"]}")
-        messageData.put("sourceId", consoleMessage.sourceId())
-        messageData.put("lineNumber", consoleMessage.lineNumber())
-        consoleMessages.add(messageData)
-        webView.dispatchEvent("console-message", "data", messageData)
-        return super.onConsoleMessage(consoleMessage)
-      }
-
+    webView.webChromeClient = object: ConsoleLogChromeClient(onConsoleMessage) {
       override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
         fullscreenView = view!!
@@ -353,25 +344,6 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun generateBgWebview(): BotGuardWebView {
-    val wv = BotGuardWebView(this)
-    wv.settings.javaScriptEnabled = true
-    wv.settings.allowUniversalAccessFromFileURLs = true
-    wv.webChromeClient = object: WebChromeClient() {
-
-      override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
-        val messageData = JSONObject()
-        messageData.put("content", consoleMessage.message())
-        messageData.put("level", consoleMessage.messageLevel())
-        messageData.put("timestamp", System.currentTimeMillis())
-        messageData.put("id", UUID.randomUUID())
-        messageData.put("key", "${messageData["id"]}-${messageData["timestamp"]}")
-        messageData.put("sourceId", consoleMessage.sourceId())
-        messageData.put("lineNumber", consoleMessage.lineNumber())
-        consoleMessages.add(messageData)
-        webView.dispatchEvent("console-message", "data", messageData)
-        return super.onConsoleMessage(consoleMessage)
-      }
-    }
-    return wv
+    return BotGuardWebView(this, onConsoleMessage)
   }
 }
