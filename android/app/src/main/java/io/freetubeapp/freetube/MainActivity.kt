@@ -248,22 +248,7 @@ class MainActivity : AppCompatActivity() {
     sigJsInterface = SigWebViewJavascriptInterface(sigWebView, jsInterface.jsCommunicator)
     sigWebView.addJavascriptInterface(sigJsInterface, "Android")
     sigWebView.settings.javaScriptEnabled = true
-    sigWebView.webChromeClient = object: WebChromeClient() {
-
-      override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
-        val messageData = JSONObject()
-        messageData.put("content", consoleMessage.message())
-        messageData.put("level", consoleMessage.messageLevel())
-        messageData.put("timestamp", System.currentTimeMillis())
-        messageData.put("id", UUID.randomUUID())
-        messageData.put("key", "${messageData["id"]}-${messageData["timestamp"]}")
-        messageData.put("sourceId", consoleMessage.sourceId())
-        messageData.put("lineNumber", consoleMessage.lineNumber())
-        consoleMessages.add(messageData)
-        webView.dispatchEvent("console-message", "data", messageData)
-        return super.onConsoleMessage(consoleMessage)
-      }
-    }
+    sigWebView.webChromeClient = ConsoleLogChromeClient(onConsoleMessage)
     sigWebView.loadUrl("file:///android_asset/decipher.html")
   }
 
