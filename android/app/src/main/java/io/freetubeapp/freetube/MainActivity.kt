@@ -42,11 +42,8 @@ import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
-
-  // region Keep Alive service
-  private lateinit var keepAliveService: KeepAliveService
-  private lateinit var keepAliveIntent: Intent
-  // endregion
+  
+  private lateinit var keepAlive: Intent
 
   // region JS interfaces
   private lateinit var jsInterface: FreeTubeJavaScriptInterface
@@ -107,8 +104,14 @@ class MainActivity : AppCompatActivity() {
   @Suppress("DEPRECATION")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    // this keeps android from shutting off the app to conserve battery
+    keepAlive = Intent(this, KeepAliveService::class.java)
+    startService(keepAlive)
+
     // allow fullscreen shaka player to use whole window width
     window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+
     when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
       Configuration.UI_MODE_NIGHT_NO -> {
         darkMode = false
@@ -149,11 +152,6 @@ class MainActivity : AppCompatActivity() {
         action ->
       webView.dispatchEvent("media-$action")
     }
-
-    // this keeps android from shutting off the app to conserve battery
-    keepAliveService = KeepAliveService()
-    keepAliveIntent = Intent(this, keepAliveService.javaClass)
-    startService(keepAliveIntent)
 
     // this gets the controller for hiding and showing the system bars
     WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -298,7 +296,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     // stop the keep alive service
-    stopService(keepAliveIntent)
+    stopService(keepAlive)
     // cancel media notification (if there is one)
     jsInterface.cancelMediaNotification()
     // clean up the web view
