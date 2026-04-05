@@ -483,7 +483,12 @@ class FreeTubeJavaScriptInterface(
         .ifDataUri {
           fileName ->
           val path = getDirectory(DATA_DIRECTORY)
-          resolve(File(path, fileName).readText())
+          val file = File(path, fileName)
+          if (file.exists()) {
+            resolve(File(path, fileName).readText())
+          } else {
+            resolve("")
+          }
         }
         .catch {
           ex ->
@@ -599,7 +604,6 @@ class FreeTubeJavaScriptInterface(
     return Promise(coroutineScope, {
       resolve,
       reject ->
-        // TODO decouple
         methods.launchIntent(
           Intent(Intent.ACTION_GET_CONTENT)
           .setType("*/*")
@@ -629,7 +633,6 @@ class FreeTubeJavaScriptInterface(
     return Promise(coroutineScope, {
       resolve,
       reject ->
-      // TODO decouple
       methods.launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
