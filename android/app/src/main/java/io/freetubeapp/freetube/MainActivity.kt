@@ -25,6 +25,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.Promise
+import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
@@ -107,14 +108,7 @@ class MainActivity : AppCompatActivity() {
     // allow fullscreen shaka player to use whole window width
     window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
-    when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-      Configuration.UI_MODE_NIGHT_NO -> {
-        darkMode = false
-      }
-      Configuration.UI_MODE_NIGHT_YES -> {
-        darkMode = true
-      }
-    }
+    darkMode = resources.configuration.isDarkMode()
 
     val content: View = findViewById(android.R.id.content)
     content.viewTreeObserver.addOnPreDrawListener(
@@ -185,16 +179,9 @@ class MainActivity : AppCompatActivity() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    when (newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-      Configuration.UI_MODE_NIGHT_NO -> {
-        darkMode = false
-        webView.dispatchEvent("enabled-light-mode")
-      }
-      Configuration.UI_MODE_NIGHT_YES -> {
-        darkMode = true
-        webView.dispatchEvent("enabled-dark-mode")
-      }
-    }
+    darkMode = newConfig.isDarkMode()
+    val colorString = if (darkMode) { "dark" } else { "light" }
+    webView.dispatchEvent("enabled-$colorString-mode")
   }
 
   /**
