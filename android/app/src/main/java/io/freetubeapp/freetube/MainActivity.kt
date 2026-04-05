@@ -44,7 +44,10 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
-  private lateinit var keepAlive: Intent
+  private val keepGoingService: Intent
+    get() {
+      return Intent(this, KeepAliveService::class.java)
+    }
 
   // region JS interfaces
   private lateinit var jsInterface: FreeTubeJavaScriptInterface
@@ -109,8 +112,7 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
 
     // this keeps android from shutting off the app to conserve battery
-    keepAlive = Intent(this, KeepAliveService::class.java)
-    startService(keepAlive)
+    startService(keepGoingService)
 
     // allow fullscreen shaka player to use whole window width
     window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -200,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onDestroy() {
     // stop the keep alive service
-    stopService(keepAlive)
+    stopService(keepGoingService)
     // cancel media notification (if there is one)
     jsInterface.cancelMediaNotification()
     // clean up the web view
