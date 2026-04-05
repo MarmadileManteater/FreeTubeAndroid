@@ -56,8 +56,14 @@ class MainActivity : AppCompatActivity() {
   // endregion
 
   // region Callbacks
-  private lateinit var activityResultListeners: MutableList<(ActivityResult?) -> Unit>
-  private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+  private val activityResultListeners: MutableList<(ActivityResult?) -> Unit> = mutableListOf()
+  private val activityResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    for (listener in activityResultListeners) {
+      listener(it)
+    }
+    // clear the listeners
+    activityResultListeners.removeAll{ true }
+  }
   // endregion
 
   // region State Information
@@ -128,26 +134,10 @@ class MainActivity : AppCompatActivity() {
       }
     )
 
-    activityResultListeners = mutableListOf()
-
-    activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-      for (listener in activityResultListeners) {
-        listener(it)
-      }
-      // clear the listeners
-      activityResultListeners = mutableListOf()
-    }
-
     MediaControlsReceiver.notifyMediaSessionListeners = {
         action ->
       webView.dispatchEvent("media-$action")
     }
-
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
-    webView = binding.webView
-    jsInterface = webView.jsInterface
-    webView.onConsoleMessage = onConsoleMessage
 
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
@@ -162,6 +152,12 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
+
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
+    webView = binding.webView
+    jsInterface = webView.jsInterface
+    webView.onConsoleMessage = onConsoleMessage
 
     val url = intent?.toYtUrl()
     val postfix = if (url != null) {
