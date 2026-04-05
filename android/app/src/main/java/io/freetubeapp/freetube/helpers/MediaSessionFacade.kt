@@ -73,8 +73,7 @@ class MediaSessionFacade(
     trackName: String,
     artist: String,
     duration: Long,
-    art: String?,
-    pushNotification: Boolean = true
+    art: String?
   ): MediaSessionFacade {
     val metadataBuilder = MediaMetadata.Builder()
 
@@ -103,10 +102,6 @@ class MediaSessionFacade(
         .build()
     )
 
-    // TODO is this necessary?
-    if (pushNotification) {
-      push()
-    }
     return this
   }
 
