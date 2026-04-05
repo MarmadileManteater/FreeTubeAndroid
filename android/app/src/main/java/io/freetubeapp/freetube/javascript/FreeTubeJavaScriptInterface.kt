@@ -54,8 +54,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 
-class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebView) {
-  private var context: MainActivity = main
+class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView: FreeTubeWebView) {
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
@@ -587,9 +586,11 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
 
   @JavascriptInterface
   fun requestOpenDialog(fileTypes: String): String {
+    // TODO decouple
     return Promise(context.threadPoolExecutor, {
       resolve,
       reject ->
+        // TODO decouple
         context.launchIntent(
           Intent(Intent.ACTION_GET_CONTENT)
           .setType("*/*")
@@ -616,9 +617,11 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
 
   @JavascriptInterface
   fun requestDirectoryAccessDialog(): String {
+    // TODO decouple
     return Promise(context.threadPoolExecutor, {
       resolve,
       reject ->
+      // TODO decouple
       context.launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
@@ -652,6 +655,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
   @JavascriptInterface
   fun getLogs(): String {
     var logs = "["
+    // TODO decouple
     for (message in context.consoleMessages) {
       logs += "${message},"
     }
@@ -665,6 +669,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
 
   @JavascriptInterface
   fun restart() {
+    // TODO decouple
     context.finish()
     context.startActivity(Intent(Intent.ACTION_MAIN)
       .addCategory(Intent.CATEGORY_LAUNCHER)
@@ -676,6 +681,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
    */
   @JavascriptInterface
   fun hideSplashScreen() {
+    // TODO decouple
     context.showSplashScreen = false
   }
 
@@ -683,6 +689,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
   fun enableKeepScreenOn() {
     if (!keepScreenOn) {
       keepScreenOn = true
+      // TODO decouple
       context.runOnUiThread {
         context.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
@@ -693,6 +700,7 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
   fun disableKeepScreenOn() {
     if (keepScreenOn) {
       keepScreenOn = false
+      // TODO decouple
       context.runOnUiThread {
         context.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
@@ -712,12 +720,16 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
    */
   @JavascriptInterface
   fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
+    // TODO decouple
     context.runOnUiThread {
+      // TODO decouple
       val windowInsetsController =
         WindowCompat.getInsetsController(context.window, context.window.decorView)
       windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
       windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
+      // TODO decouple
       context.window.navigationBarColor = navigationHex.hexToColour()
+      // TODO decouple
       context.window.statusBarColor = statusHex.hexToColour()
     }
 
@@ -726,11 +738,13 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
     val canvas = Canvas(bitmap)
     canvas.drawColor(navigationHex.hexToColour())
     val bitmapDrawable = bitmap.toDrawable(context.resources)
+    // TODO decouple
     context.window.setBackgroundDrawable(bitmapDrawable)
   }
 
   @JavascriptInterface
   fun getSystemTheme(): String {
+    // TODO decouple
     return if (context.darkMode) {
       "dark"
     } else {
@@ -740,18 +754,21 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
 
   @JavascriptInterface
   fun isAppPaused(): Boolean {
+    // TODO decouple
     return context.paused
   }
 
   @JavascriptInterface
   fun enterPromptMode() {
     webView.isVerticalScrollBarEnabled = false
+    // TODO decouple
     context.isInAPrompt = true
   }
 
   @JavascriptInterface
   fun exitPromptMode() {
     webView.isVerticalScrollBarEnabled = true
+    // TODO decouple
     context.isInAPrompt = false
   }
 
@@ -780,22 +797,26 @@ class FreeTubeJavaScriptInterface(main: MainActivity, val webView: FreeTubeWebVi
 
   @JavascriptInterface
   fun generatePOToken(videoId: String, sessionContext: String): String {
+    // TODO decouple
     return Promise(context.threadPoolExecutor, {
       resolve,
       reject
       ->
+      // TODO decouple
         context.runOnUiThread {
           try {
             val bgScript = getBotGuardScript(videoId, sessionContext)
             val bgWv = webView.generateBgWebview()
             bgWv.jsInterface.onReturnToken {
               run {
+                // TODO decouple
                 context.runOnUiThread {
                   resolve(it)
                   bgWv.destroy()
                 }
               }
             }
+            // TODO decouple
             context.runOnUiThread {
               bgWv.loadDataWithBaseURL(
                 "https://www.youtube.com/",
