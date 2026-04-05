@@ -1,0 +1,116 @@
+package io.freetubeapp.freetube.helpers
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.media.MediaMetadata
+import android.media.session.PlaybackState
+import android.media.session.PlaybackState.STATE_PAUSED
+import android.os.Build
+import androidx.core.app.NotificationManagerCompat
+import java.net.URL
+
+// 🤫 pay no attention to the one behind the curtain
+class MediaSessionFacade(
+  private val context: Context,
+  private val channelId: String,
+  dispatchMediaEvent: (String) -> Unit = {},
+  dispatchPositionEvent: (Long) -> Unit = {},
+  private var state: Int = STATE_PAUSED,
+  private val notificationId: Int = (2..1000).random(),
+  private val notificationTag: String = "media_controls"
+) {
+  private val notificationManager = NotificationManagerCompat.from(context)
+  private val notificationChannel = context.createNotificationChannel(channelId)
+  private val session = context.createMediaSession(
+    channelId,
+    { event ->
+      dispatchMediaEvent(event)
+    },
+    { position ->
+      dispatchPositionEvent(position)
+    }
+  )
+  private var notification = context.createNotification(session, channelId, state)
+  private var playbackPosition: Long? = null
+
+  @SuppressLint("MissingPermission")
+  fun push() {
+    // AFAIK you don't need permission to push a media session notification
+    notificationManager.notify(notificationTag, notificationId, notification)
+  }
+
+  fun setState(givenState: Int?, position: Long? = null): MediaSessionFacade {
+    if (givenState != null) {
+      state = givenState
+    }
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+      // recreate media notification
+      notification = context.createNotification(session, channelId, state)
+      push()
+    }
+
+    val statePosition: Long? = position ?: playbackPosition
+    playbackPosition = statePosition
+    session.setPlaybackState(
+      PlaybackState.Builder()
+        .setState(state, statePosition ?: 0, 0.0f)
+        .setActions(
+          PlaybackState.ACTION_PLAY_PAUSE or
+          PlaybackState.ACTION_PAUSE or
+          PlaybackState.ACTION_SKIP_TO_NEXT or
+          PlaybackState.ACTION_SKIP_TO_PREVIOUS or
+          PlaybackState.ACTION_PLAY_FROM_MEDIA_ID or
+          PlaybackState.ACTION_PLAY_FROM_SEARCH or
+          PlaybackState.ACTION_SEEK_TO
+        ).build()
+    )
+    return this
+  }
+
+  fun setMetadata(
+    trackName: String,
+    artist: String,
+    duration: Long,
+    art: String?,
+    pushNotification: Boolean = true
+  ): MediaSessionFacade {
+    val metadataBuilder = MediaMetadata.Builder()
+
+    if (art != null) {
+      try {
+        val connection = URL(art).openConnection()
+        connection.connect()
+
+        val input = connection.getInputStream()
+        val bitmapArt = BitmapFactory.decodeStream(input)
+
+        metadataBuilder
+          .putBitmap(MediaMetadata.METADATA_KEY_ART, bitmapArt)
+          .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmapArt)
+
+      } catch (ex: Throwable) {
+        ex.printStackTrace()
+      }
+    }
+
+    session.setMetadata(
+      metadataBuilder
+        .putString(MediaMetadata.METADATA_KEY_TITLE, trackName)
+        .putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+        .putLong(MediaMetadata.METADATA_KEY_DURATION, duration)
+        .build()
+    )
+
+    // TODO is this necessary?
+    if (pushNotification) {
+      push()
+    }
+    return this
+  }
+
+  fun cancel() {
+    notificationManager.cancelAll()
+  }
+}
