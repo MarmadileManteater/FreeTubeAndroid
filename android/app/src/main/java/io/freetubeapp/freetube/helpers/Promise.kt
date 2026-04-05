@@ -10,7 +10,7 @@ import java.util.UUID.randomUUID
 import java.util.concurrent.Executor
 import java.util.concurrent.ThreadPoolExecutor
 
-class Promise<T, G>(val coroutineScope: CoroutineScope, runnable: ((T) -> Unit, (G) -> Unit) -> Unit) {
+class Promise<T, G>(coroutineScope: CoroutineScope, runnable: ((T) -> Unit, (G) -> Unit) -> Unit) {
   private val successListeners: MutableList<(T) -> Unit> = mutableListOf()
   private var successResult: T? = null
   private val errorListeners: MutableList<(G) -> Unit> = mutableListOf()

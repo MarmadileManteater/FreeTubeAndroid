@@ -123,41 +123,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     webView = FreeTubeWebView(this, state, ApplicationMethods(
-      restart = {
-        finish()
-        startActivity(Intent(Intent.ACTION_MAIN)
-          .addCategory(Intent.CATEGORY_LAUNCHER)
-          .setClass(this,  MainActivity::class.java))
-      },
+      restart = { restart() },
       launchIntent = { intent -> launchIntent(intent) },
-      setKeepScreenOn = { newState ->
-        if (state.keepScreenOn != newState) {
-          state.keepScreenOn = newState
-          runOnUiThread {
-            if (state.keepScreenOn) {
-              window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            } else {
-              window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            }
-          }
-        }
-      },
+      setKeepScreenOn = { newState -> setKeepScreenOn(newState) },
       themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
-        runOnUiThread {
-          val windowInsetsController =
-            WindowCompat.getInsetsController(window, window.decorView)
-          windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
-          windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
-          window.navigationBarColor = navigationHex.hexToColour()
-          window.statusBarColor = statusHex.hexToColour()
-
-          val bitmap = createBitmap(24, 24)
-          bitmap.eraseColor(navigationHex.hexToColour())
-          val canvas = Canvas(bitmap)
-          canvas.drawColor(navigationHex.hexToColour())
-          val bitmapDrawable = bitmap.toDrawable(resources)
-          window.setBackgroundDrawable(bitmapDrawable)
-        }
+        themeSystemUI(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
       }
     ))
 
@@ -222,7 +192,14 @@ class MainActivity : AppCompatActivity() {
     activityResultListeners.add(listener)
   }
 
-  fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
+  private fun restart() {
+    finish()
+    startActivity(Intent(Intent.ACTION_MAIN)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setClass(this,  MainActivity::class.java))
+  }
+
+  private fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
     return Promise({
         resolve,
         reject ->
@@ -235,5 +212,36 @@ class MainActivity : AppCompatActivity() {
         reject(exception)
       }
     })
+  }
+
+  private fun setKeepScreenOn(newState: Boolean) {
+    if (state.keepScreenOn != newState) {
+      state.keepScreenOn = newState
+      runOnUiThread {
+        if (state.keepScreenOn) {
+          window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+          window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+      }
+    }
+  }
+
+  private fun themeSystemUI(navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) {
+    runOnUiThread {
+      val windowInsetsController =
+        WindowCompat.getInsetsController(window, window.decorView)
+      windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
+      windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
+      window.navigationBarColor = navigationHex.hexToColour()
+      window.statusBarColor = statusHex.hexToColour()
+
+      val bitmap = createBitmap(24, 24)
+      bitmap.eraseColor(navigationHex.hexToColour())
+      val canvas = Canvas(bitmap)
+      canvas.drawColor(navigationHex.hexToColour())
+      val bitmapDrawable = bitmap.toDrawable(resources)
+      window.setBackgroundDrawable(bitmapDrawable)
+    }
   }
 }
