@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.isDarkMode
+import io.freetubeapp.freetube.helpers.toYtUrl
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
@@ -162,19 +163,13 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    if (intent!!.data !== null) {
-      val url = intent!!.data.toString()
-      val host = intent!!.data!!.host.toString()
-      val intentPath = if (host != "youtube.com" && host != "youtu.be" && host != "m.youtube.com" && host != "www.youtube.com") {
-        url.replace("${intent!!.data!!.host}", "youtube.com")
-      } else {
-        url
-      }
-      val intentEncoded = URLEncoder.encode(intentPath)
-      webView.loadUrl("file:///android_asset/index.html?intent=${intentEncoded}")
+    val url = intent?.toYtUrl()
+    val postfix = if (url != null) {
+      "?intent=${URLEncoder.encode(url)}"
     } else {
-      webView.loadUrl("file:///android_asset/index.html")
+      ""
     }
+    webView.loadUrl("file:///android_asset/index.html$postfix")
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -189,16 +184,9 @@ class MainActivity : AppCompatActivity() {
    */
   @SuppressLint("MissingSuperCall")
   override fun onNewIntent(intent: Intent?) {
-    if (intent!!.data !== null) {
-      val uri = intent!!.data
-      val isYT =
-        uri!!.host!! == "www.youtube.com" || uri.host!! == "youtube.com" || uri.host!! == "m.youtube.com" || uri.host!! == "youtu.be"
-      val url = if (!isYT) {
-        uri.toString().replace(uri.host.toString(), "www.youtube.com")
-      } else {
-        uri
-      }
-      webView.dispatchEvent("youtube-link", "link", url.toString())
+    val url = intent?.toYtUrl()
+    if (url != null) {
+      webView.dispatchEvent("youtube-link", "link", url)
     }
   }
 
