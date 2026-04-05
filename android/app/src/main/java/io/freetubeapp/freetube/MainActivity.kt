@@ -3,6 +3,7 @@ package io.freetubeapp.freetube
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -21,13 +22,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.viewpager.widget.ViewPager
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
+import io.freetubeapp.freetube.helpers.ApplicationMethods
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
+import io.freetubeapp.freetube.helpers.hexToColour
 import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.helpers.toYtUrl
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
@@ -117,7 +122,45 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    webView = FreeTubeWebView(this, state)
+    webView = FreeTubeWebView(this, state, ApplicationMethods(
+      restart = {
+        finish()
+        startActivity(Intent(Intent.ACTION_MAIN)
+          .addCategory(Intent.CATEGORY_LAUNCHER)
+          .setClass(this,  MainActivity::class.java))
+      },
+      launchIntent = { intent -> launchIntent(intent) },
+      setKeepScreenOn = { newState ->
+        if (state.keepScreenOn != newState) {
+          state.keepScreenOn = newState
+          runOnUiThread {
+            if (state.keepScreenOn) {
+              window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+              window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+          }
+        }
+      },
+      themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
+        runOnUiThread {
+          val windowInsetsController =
+            WindowCompat.getInsetsController(window, window.decorView)
+          windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
+          windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
+          window.navigationBarColor = navigationHex.hexToColour()
+          window.statusBarColor = statusHex.hexToColour()
+
+          val bitmap = createBitmap(24, 24)
+          bitmap.eraseColor(navigationHex.hexToColour())
+          val canvas = Canvas(bitmap)
+          canvas.drawColor(navigationHex.hexToColour())
+          val bitmapDrawable = bitmap.toDrawable(resources)
+          window.setBackgroundDrawable(bitmapDrawable)
+        }
+      }
+    ))
+
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)
       root.addView(webView)

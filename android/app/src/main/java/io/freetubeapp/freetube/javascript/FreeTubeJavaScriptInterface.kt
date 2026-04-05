@@ -37,6 +37,7 @@ import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.MediaControlsReceiver
 import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.helpers.AmbiguousFileUri
+import io.freetubeapp.freetube.helpers.ApplicationMethods
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
@@ -57,13 +58,18 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 
-class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView: FreeTubeWebView, val state: ApplicationState) {
+class FreeTubeJavaScriptInterface(
+  private val context: Context,
+  private val webView: FreeTubeWebView,
+  private val state: ApplicationState,
+  private val methods: ApplicationMethods
+) {
   private val coroutineScope = CoroutineScope(Dispatchers.Main)
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
   private var lastNotification: Notification? = null
-  private var keepScreenOn: Boolean = false
+
   val jsCommunicator: AsyncJSCommunicator
 
   companion object {
@@ -568,7 +574,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
       resolve,
       reject
       ->
-      context.launchIntent(
+      methods.launchIntent(
         Intent(Intent.ACTION_CREATE_DOCUMENT)
         .addCategory(Intent.CATEGORY_OPENABLE)
         .setType(fileType)
@@ -594,7 +600,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
       resolve,
       reject ->
         // TODO decouple
-        context.launchIntent(
+        methods.launchIntent(
           Intent(Intent.ACTION_GET_CONTENT)
           .setType("*/*")
           .putExtra(Intent.EXTRA_MIME_TYPES, fileTypes.split(",").toTypedArray())
@@ -624,7 +630,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
       resolve,
       reject ->
       // TODO decouple
-      context.launchIntent(
+      methods.launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
           if (it!!.resultCode == Activity.RESULT_CANCELED) {
@@ -670,11 +676,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun restart() {
-    // TODO decouple
-    context.finish()
-    context.startActivity(Intent(Intent.ACTION_MAIN)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setClass(context,  MainActivity::class.java))
+    methods.restart()
   }
 
   /**
@@ -687,22 +689,13 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun enableKeepScreenOn() {
-    if (!keepScreenOn) {
-      keepScreenOn = true
-      webView.post {
-        context.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      }
-    }
+    methods.setKeepScreenOn(true)
+
   }
 
   @JavascriptInterface
   fun disableKeepScreenOn() {
-    if (keepScreenOn) {
-      keepScreenOn = false
-      webView.post {
-        context.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-      }
-    }
+    methods.setKeepScreenOn(false)
   }
 
   /**
@@ -718,25 +711,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
    */
   @JavascriptInterface
   fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
-    webView.post {
-      // TODO decouple
-      val windowInsetsController =
-        WindowCompat.getInsetsController(context.window, context.window.decorView)
-      windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
-      windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
-      // TODO decouple
-      context.window.navigationBarColor = navigationHex.hexToColour()
-      // TODO decouple
-      context.window.statusBarColor = statusHex.hexToColour()
-    }
-
-    val bitmap = createBitmap(24, 24)
-    bitmap.eraseColor(navigationHex.hexToColour())
-    val canvas = Canvas(bitmap)
-    canvas.drawColor(navigationHex.hexToColour())
-    val bitmapDrawable = bitmap.toDrawable(context.resources)
-    // TODO decouple
-    context.window.setBackgroundDrawable(bitmapDrawable)
+    methods.themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
   }
 
   @JavascriptInterface

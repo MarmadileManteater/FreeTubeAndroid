@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.R
+import io.freetubeapp.freetube.helpers.ApplicationMethods
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
@@ -28,10 +29,10 @@ import org.json.JSONObject
 @SuppressLint("ViewConstructor")
 class FreeTubeWebView (
   context: Context,
-  private val state: ApplicationState
+  private val state: ApplicationState,
+  methods: ApplicationMethods
 ) : BackgroundPlayWebView(context, null) {
-  // TODO fix the coupling here with context as MainActivity
-  val jsInterface = FreeTubeJavaScriptInterface(context as MainActivity, this, state)
+  val jsInterface = FreeTubeJavaScriptInterface(context, this, state, methods)
 
   val onConsoleMessage: (JSONObject) -> Unit = { messageData: JSONObject ->
     state.consoleMessages.add(messageData)
