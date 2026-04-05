@@ -8,5 +8,6 @@ data class ApplicationState(
   var darkMode: Boolean = false,
   var paused: Boolean = false,
   var isInAPrompt: Boolean = false,
-  var keepScreenOn: Boolean = false
+  var keepScreenOn: Boolean = false,
+  var currentPage: String? = null
 )

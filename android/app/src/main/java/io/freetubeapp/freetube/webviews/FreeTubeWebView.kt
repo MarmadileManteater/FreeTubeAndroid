@@ -57,6 +57,10 @@ class FreeTubeWebView (
     settings.mediaPlaybackRequiresUserGesture = false
 
     webViewClient = object: WebViewClient() {
+      override fun onPageFinished(view: WebView?, url: String?) {
+        state.currentPage = url
+        super.onPageFinished(view, url)
+      }
       override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         if (request!!.url!!.scheme == "file") {
           // don't send file url requests to a web browser (it will crash the app)
