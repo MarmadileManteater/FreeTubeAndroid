@@ -689,8 +689,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   fun enableKeepScreenOn() {
     if (!keepScreenOn) {
       keepScreenOn = true
-      // TODO decouple
-      context.runOnUiThread {
+      webView.post {
         context.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
     }
@@ -700,8 +699,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   fun disableKeepScreenOn() {
     if (keepScreenOn) {
       keepScreenOn = false
-      // TODO decouple
-      context.runOnUiThread {
+      webView.post {
         context.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
       }
     }
@@ -720,8 +718,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
    */
   @JavascriptInterface
   fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
-    // TODO decouple
-    context.runOnUiThread {
+    webView.post {
       // TODO decouple
       val windowInsetsController =
         WindowCompat.getInsetsController(context.window, context.window.decorView)
@@ -797,22 +794,19 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
       resolve,
       reject
       ->
-      // TODO decouple
-        context.runOnUiThread {
+        webView.post {
           try {
             val bgScript = getBotGuardScript(videoId, sessionContext)
             val bgWv = webView.generateBgWebview()
             bgWv.jsInterface.onReturnToken {
               run {
-                // TODO decouple
-                context.runOnUiThread {
+                webView.post {
                   resolve(it)
                   bgWv.destroy()
                 }
               }
             }
-            // TODO decouple
-            context.runOnUiThread {
+            webView.post {
               bgWv.loadDataWithBaseURL(
                 "https://www.youtube.com/",
                 "<script>\n" +
