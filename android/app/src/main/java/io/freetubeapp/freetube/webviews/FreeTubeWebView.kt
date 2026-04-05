@@ -7,30 +7,36 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.WindowInsetsController
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.R
+import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import org.json.JSONObject
 
-class FreeTubeWebView @JvmOverloads constructor(
-  context: Context, attrs: AttributeSet? = null
-) : BackgroundPlayWebView(context, attrs) {
+@SuppressLint("ViewConstructor")
+class FreeTubeWebView (
+  context: Context,
+  val state: ApplicationState
+) : BackgroundPlayWebView(context, null) {
   // TODO fix the coupling here with context as MainActivity
   val jsInterface = FreeTubeJavaScriptInterface(context as MainActivity, this)
 
   var onConsoleMessage: (JSONObject) -> Unit = {}
 
   init {
+    layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
     setBackgroundColor(Color.TRANSPARENT)
 
     @SuppressLint("SetJavaScriptEnabled")

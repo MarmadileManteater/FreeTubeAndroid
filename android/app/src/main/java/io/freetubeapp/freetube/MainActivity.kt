@@ -19,10 +19,12 @@ import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.viewpager.widget.ViewPager
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
@@ -50,6 +52,8 @@ class MainActivity : AppCompatActivity() {
       return Intent(this, KeepAliveService::class.java)
     }
 
+  val state = ApplicationState()
+
   // region JS interfaces
   private lateinit var jsInterface: FreeTubeJavaScriptInterface
   // endregion
@@ -69,8 +73,6 @@ class MainActivity : AppCompatActivity() {
     activityResultListeners.removeAll{ true }
   }
   // endregion
-
-  val state = ApplicationState()
 
   // region Thread Pool Executor
   /*
@@ -152,7 +154,8 @@ class MainActivity : AppCompatActivity() {
 
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
-    webView = binding.webView
+    webView = FreeTubeWebView(this, state)
+    binding.root.addView(webView)
     jsInterface = webView.jsInterface
     webView.onConsoleMessage = onConsoleMessage
 
