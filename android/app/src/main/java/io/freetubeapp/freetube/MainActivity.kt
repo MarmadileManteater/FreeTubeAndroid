@@ -24,6 +24,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
+import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.helpers.toYtUrl
@@ -69,13 +70,7 @@ class MainActivity : AppCompatActivity() {
   }
   // endregion
 
-  // region State Information
-  var consoleMessages: MutableList<JSONObject> = mutableListOf()
-  var showSplashScreen: Boolean = true
-  var darkMode: Boolean = false
-  var paused: Boolean = false
-  var isInAPrompt: Boolean = false
-  // endregion
+  val state = ApplicationState()
 
   // region Thread Pool Executor
   /*
@@ -100,7 +95,7 @@ class MainActivity : AppCompatActivity() {
   // endregion
 
   private val onConsoleMessage = { messageData: JSONObject ->
-    consoleMessages.add(messageData)
+    state.consoleMessages.add(messageData)
     webView.dispatchEvent("console-message", "data", messageData)
   }
 
@@ -117,14 +112,14 @@ class MainActivity : AppCompatActivity() {
     // allow fullscreen shaka player to use whole window width
     window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
-    darkMode = resources.configuration.isDarkMode()
+    state.darkMode = resources.configuration.isDarkMode()
 
     val content: View = findViewById(android.R.id.content)
     content.viewTreeObserver.addOnPreDrawListener(
       object : ViewTreeObserver.OnPreDrawListener {
         override fun onPreDraw(): Boolean {
           // Check whether the initial data is ready.
-          return if (!showSplashScreen) {
+          return if (!state.showSplashScreen) {
             // The content is ready. Start drawing.
             content.viewTreeObserver.removeOnPreDrawListener(this)
             true
@@ -143,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
-      if (isInAPrompt) {
+      if (state.isInAPrompt) {
         webView.dispatchEvent("exit-prompt")
         jsInterface.exitPromptMode()
       } else {
@@ -172,8 +167,8 @@ class MainActivity : AppCompatActivity() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    darkMode = newConfig.isDarkMode()
-    val colorString = if (darkMode) { "dark" } else { "light" }
+    state.darkMode = newConfig.isDarkMode()
+    val colorString = if (state.darkMode) { "dark" } else { "light" }
     webView.dispatchEvent("enabled-$colorString-mode")
   }
 
@@ -190,13 +185,13 @@ class MainActivity : AppCompatActivity() {
 
   override fun onPause() {
     super.onPause()
-    paused = true
+    state.paused = true
     webView.dispatchEvent("app-pause")
   }
 
   override fun onResume() {
     super.onResume()
-    paused = false
+    state.paused = false
     webView.dispatchEvent("app-resume")
   }
 

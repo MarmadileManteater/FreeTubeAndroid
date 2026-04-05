@@ -656,7 +656,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   fun getLogs(): String {
     var logs = "["
     // TODO decouple
-    for (message in context.consoleMessages) {
+    for (message in context.state.consoleMessages) {
       logs += "${message},"
     }
     // get rid of trailing comma
@@ -682,7 +682,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   @JavascriptInterface
   fun hideSplashScreen() {
     // TODO decouple
-    context.showSplashScreen = false
+    context.state.showSplashScreen = false
   }
 
   @JavascriptInterface
@@ -745,7 +745,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   @JavascriptInterface
   fun getSystemTheme(): String {
     // TODO decouple
-    return if (context.darkMode) {
+    return if (context.state.darkMode) {
       "dark"
     } else {
       "light"
@@ -755,21 +755,21 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   @JavascriptInterface
   fun isAppPaused(): Boolean {
     // TODO decouple
-    return context.paused
+    return context.state.paused
   }
 
   @JavascriptInterface
   fun enterPromptMode() {
     webView.isVerticalScrollBarEnabled = false
     // TODO decouple
-    context.isInAPrompt = true
+    context.state.isInAPrompt = true
   }
 
   @JavascriptInterface
   fun exitPromptMode() {
     webView.isVerticalScrollBarEnabled = true
     // TODO decouple
-    context.isInAPrompt = false
+    context.state.isInAPrompt = false
   }
 
   @JavascriptInterface
