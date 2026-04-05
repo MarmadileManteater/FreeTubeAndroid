@@ -139,10 +139,11 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    val binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
     webView = FreeTubeWebView(this, state)
-    binding.root.addView(webView)
+    ActivityMainBinding.inflate(layoutInflater).apply {
+      setContentView(root)
+      root.addView(webView)
+    }
 
     val url = intent?.toYtUrl()
     val postfix = if (url != null) {
