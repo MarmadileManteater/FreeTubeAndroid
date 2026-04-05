@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity() {
       return Intent(this, KeepAliveService::class.java)
     }
 
-  val state = ApplicationState()
-  lateinit var webView: FreeTubeWebView
+  private val state = ApplicationState()
+  private lateinit var webView: FreeTubeWebView
 
   // region Callbacks
   private val activityResultListeners: MutableList<(ActivityResult?) -> Unit> = mutableListOf()
