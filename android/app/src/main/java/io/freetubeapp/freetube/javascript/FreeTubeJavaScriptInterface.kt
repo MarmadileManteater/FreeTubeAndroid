@@ -46,6 +46,8 @@ import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.writeBytes
 import io.freetubeapp.freetube.helpers.writeText
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
 import java.io.File
 import java.net.URL
@@ -56,6 +58,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView: FreeTubeWebView, val state: ApplicationState) {
+  private val coroutineScope = CoroutineScope(Dispatchers.Main)
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
@@ -459,7 +462,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
    */
   @JavascriptInterface
   fun readFile(uri: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject ->
       AmbiguousFileUri(uri)
@@ -489,7 +492,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   @OptIn(ExperimentalEncodingApi::class)
   @JavascriptInterface
   fun writeFile(uri: String, content: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject ->
         AmbiguousFileUri(uri)
@@ -522,7 +525,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   @OptIn(ExperimentalEncodingApi::class)
   @JavascriptInterface
   fun appendFile(uri: String, content: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject ->
         AmbiguousFileUri(uri)
@@ -561,7 +564,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
    */
   @JavascriptInterface
   fun requestSaveDialog(fileName: String, fileType: String): String {
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject
       ->
@@ -587,8 +590,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun requestOpenDialog(fileTypes: String): String {
-    // TODO decouple
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject ->
         // TODO decouple
@@ -618,8 +620,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun requestDirectoryAccessDialog(): String {
-    // TODO decouple
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject ->
       // TODO decouple
@@ -792,8 +793,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun generatePOToken(videoId: String, sessionContext: String): String {
-    // TODO decouple
-    return Promise(context.threadPoolExecutor, {
+    return Promise(coroutineScope, {
       resolve,
       reject
       ->

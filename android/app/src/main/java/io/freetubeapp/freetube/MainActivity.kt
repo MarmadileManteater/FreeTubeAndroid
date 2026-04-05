@@ -66,28 +66,6 @@ class MainActivity : AppCompatActivity() {
   }
   // endregion
 
-  // region Thread Pool Executor
-  /*
-   * Gets the number of available cores
-   * (not always the same as the maximum number of cores)
-   */
-  private val numberOfCores = Runtime.getRuntime().availableProcessors()
-  // Instantiates the queue of Runnables as a LinkedBlockingQueue
-  private val workQueue: BlockingQueue<Runnable> = LinkedBlockingQueue()
-  // Sets the amount of time an idle thread waits before terminating
-  private val keepAliveTime = 1
-  // Sets the Time Unit to seconds
-  private val keepAliveTimeUnit: TimeUnit = TimeUnit.SECONDS
-  // Creates a thread pool manager
-  var threadPoolExecutor = ThreadPoolExecutor(
-    numberOfCores,  // Initial pool size
-    numberOfCores,  // Max pool size
-    keepAliveTime.toLong(),
-    keepAliveTimeUnit,
-    workQueue
-  )
-  // endregion
-
   // region Overridden methods
 
   @SuppressLint("SetJavaScriptEnabled")
@@ -202,7 +180,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
-    return Promise(threadPoolExecutor, {
+    return Promise({
         resolve,
         reject ->
       try {

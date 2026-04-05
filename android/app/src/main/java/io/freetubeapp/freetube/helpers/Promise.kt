@@ -1,23 +1,31 @@
 package io.freetubeapp.freetube.helpers
 
 import io.freetubeapp.freetube.javascript.AsyncJSCommunicator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.UUID.randomUUID
+import java.util.concurrent.Executor
 import java.util.concurrent.ThreadPoolExecutor
 
-class Promise<T, G>(executor: ThreadPoolExecutor, runnable: ((T) -> Unit, (G) -> Unit) -> Unit) {
+class Promise<T, G>(val coroutineScope: CoroutineScope, runnable: ((T) -> Unit, (G) -> Unit) -> Unit) {
   private val successListeners: MutableList<(T) -> Unit> = mutableListOf()
   private var successResult: T? = null
   private val errorListeners: MutableList<(G) -> Unit> = mutableListOf()
   private var errorResult: G? = null
   private val id = "${randomUUID()}"
 
+  constructor(runnable: ((T) -> Unit, (G) -> Unit) -> Unit): this(CoroutineScope(Dispatchers.IO), runnable)
+
   init {
-    executor.run {
+    coroutineScope.launch {
       runnable.invoke({
-        result ->
+          result ->
         notifySuccess(result)
       }, {
-        result ->
+          result ->
         notifyError(result)
       })
     }
