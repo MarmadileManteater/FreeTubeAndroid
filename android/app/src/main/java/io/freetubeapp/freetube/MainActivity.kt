@@ -53,15 +53,7 @@ class MainActivity : AppCompatActivity() {
     }
 
   val state = ApplicationState()
-
-  // region JS interfaces
-  private lateinit var jsInterface: FreeTubeJavaScriptInterface
-  // endregion
-
-  // region Bindings
-  private lateinit var binding: ActivityMainBinding
   lateinit var webView: FreeTubeWebView
-  // endregion
 
   // region Callbacks
   private val activityResultListeners: MutableList<(ActivityResult?) -> Unit> = mutableListOf()
@@ -95,11 +87,6 @@ class MainActivity : AppCompatActivity() {
     workQueue
   )
   // endregion
-
-  private val onConsoleMessage = { messageData: JSONObject ->
-    state.consoleMessages.add(messageData)
-    webView.dispatchEvent("console-message", "data", messageData)
-  }
 
   // region Overridden methods
 
@@ -142,7 +129,7 @@ class MainActivity : AppCompatActivity() {
     onBackPressedDispatcher.addCallback {
       if (state.isInAPrompt) {
         webView.dispatchEvent("exit-prompt")
-        jsInterface.exitPromptMode()
+        webView.jsInterface.exitPromptMode()
       } else {
         if (webView.canGoBack()) {
           webView.goBack()
@@ -152,12 +139,10 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    binding = ActivityMainBinding.inflate(layoutInflater)
+    val binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     webView = FreeTubeWebView(this, state)
     binding.root.addView(webView)
-    jsInterface = webView.jsInterface
-    webView.onConsoleMessage = onConsoleMessage
 
     val url = intent?.toYtUrl()
     val postfix = if (url != null) {
@@ -202,7 +187,7 @@ class MainActivity : AppCompatActivity() {
     // stop the keep alive service
     stopService(keepGoingService)
     // cancel media notification (if there is one)
-    jsInterface.cancelMediaNotification()
+    webView.jsInterface.cancelMediaNotification()
     // clean up the web view
     webView.destroy()
     // call `super`

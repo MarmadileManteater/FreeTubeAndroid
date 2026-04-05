@@ -28,12 +28,15 @@ import org.json.JSONObject
 @SuppressLint("ViewConstructor")
 class FreeTubeWebView (
   context: Context,
-  val state: ApplicationState
+  private val state: ApplicationState
 ) : BackgroundPlayWebView(context, null) {
   // TODO fix the coupling here with context as MainActivity
-  val jsInterface = FreeTubeJavaScriptInterface(context as MainActivity, this)
+  val jsInterface = FreeTubeJavaScriptInterface(context as MainActivity, this, state)
 
-  var onConsoleMessage: (JSONObject) -> Unit = {}
+  val onConsoleMessage: (JSONObject) -> Unit = { messageData: JSONObject ->
+    state.consoleMessages.add(messageData)
+    dispatchEvent("console-message", "data", messageData)
+  }
 
   init {
     layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)

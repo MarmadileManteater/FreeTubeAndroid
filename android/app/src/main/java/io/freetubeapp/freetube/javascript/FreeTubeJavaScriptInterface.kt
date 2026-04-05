@@ -37,6 +37,7 @@ import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.MediaControlsReceiver
 import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.helpers.AmbiguousFileUri
+import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
 import io.freetubeapp.freetube.helpers.hexToColour
@@ -54,7 +55,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 
-class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView: FreeTubeWebView) {
+class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView: FreeTubeWebView, val state: ApplicationState) {
   private var mediaSession: MediaSession?
   private var lastPosition: Long
   private var lastState: Int
@@ -655,7 +656,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
   @JavascriptInterface
   fun getLogs(): String {
     var logs = "["
-    for (message in webView.state.consoleMessages) {
+    for (message in state.consoleMessages) {
       logs += "${message},"
     }
     // get rid of trailing comma
@@ -680,7 +681,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
    */
   @JavascriptInterface
   fun hideSplashScreen() {
-    webView.state.showSplashScreen = false
+    state.showSplashScreen = false
   }
 
   @JavascriptInterface
@@ -742,7 +743,7 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun getSystemTheme(): String {
-    return if (webView.state.darkMode) {
+    return if (state.darkMode) {
       "dark"
     } else {
       "light"
@@ -751,19 +752,19 @@ class FreeTubeJavaScriptInterface(private val context: MainActivity, val webView
 
   @JavascriptInterface
   fun isAppPaused(): Boolean {
-    return webView.state.paused
+    return state.paused
   }
 
   @JavascriptInterface
   fun enterPromptMode() {
     webView.isVerticalScrollBarEnabled = false
-    webView.state.isInAPrompt = true
+    state.isInAPrompt = true
   }
 
   @JavascriptInterface
   fun exitPromptMode() {
     webView.isVerticalScrollBarEnabled = true
-    webView.state.isInAPrompt = false
+    state.isInAPrompt = false
   }
 
   @JavascriptInterface
