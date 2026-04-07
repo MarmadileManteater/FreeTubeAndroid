@@ -21,8 +21,11 @@ class MediaSessionFacade(
   private val notificationId: Int = (2..1000).random(),
   private val notificationTag: String = "media_controls"
 ) {
+  init {
+    context.createNotificationChannel(channelId)
+  }
+  
   private val notificationManager = NotificationManagerCompat.from(context)
-  private val notificationChannel = context.createNotificationChannel(channelId)
   private val session = context.createMediaSession(
     channelId,
     { event ->
