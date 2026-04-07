@@ -22,5 +22,5 @@ export function createMediaSession(title, artist, duration, cover = null) {
  * @param {number?} position playback position in milliseconds
  */
 export function updateMediaSessionState(state, position = null) {
-  android.updateMediaSessionState(state?.toString() || null, position)
+  android.updateMediaSessionState(state?.toString() || null, position?.toString() || null)
 }

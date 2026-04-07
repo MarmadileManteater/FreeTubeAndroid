@@ -2705,14 +2705,14 @@ export default defineComponent({
         window.addEventListener('media-pause', mediaPause)
         videoElement.addEventListener('play', () => {
           android.enableKeepScreenOn()
-          updateMediaSessionState(STATE_PLAYING.toString())
+          updateMediaSessionState(STATE_PLAYING)
         })
         videoElement.addEventListener('pause', () => {
           android.disableKeepScreenOn()
           updateMediaSessionState(STATE_PAUSED)
         })
         videoElement.addEventListener('timeupdate', () => {
-          updateMediaSessionState(null, Math.floor(videoElement.currentTime * 1000).toString())
+          updateMediaSessionState(videoElement.paused ? STATE_PAUSED : STATE_PLAYING, Math.floor(videoElement.currentTime * 1000))
         })
       }
 
