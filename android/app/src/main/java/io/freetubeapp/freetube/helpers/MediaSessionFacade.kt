@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadata
 import android.media.session.PlaybackState
+import android.media.session.PlaybackState.STATE_BUFFERING
 import android.media.session.PlaybackState.STATE_PAUSED
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
@@ -28,6 +29,7 @@ class MediaSessionFacade(
       dispatchMediaEvent(event)
     },
     { position ->
+      setState(STATE_BUFFERING, position)
       dispatchPositionEvent(position)
     }
   )
@@ -88,7 +90,6 @@ class MediaSessionFacade(
         metadataBuilder
           .putBitmap(MediaMetadata.METADATA_KEY_ART, bitmapArt)
           .putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, bitmapArt)
-
       } catch (ex: Throwable) {
         ex.printStackTrace()
       }
