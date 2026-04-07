@@ -94,7 +94,7 @@ class FreeTubeJavaScriptInterface(
         art
       )
   }
-  
+
   @JavascriptInterface
   fun cancelMediaNotification() {
     mediaSession.cancel()

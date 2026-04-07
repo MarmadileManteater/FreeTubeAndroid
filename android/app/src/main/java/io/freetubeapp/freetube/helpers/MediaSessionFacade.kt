@@ -45,7 +45,6 @@ class MediaSessionFacade(
     notificationManager.notify(notificationTag, notificationId, notification)
   }
 
-
   /**
    * sets the state of the active media session
    * @param givenState the state; should be an Int (as a string because the java bridge)
