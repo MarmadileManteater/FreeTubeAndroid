@@ -9,7 +9,6 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationManagerCompat
 
-
 class KeepAliveService : Service() {
   companion object {
     private const val CHANNEL_ID = "keep_alive"
