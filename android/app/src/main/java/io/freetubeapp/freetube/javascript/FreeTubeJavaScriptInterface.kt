@@ -420,56 +420,53 @@ class FreeTubeJavaScriptInterface(
 
   @JavascriptInterface
   fun generatePOToken(videoId: String, sessionContext: String): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject
-      ->
-        webView.post {
-          try {
-            val bgScript = getBotGuardScript(videoId, sessionContext)
-            val bgWv = webView.generateBgWebview()
-            bgWv.jsInterface.onReturnToken {
-              run {
-                webView.post {
-                  resolve(it)
-                  bgWv.destroy()
-                }
+    return Promise(coroutineScope) { resolve, reject ->
+      webView.post {
+        try {
+          val bgScript = getBotGuardScript(videoId, sessionContext)
+          val bgWv = webView.generateBgWebview()
+          bgWv.jsInterface.onReturnToken {
+            run {
+              webView.post {
+                resolve(it)
+                bgWv.destroy()
               }
             }
-            webView.post {
-              bgWv.loadDataWithBaseURL(
-                "https://www.youtube.com/",
-                "<script>\n" +
-                  "window.ofetch = window.fetch\n" +
-                  "window.fetch = async (url, data) => {\n" +
-                  "  if (url.startsWith('https://www.google.com/')) {\n" +
-                  "    return new Promise((resolve, _) => {" +
-                  "    const script = document.createElement('script')\n" +
-                  "    script.src = url\n" +
-                  "    script.async = true\n" +
-                  "    document.body.appendChild(script)\n" +
-                  "     script.addEventListener('load', () => {\n" +
-                  "       resolve({ text: () => '() => {}' })\n" +
-                  "     })\n" +
-                  "    })\n" +
-                  "  }\n" +
-                  "  const id = crypto.randomUUID()\n" +
-                  "  if (data && 'body' in data) {" +
-                  "    Android.queueBody(id, data.body)\n" +
-                  "    data.headers['x-fta-request-id'] = id\n" +
-                  "  }" +
-                  "  return await window.ofetch(url, data)\n" +
-                  "}</script><script>${bgScript}</script>",
-                "text/html",
-                "utf-8",
-                null
-              )
-            }
-          } catch (exception: Exception) {
-            reject(exception.message ?: exception.javaClass.name)
           }
+          webView.post {
+            bgWv.loadDataWithBaseURL(
+              "https://www.youtube.com/",
+              "<script>\n" +
+                "window.ofetch = window.fetch\n" +
+                "window.fetch = async (url, data) => {\n" +
+                "  if (url.startsWith('https://www.google.com/')) {\n" +
+                "    return new Promise((resolve, _) => {" +
+                "    const script = document.createElement('script')\n" +
+                "    script.src = url\n" +
+                "    script.async = true\n" +
+                "    document.body.appendChild(script)\n" +
+                "     script.addEventListener('load', () => {\n" +
+                "       resolve({ text: () => '() => {}' })\n" +
+                "     })\n" +
+                "    })\n" +
+                "  }\n" +
+                "  const id = crypto.randomUUID()\n" +
+                "  if (data && 'body' in data) {" +
+                "    Android.queueBody(id, data.body)\n" +
+                "    data.headers['x-fta-request-id'] = id\n" +
+                "  }" +
+                "  return await window.ofetch(url, data)\n" +
+                "}</script><script>${bgScript}</script>",
+              "text/html",
+              "utf-8",
+              null
+            )
+          }
+        } catch (exception: Exception) {
+          reject(exception.message ?: exception.javaClass.name)
         }
-    }).addJsCommunicator(jsCommunicator)
+      }
+    }.addJsCommunicator(jsCommunicator)
   }
 
   @JavascriptInterface
