@@ -468,7 +468,7 @@ class FreeTubeJavaScriptInterface(
   }
 
   @JavascriptInterface
-  fun runDecipherScript(id: String, code: String): String {
+  fun runDecipherScript(id: String, code: String, timeout: String): String {
     webView.post {
       webView.generateSigWebview()
         .onLoad = {
@@ -476,10 +476,10 @@ class FreeTubeJavaScriptInterface(
           jsInterface.jsCommunicator.resolve(id, code)
           // dispatch event to read data
           dispatchEvent("message", "id", id)
-          // TODO figure out when to clean up web views
+          // when timeout is called, clean up webview
           postDelayed({
             destroy()
-          }, 10000)
+          }, timeout.toLong())
       }
     }
     return id
