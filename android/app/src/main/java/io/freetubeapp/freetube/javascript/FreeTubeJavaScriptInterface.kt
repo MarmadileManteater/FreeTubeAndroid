@@ -90,7 +90,6 @@ class FreeTubeJavaScriptInterface(
    * @param duration the length of the video in milliseconds
    * @param art the URL to the video thumbnail
    */
-  @SuppressLint("NewApi")
   @JavascriptInterface
   fun updateMediaSessionData(trackName: String, artist: String, duration: Long, art: String? = null) {
     mediaSession
