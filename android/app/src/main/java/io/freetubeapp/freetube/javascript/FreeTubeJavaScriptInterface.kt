@@ -1,12 +1,9 @@
 package io.freetubeapp.freetube.javascript
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.media.session.PlaybackState.STATE_PAUSED
-import android.net.Uri
-import android.provider.OpenableColumns
 import android.webkit.JavascriptInterface
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile

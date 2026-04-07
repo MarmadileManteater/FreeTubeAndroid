@@ -1,9 +1,7 @@
 package io.freetubeapp.freetube.helpers
 
 import android.content.Intent
-import android.view.WindowInsetsController
 import androidx.activity.result.ActivityResult
-import androidx.core.view.WindowInsetsControllerCompat
 
 data class ApplicationMethods(
   val restart: () -> Unit,

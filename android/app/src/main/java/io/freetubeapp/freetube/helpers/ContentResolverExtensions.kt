@@ -4,6 +4,11 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
 
+enum class WriteMode {
+  Truncate,
+  Append
+}
+
 fun ContentResolver.readBytes(uri: Uri): ByteArray {
   val stream = openInputStream(uri)
   val content = stream!!.readBytes()

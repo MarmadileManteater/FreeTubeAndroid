@@ -22,28 +22,15 @@ class KeepAliveService : Service() {
   override fun onCreate() {
     super.onCreate()
     val notificationManager = NotificationManagerCompat.from(applicationContext)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      val channel = NotificationChannel(CHANNEL_ID, "Keep Alive", NotificationManager.IMPORTANCE_MIN)
-      notificationManager.createNotificationChannel(channel)
-    } else {
-      val channel = NotificationChannelCompat.Builder(CHANNEL_ID, NotificationManager.IMPORTANCE_MIN).build()
-      notificationManager.createNotificationChannel(channel)
-    }
+    val channel = NotificationChannel(CHANNEL_ID, "Keep Alive", NotificationManager.IMPORTANCE_MIN)
+    notificationManager.createNotificationChannel(channel)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      startForeground(1,
-        Notification.Builder(this.applicationContext, CHANNEL_ID)
-          .setContentTitle("FreeTube is running in the background.")
-          .setCategory(Notification.CATEGORY_SERVICE)
-          .setSmallIcon(R.drawable.ic_media_notification_icon)
-          .build())
-    } else {
-      startForeground(1,
-        Notification.Builder(this.applicationContext)
-          .setContentTitle("FreeTube is running in the background.")
-          .setCategory(Notification.CATEGORY_SERVICE)
-          .build())
-    }
+    startForeground(1,
+      Notification.Builder(this.applicationContext, CHANNEL_ID)
+        .setContentTitle("FreeTube is running in the background.")
+        .setCategory(Notification.CATEGORY_SERVICE)
+        .setSmallIcon(R.drawable.ic_media_notification_icon)
+        .build())
   }
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)

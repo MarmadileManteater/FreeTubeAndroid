@@ -1,7 +1,6 @@
 package io.freetubeapp.freetube.javascript
 
 import android.webkit.JavascriptInterface
-import io.freetubeapp.freetube.MainActivity
 
 class BotGuardJavascriptInterface {
   private var poToken: String? = null

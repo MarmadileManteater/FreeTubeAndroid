@@ -9,9 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_KEY_EVENT
 import android.media.session.MediaSession
-import android.media.session.PlaybackState.STATE_PAUSED
 import android.media.session.PlaybackState.STATE_PLAYING
-import android.net.Uri
 import android.os.Build
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_MEDIA_NEXT
@@ -46,6 +44,7 @@ fun Context.createMediaSession(channelId: String, dispatchEvent: (String) -> Uni
       val keyEvent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         mediaButtonIntent.extras?.getParcelable(EXTRA_KEY_EVENT, KeyEvent::class.java)
       } else {
+        @Suppress("DEPRECATION")
         mediaButtonIntent.extras?.getParcelable(EXTRA_KEY_EVENT)
       }
       return if (keyEvent == null) {

@@ -14,12 +14,12 @@ fun AssetManager.readText(assetName: String) : String {
       line = reader.readLine()
     }
   } catch (ex: Exception) {
-    // pass
+    ex.printStackTrace()
   } finally {
     try {
       reader.close()
     } catch (ex: Exception) {
-      // pass
+      ex.printStackTrace()
     }
   }
   return lines.joinToString("\n")

@@ -2,7 +2,6 @@ package io.freetubeapp.freetube.webviews
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.webkit.WebView
 
 open class BackgroundPlayWebView @JvmOverloads constructor(
@@ -11,7 +10,7 @@ open class BackgroundPlayWebView @JvmOverloads constructor(
   private var once: Boolean = false
   override fun onWindowVisibilityChanged(visibility: Int) {
     if (once) return
-    if (visibility != View.GONE) super.onWindowVisibilityChanged(View.VISIBLE)
+    if (visibility != GONE) super.onWindowVisibilityChanged(VISIBLE)
     once = true
   }
 }

@@ -2,13 +2,12 @@ package io.freetubeapp.freetube.javascript
 
 import android.content.Context
 import android.webkit.WebView
-import io.freetubeapp.freetube.helpers.Promise
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
 
 /**
  * fires and forgets javascript
- * @param js javascript string to be evaluated
+ * @param js JavaScript string to be evaluated
  */
 fun WebView.fafJS(js: String) {
   post {
@@ -24,7 +23,7 @@ fun WebView.dispatchEvent(eventName: String) {
 }
 
 /**
- * calls `window.dispatchEvent` with the given json assigned to the event which is dispatched
+ * calls `window.dispatchEvent` with the given JSON assigned to the event which is dispatched
  */
 fun WebView.dispatchEvent(eventName: String, event: JSONObject) {
   var js = "var tempVar = new Event(\"$eventName\");"
@@ -77,14 +76,6 @@ fun btoa(message: String): String {
  */
 fun WebView.consoleLog(message: String, level: String = "log") {
   fafJS("console.$level(${btoa(message)})")
-}
-
-fun WebView.consoleError(message: String) {
-  consoleLog(message, "error")
-}
-
-fun WebView.consoleWarn(message: String) {
-  consoleLog(message, "warn")
 }
 
 fun WebView.setScale(scale: Double, context: Context) {

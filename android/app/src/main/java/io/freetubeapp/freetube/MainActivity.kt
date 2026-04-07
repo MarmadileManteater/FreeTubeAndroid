@@ -1,54 +1,33 @@
 package io.freetubeapp.freetube
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Canvas
-import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.WindowManager
-import android.webkit.ConsoleMessage
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.FrameLayout
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.viewpager.widget.ViewPager
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.ApplicationMethods
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
-import io.freetubeapp.freetube.helpers.WindowInsetsControllerWrapper
 import io.freetubeapp.freetube.helpers.hexToColour
 import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.helpers.toYtUrl
-import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
-import io.freetubeapp.freetube.webviews.BackgroundPlayWebView
-import io.freetubeapp.freetube.webviews.BotGuardWebView
-import io.freetubeapp.freetube.webviews.ConsoleLogChromeClient
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
-import org.json.JSONObject
 import java.net.URLEncoder
-import java.util.UUID
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import java.nio.charset.Charset
 
 
 class MainActivity : AppCompatActivity() {
@@ -141,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
     val url = intent?.toYtUrl()
     val postfix = if (url != null) {
-      "?intent=${URLEncoder.encode(url)}"
+      "?intent=${urlEncode(url)}"
     } else {
       ""
     }
@@ -203,9 +182,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
-    return Promise({
-        resolve,
-        reject ->
+    return Promise { resolve, reject ->
       try {
         listenForActivityResults {
           resolve(it)
@@ -214,7 +191,7 @@ class MainActivity : AppCompatActivity() {
       } catch (exception: Exception) {
         reject(exception)
       }
-    })
+    }
   }
 
   private fun setKeepScreenOn(newState: Boolean) {
@@ -243,6 +220,15 @@ class MainActivity : AppCompatActivity() {
       canvas.drawColor(navigationHex.hexToColour())
       val bitmapDrawable = bitmap.toDrawable(resources)
       window.setBackgroundDrawable(bitmapDrawable)
+    }
+  }
+
+  private fun urlEncode(url: String): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      URLEncoder.encode(url, Charset.defaultCharset())
+    } else {
+      @Suppress("DEPRECATION")
+      URLEncoder.encode(url)
     }
   }
 }

@@ -3,19 +3,13 @@ package io.freetubeapp.freetube.webviews
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.util.AttributeSet
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.javascript.AsyncJSCommunicator
 import io.freetubeapp.freetube.javascript.SigWebViewJavascriptInterface
-import io.freetubeapp.freetube.javascript.consoleLog
 import org.json.JSONObject
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 @SuppressLint("ViewConstructor")
 class SigWebView(
