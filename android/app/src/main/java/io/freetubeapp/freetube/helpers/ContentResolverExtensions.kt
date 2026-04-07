@@ -19,9 +19,6 @@ fun ContentResolver.writeBytes(uri: Uri, bytes: ByteArray, writeMode: WriteMode 
       WriteMode.Append -> {
         "wa"
       }
-      else -> {
-        "w"
-      }
   }
   val stream = openOutputStream(uri, mode)
   stream!!.write(bytes)
