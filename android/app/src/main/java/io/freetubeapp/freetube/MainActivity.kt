@@ -29,7 +29,6 @@ import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-
 class MainActivity : AppCompatActivity() {
 
   private val keepGoingService: Intent
