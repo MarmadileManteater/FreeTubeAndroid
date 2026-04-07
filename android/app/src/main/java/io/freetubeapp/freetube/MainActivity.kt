@@ -72,12 +72,14 @@ class MainActivity : AppCompatActivity() {
   }
   // endregion
 
-  private val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+  private lateinit var windowInsetsController: WindowInsetsControllerCompat
 
   // region Overridden methods
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
 
     // this keeps android from shutting off the app to conserve battery
     startService(keepGoingService)

@@ -3,7 +3,6 @@ package io.freetubeapp.freetube.helpers
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
-import androidx.core.net.toUri
 
 fun ContentResolver.readBytes(uri: Uri): ByteArray {
   val stream = openInputStream(uri)

@@ -11,6 +11,7 @@ import android.content.Intent.EXTRA_KEY_EVENT
 import android.media.session.MediaSession
 import android.media.session.PlaybackState.STATE_PAUSED
 import android.media.session.PlaybackState.STATE_PLAYING
+import android.net.Uri
 import android.os.Build
 import android.view.KeyEvent
 import android.view.KeyEvent.KEYCODE_MEDIA_NEXT
@@ -18,9 +19,12 @@ import android.view.KeyEvent.KEYCODE_MEDIA_PAUSE
 import android.view.KeyEvent.KEYCODE_MEDIA_PLAY
 import android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import io.freetubeapp.freetube.MainActivity
 import io.freetubeapp.freetube.MediaControlsReceiver
 import io.freetubeapp.freetube.R
+import java.io.File
 
 fun Context.createNotificationChannel(channelId: String): NotificationChannel {
   val notificationManager = NotificationManagerCompat.from(this)
@@ -192,3 +196,15 @@ fun Context.createNotification(session: MediaSession, channelId: String, state: 
     .build()
 }
 
+fun Context.getDataDirectory(): String? {
+  return getExternalFilesDir(null)?.parent
+}
+
+fun Context.resolveAmbiguousUri(givenUri: String): DocumentFile? {
+  return  if (givenUri.startsWith("data://")) {
+    val path = givenUri.split("data://")[1]
+    DocumentFile.fromFile(File(getDataDirectory(), path))
+  } else {
+    DocumentFile.fromSingleUri(this, givenUri.toUri())
+  }
+}

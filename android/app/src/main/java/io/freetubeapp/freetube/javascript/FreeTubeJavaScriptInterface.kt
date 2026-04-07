@@ -10,7 +10,6 @@ import android.provider.OpenableColumns
 import android.webkit.JavascriptInterface
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import io.freetubeapp.freetube.helpers.AmbiguousFileUri
 import io.freetubeapp.freetube.helpers.ApplicationMethods
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.MediaSessionFacade
@@ -19,8 +18,8 @@ import io.freetubeapp.freetube.helpers.WriteMode
 import io.freetubeapp.freetube.helpers.getFileName
 import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
+import io.freetubeapp.freetube.helpers.resolveAmbiguousUri
 import io.freetubeapp.freetube.helpers.writeBytes
-import io.freetubeapp.freetube.helpers.writeText
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -159,26 +158,14 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun readFile(uri: String): String {
     return Promise(coroutineScope) { resolve, reject ->
-      AmbiguousFileUri(uri)
-        .ifContentUri { uri ->
-          resolve(
-            context.contentResolver
-              .readBytes(uri)
-              .toString(Charset.forName("utf-8"))
-          )
-        }
-        .ifDataUri { fileName ->
-          val path = getDirectory(DATA_DIRECTORY)
-          val file = File(path, fileName)
-          if (file.exists()) {
-            resolve(File(path, fileName).readText())
-          } else {
-            resolve("")
-          }
-        }
-        .catch { ex ->
-          reject(ex.stackTraceToString())
-        }
+      val file = context.resolveAmbiguousUri(uri)
+      if (file != null) {
+        resolve(context.contentResolver
+          .readBytes(file.uri)
+          .toString(Charset.forName("utf-8")))
+      } else {
+        reject("File not found from given uri")
+      }
     }.addJsCommunicator(jsCommunicator)
   }
 
@@ -189,27 +176,21 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun writeFile(uri: String, content: String): String {
     return Promise(coroutineScope) { resolve, reject ->
-      AmbiguousFileUri(uri)
-        .ifContentUri { uri ->
-          val bytes = if (content.startsWith("data:")) {
-            Base64.decode(content.split("base64,")[1])
-          } else {
-            content.toByteArray()
-          }
-          context.contentResolver.writeBytes(
-            uri,
-            bytes
-          )
-          resolve("")
+      val file = context.resolveAmbiguousUri(uri)
+      if (file != null) {
+        val bytes = if (content.startsWith("data:")) {
+          Base64.decode(content.split("base64,")[1])
+        } else {
+          content.toByteArray()
         }
-        .ifDataUri { fileName ->
-          val path = getDirectory(DATA_DIRECTORY)
-          File(path, fileName).writeText(content)
-          resolve("")
-        }
-        .catch { ex ->
-          reject(ex.stackTraceToString())
-        }
+        context.contentResolver.writeBytes(
+          file.uri,
+          bytes
+        )
+        resolve("")
+      } else {
+        reject("File not found from given uri")
+      }
     }.addJsCommunicator(jsCommunicator)
   }
 
@@ -217,28 +198,22 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun appendFile(uri: String, content: String): String {
     return Promise(coroutineScope) { resolve, reject ->
-      AmbiguousFileUri(uri)
-        .ifContentUri { uri ->
-          val bytes = if (content.startsWith("data:")) {
-            Base64.decode(content.split("base64,")[1])
-          } else {
-            content.toByteArray()
-          }
-          context.contentResolver.writeBytes(
-            uri,
-            bytes,
-            WriteMode.Append
-          )
-          resolve("")
+      val file = context.resolveAmbiguousUri(uri)
+      if (file != null) {
+        val bytes = if (content.startsWith("data:")) {
+          Base64.decode(content.split("base64,")[1])
+        } else {
+          content.toByteArray()
         }
-        .ifDataUri { fileName ->
-          val path = getDirectory(DATA_DIRECTORY)
-          File(path, fileName).writeText(content, WriteMode.Append)
-          resolve("")
-        }
-        .catch { ex ->
-          reject(ex.stackTraceToString())
-        }
+        context.contentResolver.writeBytes(
+          file.uri,
+          bytes,
+          WriteMode.Append
+        )
+        resolve("")
+      } else {
+        reject("File not found from given uri")
+      }
     }.addJsCommunicator(jsCommunicator)
   }
   // endregion
