@@ -12,6 +12,7 @@ import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.MediaSessionFacade
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
+import io.freetubeapp.freetube.helpers.getDataDirectory
 import io.freetubeapp.freetube.helpers.getFileName
 import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
@@ -26,6 +27,7 @@ import java.nio.charset.Charset
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+const val DATA_DIRECTORY = "data://"
 
 class FreeTubeJavaScriptInterface(
   private val context: Context,
@@ -45,10 +47,6 @@ class FreeTubeJavaScriptInterface(
     }
   )
   val jsCommunicator: AsyncJSCommunicator = AsyncJSCommunicator(webView)
-
-  companion object {
-    private const val DATA_DIRECTORY = "data://"
-  }
 
   // region Media Notifications
   /**
@@ -105,14 +103,12 @@ class FreeTubeJavaScriptInterface(
    * @return a full directory uri
    */
   @JavascriptInterface
-  fun getDirectory(directory: String): String {
-    val path =  if (directory == DATA_DIRECTORY) {
-      // this is the directory cordova gave us access to before
-      context.getExternalFilesDir(null)!!.parent
+  fun getDirectory(directory: String): String? {
+    return if (directory == DATA_DIRECTORY) {
+      context.getDataDirectory()
     } else {
       directory
     }
-    return path
   }
 
   @JavascriptInterface
@@ -142,11 +138,16 @@ class FreeTubeJavaScriptInterface(
   // region IO
   @JavascriptInterface
   fun listFilesInDataDir(): String {
-    return "[${
-      File(getDirectory(DATA_DIRECTORY)).listFiles()?.joinToString(",") { file ->
-        "{ \"uri\": \"${DATA_DIRECTORY}${file.name}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
-      } ?: ""
-    }]"
+    val directory = context.getDataDirectory()
+    return if (directory == null) {
+      "[]"
+    } else {
+      "[${
+        File(directory).listFiles()?.joinToString(",") { file ->
+          "{ \"uri\": \"$DATA_DIRECTORY${file.name}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
+        } ?: ""
+      }]"
+    }
   }
 
   /**
