@@ -145,7 +145,7 @@ import {
 import { processToBeAddedPlaylistVideo } from '../../helpers/playlists'
 
 import android from 'android'
-import { selectDataDirectory, getCurrentDataDirectory } from '../../helpers/android/storage'
+import { selectDataDirectory, getCurrentDataDirectory, DATA_DIRECTORY } from '../../helpers/android/storage'
 import { handleAmbigiousContent } from '../../helpers/android/utils'
 
 const IMPORT_DIRECTORY_ID = 'data-settings-import'
@@ -181,7 +181,7 @@ async function resetDirectory() {
 
 const dataDirectory = ref('')
 if (process.env.IS_ANDROID) {
-  dataDirectory.value = android.getDirectory('data://')
+  dataDirectory.value = android.getDirectory(DATA_DIRECTORY)
 
   getCurrentDataDirectory().then(({ uri }) => {
     if (uri !== 'data://') {

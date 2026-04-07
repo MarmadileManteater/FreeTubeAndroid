@@ -5,7 +5,7 @@ import { blobToBase64, reverseObject } from './utils'
 import { useI18n } from '../../composables/use-i18n-polyfill'
 import { showToast } from '../utils'
 
-const DATA_DIRECTORY = 'data://'
+export const DATA_DIRECTORY = 'data://'
 
 const DATA_LOCATION = `${DATA_DIRECTORY}data-location.json`
 
