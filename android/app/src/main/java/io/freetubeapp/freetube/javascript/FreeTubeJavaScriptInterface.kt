@@ -8,6 +8,7 @@ import android.media.session.PlaybackState.STATE_PAUSED
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.webkit.JavascriptInterface
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import io.freetubeapp.freetube.helpers.AmbiguousFileUri
 import io.freetubeapp.freetube.helpers.ApplicationMethods
@@ -119,35 +120,17 @@ class FreeTubeJavaScriptInterface(
     return path
   }
 
-  fun getFileNameFromUri(uri: String): String {
-    var result: String? = null
-    val cursor = context.contentResolver.query(Uri.parse(uri),  null, null, null, null)
-    try {
-      if (cursor != null && cursor.moveToFirst()) {
-        val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (index != -1) {
-          result = cursor.getString(index)
-        }
-      }
-    } finally {
-      cursor!!.close()
-    }
-
-    if (result == null) {
-      result = uri.split(Regex("(/)|(%2F)")).last()
-    }
-
-    return result
-  }
-
   @JavascriptInterface
   fun revokePermissionForTree(treeUri: String) {
-    context.revokeUriPermission(Uri.parse(treeUri), Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+    context.revokeUriPermission(
+      treeUri.toUri(),
+      Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+    )
   }
 
   @JavascriptInterface
   fun listFilesInTree(tree: String): String {
-    val directory = DocumentFile.fromTreeUri(context, Uri.parse(tree))
+    val directory = DocumentFile.fromTreeUri(context, tree.toUri())
     val files = directory!!.listFiles().joinToString(",") { file ->
       "{ \"uri\": \"${file.uri}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
     }
@@ -156,7 +139,7 @@ class FreeTubeJavaScriptInterface(
 
   @JavascriptInterface
   fun createFileInTree(tree: String, fileName: String): String {
-    val directory = DocumentFile.fromTreeUri(context, Uri.parse(tree))
+    val directory = DocumentFile.fromTreeUri(context, tree.toUri())
     return directory!!.createFile("*/*", fileName)!!.uri.toString()
   }
   // endregion
@@ -366,8 +349,9 @@ class FreeTubeJavaScriptInterface(
 
   @JavascriptInterface
   fun openExternalLink(url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    context.startActivity(intent)
+    context.startActivity(
+      Intent(Intent.ACTION_VIEW, url.toUri())
+    )
   }
 
   @JavascriptInterface
