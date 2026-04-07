@@ -93,9 +93,14 @@ class FreeTubeWebView (
 
           // hide system ui
           viewGroup.fitsSystemWindows = false
+
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
             windowInsetsController?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+          } else {
+            val controller = methods.getWindowInsetsController()
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
           }
 
           viewGroup.addView(view)
@@ -111,6 +116,9 @@ class FreeTubeWebView (
         viewGroup.fitsSystemWindows = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
           windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
+        } else {
+          val controller = methods.getWindowInsetsController()
+          controller.show(WindowInsetsCompat.Type.systemBars())
         }
 
         viewGroup.removeView(fullscreenView)

@@ -73,8 +73,6 @@ class MainActivity : AppCompatActivity() {
 
   // region Overridden methods
 
-  @SuppressLint("SetJavaScriptEnabled")
-  @Suppress("DEPRECATION")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -128,7 +126,8 @@ class MainActivity : AppCompatActivity() {
       setKeepScreenOn = { newState -> setKeepScreenOn(newState) },
       themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
         themeSystemUI(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
-      }
+      },
+      getWindowInsetsController = { WindowCompat.getInsetsController(window, window.decorView) }
     ))
 
     ActivityMainBinding.inflate(layoutInflater).apply {
