@@ -32,6 +32,7 @@ import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.ApplicationMethods
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.Promise
+import io.freetubeapp.freetube.helpers.WindowInsetsControllerWrapper
 import io.freetubeapp.freetube.helpers.hexToColour
 import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.helpers.toYtUrl
@@ -126,9 +127,8 @@ class MainActivity : AppCompatActivity() {
       setKeepScreenOn = { newState -> setKeepScreenOn(newState) },
       themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
         themeSystemUI(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
-      },
-      getWindowInsetsController = { WindowCompat.getInsetsController(window, window.decorView) }
-    ))
+      }
+    ), WindowCompat.getInsetsController(window, window.decorView))
 
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)

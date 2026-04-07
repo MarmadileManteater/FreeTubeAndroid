@@ -9,6 +9,5 @@ data class ApplicationMethods(
   val restart: () -> Unit,
   val launchIntent: (Intent) -> Promise<ActivityResult?, Exception>,
   val setKeepScreenOn: (Boolean) -> Unit,
-  val themeSystemUi: (String, String, Boolean, Boolean) -> Unit,
-  val getWindowInsetsController: () -> WindowInsetsControllerCompat
+  val themeSystemUi: (String, String, Boolean, Boolean) -> Unit
 )
