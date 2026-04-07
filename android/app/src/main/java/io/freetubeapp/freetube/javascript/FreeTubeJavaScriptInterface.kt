@@ -40,7 +40,7 @@ class FreeTubeJavaScriptInterface(
   private val coroutineScope = CoroutineScope(Dispatchers.Main)
   private val mediaSession: MediaSessionFacade = MediaSessionFacade(
     context,
-    CHANNEL_ID,
+    "media_controls",
     { event ->
       webView.dispatchEvent(event)
     },
@@ -52,7 +52,6 @@ class FreeTubeJavaScriptInterface(
 
   companion object {
     private const val DATA_DIRECTORY = "data://"
-    private const val CHANNEL_ID = "media_controls"
   }
 
   // region Media Notifications
