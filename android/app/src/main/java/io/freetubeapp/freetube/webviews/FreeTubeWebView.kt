@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -62,20 +63,21 @@ class FreeTubeWebView (
         super.onPageFinished(view, url)
       }
       override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        if (request!!.url!!.scheme == "file") {
+        if (request?.url?.scheme == "file") {
           // don't send file url requests to a web browser (it will crash the app)
           return true
         }
 
         val regex = context.getString(R.string.youtube_regex)
 
-        if (Regex(regex).containsMatchIn(request.url!!.toString())) {
-          dispatchEvent("youtube-link", "link", request.url!!.toString())
+        val urlString = request?.url?.toString()
+        if (urlString != null && Regex(regex).containsMatchIn(urlString)) {
+          dispatchEvent("youtube-link", "link", urlString)
           return true
         }
         // send all requests to a real web browser
         context.startActivity(
-          Intent(Intent.ACTION_VIEW, request.url)
+          Intent(Intent.ACTION_VIEW, request?.url)
         )
         return true
       }
@@ -91,8 +93,10 @@ class FreeTubeWebView (
 
           // hide system ui
           viewGroup.fitsSystemWindows = false
-          windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
-          windowInsetsController?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
+            windowInsetsController?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+          }
 
           viewGroup.addView(view)
           fullscreenView = view
@@ -105,7 +109,9 @@ class FreeTubeWebView (
 
         // show system ui
         viewGroup.fitsSystemWindows = true
-        windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+          windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
+        }
 
         viewGroup.removeView(fullscreenView)
         dispatchEvent("end-fullscreen")
