@@ -57,22 +57,17 @@ class MainActivity : AppCompatActivity() {
     get() {
       return Intent(this, KeepAliveService::class.java)
     }
-
   private val state = ApplicationState()
   private lateinit var webView: FreeTubeWebView
-
-  // region Callbacks
+  private lateinit var windowInsetsController: WindowInsetsControllerCompat
   private val activityResultListeners: MutableList<(ActivityResult?) -> Unit> = mutableListOf()
   private val activityResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
     for (listener in activityResultListeners) {
       listener(it)
     }
     // clear the listeners
-    activityResultListeners.removeAll{ true }
+    activityResultListeners.removeAll { true }
   }
-  // endregion
-
-  private lateinit var windowInsetsController: WindowInsetsControllerCompat
 
   // region Overridden methods
 
@@ -163,8 +158,8 @@ class MainActivity : AppCompatActivity() {
   /**
    * handles new intents which involve deep links (aka supported links)
    */
-  @SuppressLint("MissingSuperCall")
   override fun onNewIntent(intent: Intent?) {
+    super.onNewIntent(intent)
     val url = intent?.toYtUrl()
     if (url != null) {
       webView.dispatchEvent("youtube-link", "link", url)
