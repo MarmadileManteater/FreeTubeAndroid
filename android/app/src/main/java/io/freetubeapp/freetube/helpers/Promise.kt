@@ -58,9 +58,9 @@ class Promise<T, G>(coroutineScope: CoroutineScope, runnable: ((T) -> Unit, (G) 
   }
 
   fun then(listener: (T) -> Unit): Promise<T, G> {
-    if (successResult != null) {
-      // assume success result won't be unset
-      listener(successResult!!)
+    val result = successResult
+    if (result != null) {
+      listener(result)
     } else {
       successListeners.add(listener)
     }
@@ -69,9 +69,9 @@ class Promise<T, G>(coroutineScope: CoroutineScope, runnable: ((T) -> Unit, (G) 
 
   @SuppressWarnings // will complain that it could be private, but it is public on purpose
   fun catch(listener: (G) -> Unit): Promise<T, G> {
-    if (errorResult != null) {
-      // assume success result won't be unset
-      listener(errorResult!!)
+    val result = errorResult
+    if (result != null) {
+      listener(result)
     } else {
       errorListeners.add(listener)
     }

@@ -11,7 +11,9 @@ open class MediaControlsReceiver : BroadcastReceiver() {
   }
 
   override fun onReceive(context: Context?, intent: Intent?) {
-    val action = intent!!.action
-    notifyMediaSessionListeners(action!!)
+    val action = intent?.action
+    if (action != null) {
+      notifyMediaSessionListeners(action)
+    }
   }
 }
