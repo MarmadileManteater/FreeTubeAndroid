@@ -35,9 +35,6 @@ class MainActivity : AppCompatActivity() {
     get() {
       return Intent(this, KeepAliveService::class.java)
     }
-  private val state = ApplicationState()
-  private lateinit var webView: FreeTubeWebView
-  private lateinit var windowInsetsController: WindowInsetsControllerCompat
   private val activityResultListeners: MutableList<(ActivityResult?) -> Unit> = mutableListOf()
   private val activityResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
     for (listener in activityResultListeners) {
@@ -46,6 +43,9 @@ class MainActivity : AppCompatActivity() {
     // clear the listeners
     activityResultListeners.removeAll { true }
   }
+  private val state = ApplicationState()
+  private lateinit var webView: FreeTubeWebView
+  private lateinit var windowInsetsController: WindowInsetsControllerCompat
 
   // region Overridden methods
 
