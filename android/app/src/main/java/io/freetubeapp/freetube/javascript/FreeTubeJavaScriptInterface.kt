@@ -158,20 +158,16 @@ class FreeTubeJavaScriptInterface(
    */
   @JavascriptInterface
   fun readFile(uri: String): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject ->
+    return Promise(coroutineScope) { resolve, reject ->
       AmbiguousFileUri(uri)
-        .ifContentUri {
-          uri ->
-            resolve(
-              context.contentResolver
-                .readBytes(uri)
-                .toString(Charset.forName("utf-8"))
-            )
+        .ifContentUri { uri ->
+          resolve(
+            context.contentResolver
+              .readBytes(uri)
+              .toString(Charset.forName("utf-8"))
+          )
         }
-        .ifDataUri {
-          fileName ->
+        .ifDataUri { fileName ->
           val path = getDirectory(DATA_DIRECTORY)
           val file = File(path, fileName)
           if (file.exists()) {
@@ -180,11 +176,10 @@ class FreeTubeJavaScriptInterface(
             resolve("")
           }
         }
-        .catch {
-          ex ->
-            reject(ex.stackTraceToString())
+        .catch { ex ->
+          reject(ex.stackTraceToString())
         }
-    }).addJsCommunicator(jsCommunicator)
+    }.addJsCommunicator(jsCommunicator)
   }
 
   /**
@@ -193,34 +188,29 @@ class FreeTubeJavaScriptInterface(
   @OptIn(ExperimentalEncodingApi::class)
   @JavascriptInterface
   fun writeFile(uri: String, content: String): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject ->
-        AmbiguousFileUri(uri)
-          .ifContentUri {
-            uri ->
-              val bytes = if (content.startsWith("data:")) {
-                Base64.decode(content.split("base64,")[1])
-              } else {
-                content.toByteArray()
-              }
-              context.contentResolver.writeBytes(
-                uri,
-                bytes
-              )
-              resolve("")
+    return Promise(coroutineScope) { resolve, reject ->
+      AmbiguousFileUri(uri)
+        .ifContentUri { uri ->
+          val bytes = if (content.startsWith("data:")) {
+            Base64.decode(content.split("base64,")[1])
+          } else {
+            content.toByteArray()
           }
-          .ifDataUri {
-            fileName ->
-              val path = getDirectory(DATA_DIRECTORY)
-              File(path, fileName).writeText(content)
-              resolve("")
-          }
-          .catch {
-            ex ->
-              reject(ex.stackTraceToString())
-          }
-    }).addJsCommunicator(jsCommunicator)
+          context.contentResolver.writeBytes(
+            uri,
+            bytes
+          )
+          resolve("")
+        }
+        .ifDataUri { fileName ->
+          val path = getDirectory(DATA_DIRECTORY)
+          File(path, fileName).writeText(content)
+          resolve("")
+        }
+        .catch { ex ->
+          reject(ex.stackTraceToString())
+        }
+    }.addJsCommunicator(jsCommunicator)
   }
 
   @OptIn(ExperimentalEncodingApi::class)
