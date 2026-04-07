@@ -55,7 +55,7 @@ class FreeTubeJavaScriptInterface(
 
   // region Media Notifications
   /**
-   * creates (or updates) a media session
+   * creates a media notification
    * @param title the track name / video title
    * @param artist the author / channel name
    * @param duration the duration in milliseconds of the video
@@ -70,9 +70,7 @@ class FreeTubeJavaScriptInterface(
   }
 
   /**
-   * updates the state of the active media session
-   * @param state the state; should be an Int (as a string because the java bridge)
-   * @param position the position; should be a Long (as a string because the java bridge)
+   * updates the playback state of a media notification
    */
   @JavascriptInterface
   fun updateMediaSessionState(state: String?, position: String? = null) {
@@ -84,11 +82,7 @@ class FreeTubeJavaScriptInterface(
   }
 
   /**
-   * updates the metadata of the active media session
-   * @param trackName the video title
-   * @param artist the channel name
-   * @param duration the length of the video in milliseconds
-   * @param art the URL to the video thumbnail
+   * updates the track information of a media notification
    */
   @JavascriptInterface
   fun updateMediaSessionData(trackName: String, artist: String, duration: Long, art: String? = null) {
@@ -100,10 +94,7 @@ class FreeTubeJavaScriptInterface(
         art
       )
   }
-
-  /**
-   * cancels the active media notification
-   */
+  
   @JavascriptInterface
   fun cancelMediaNotification() {
     mediaSession.cancel()

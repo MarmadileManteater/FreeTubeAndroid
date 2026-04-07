@@ -24,7 +24,7 @@ class MediaSessionFacade(
   init {
     context.createNotificationChannel(channelId)
   }
-  
+
   private val notificationManager = NotificationManagerCompat.from(context)
   private val session = context.createMediaSession(
     channelId,
@@ -45,7 +45,13 @@ class MediaSessionFacade(
     notificationManager.notify(notificationTag, notificationId, notification)
   }
 
-  fun setState(givenState: Int?, position: Long? = null): MediaSessionFacade {
+
+  /**
+   * sets the state of the active media session
+   * @param givenState the state; should be an Int (as a string because the java bridge)
+   * @param givenPosition the position; should be a Long (as a string because the java bridge)
+   */
+  fun setState(givenState: Int?, givenPosition: Long? = null): MediaSessionFacade {
     if (givenState != null) {
       state = givenState
     }
@@ -56,7 +62,7 @@ class MediaSessionFacade(
       push()
     }
 
-    val statePosition: Long? = position ?: playbackPosition
+    val statePosition: Long? = givenPosition ?: playbackPosition
     playbackPosition = statePosition
     session.setPlaybackState(
       PlaybackState.Builder()
@@ -74,6 +80,13 @@ class MediaSessionFacade(
     return this
   }
 
+  /**
+   * sets the metadata of the active media session
+   * @param trackName the video title
+   * @param artist the channel name
+   * @param duration the length of the video in milliseconds
+   * @param art the URL to the video thumbnail
+   */
   fun setMetadata(
     trackName: String,
     artist: String,
@@ -109,6 +122,9 @@ class MediaSessionFacade(
     return this
   }
 
+  /**
+   * cancels the active media notification
+   */
   fun cancel() {
     notificationManager.cancelAll()
   }
