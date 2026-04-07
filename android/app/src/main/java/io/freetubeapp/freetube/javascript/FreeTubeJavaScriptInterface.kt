@@ -15,6 +15,7 @@ import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.MediaSessionFacade
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
+import io.freetubeapp.freetube.helpers.getFileName
 import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.writeBytes
@@ -321,7 +322,7 @@ class FreeTubeJavaScriptInterface(
             try {
               val uri = it.data!!.data
               val mimeType = context.contentResolver.getType(uri!!)
-              val fileName = getFileNameFromUri(uri.toString())
+              val fileName = context.contentResolver.getFileName(uri)
               val payload = JSONObject()
               payload.put("uri", uri)
               payload.put("type", mimeType)
