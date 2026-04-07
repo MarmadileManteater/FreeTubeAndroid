@@ -131,26 +131,27 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun listFilesInTree(tree: String): String {
     val directory = DocumentFile.fromTreeUri(context, tree.toUri())
-    val files = directory!!.listFiles().joinToString(",") { file ->
+    val files = directory?.listFiles()?.joinToString(",") { file ->
       "{ \"uri\": \"${file.uri}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
     }
-    return "[$files]"
+    return "[${files ?: ""}]"
   }
 
   @JavascriptInterface
-  fun createFileInTree(tree: String, fileName: String): String {
+  fun createFileInTree(tree: String, fileName: String): String? {
     val directory = DocumentFile.fromTreeUri(context, tree.toUri())
-    return directory!!.createFile("*/*", fileName)!!.uri.toString()
+    return directory?.createFile("*/*", fileName)?.uri?.toString()
   }
   // endregion
 
   // region IO
   @JavascriptInterface
   fun listFilesInDataDir(): String {
-    return "[${File(getDirectory(DATA_DIRECTORY)).listFiles()?.map {
-      file ->
-      "{ \"uri\": \"${DATA_DIRECTORY}${file.name}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
-    }!!.joinToString(",")}]"
+    return "[${
+      File(getDirectory(DATA_DIRECTORY)).listFiles()?.joinToString(",") { file ->
+        "{ \"uri\": \"${DATA_DIRECTORY}${file.name}\", \"fileName\": \"${file.name}\", \"isFile\": ${file.isFile}, \"isDirectory\": ${file.isDirectory} }"
+      } ?: ""
+    }]"
   }
 
   /**
@@ -257,12 +258,12 @@ class FreeTubeJavaScriptInterface(
           .setType(fileType)
           .putExtra(Intent.EXTRA_TITLE, fileName)
       ).then {
-        if (it!!.resultCode == Activity.RESULT_CANCELED) {
+        if (it?.resultCode == Activity.RESULT_CANCELED) {
           resolve("USER_CANCELED")
         }
         try {
           val payload = JSONObject()
-          payload.put("uri", it.data!!.data)
+          payload.put("uri", it?.data?.data)
           resolve(payload)
         } catch (ex: Exception) {
           reject(ex.toString())
@@ -279,18 +280,22 @@ class FreeTubeJavaScriptInterface(
           .setType("*/*")
           .putExtra(Intent.EXTRA_MIME_TYPES, fileTypes.split(",").toTypedArray())
       ).then {
-        if (it!!.resultCode == Activity.RESULT_CANCELED) {
+        if (it?.resultCode == Activity.RESULT_CANCELED) {
           resolve("USER_CANCELED")
         }
         try {
-          val uri = it.data!!.data
-          val mimeType = context.contentResolver.getType(uri!!)
-          val fileName = context.contentResolver.getFileName(uri)
-          val payload = JSONObject()
-          payload.put("uri", uri)
-          payload.put("type", mimeType)
-          payload.put("fileName", fileName)
-          resolve(payload)
+          val uri = it?.data?.data
+          if (uri != null) {
+            val mimeType = context.contentResolver.getType(uri)
+            val fileName = context.contentResolver.getFileName(uri)
+            val payload = JSONObject()
+            payload.put("uri", uri)
+            payload.put("type", mimeType)
+            payload.put("fileName", fileName)
+            resolve(payload)
+          } else {
+            reject("Uri from intent was null")
+          }
         } catch (ex: Exception) {
           reject(ex.toString())
         }
@@ -304,16 +309,20 @@ class FreeTubeJavaScriptInterface(
       methods.launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
-        if (it!!.resultCode == Activity.RESULT_CANCELED) {
+        if (it?.resultCode == Activity.RESULT_CANCELED) {
           resolve("USER_CANCELED")
         }
         try {
-          val uri = it.data!!.data!!
-          context.contentResolver.takePersistableUriPermission(
-            uri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-          )
-          resolve(uri)
+          val uri = it?.data?.data
+          if (uri != null) {
+            context.contentResolver.takePersistableUriPermission(
+              uri,
+              Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            resolve(uri)
+          } else {
+            reject("Uri from intent was null")
+          }
         } catch (ex: Exception) {
           reject(ex.toString())
         }
@@ -483,7 +492,7 @@ class FreeTubeJavaScriptInterface(
               )
             }
           } catch (exception: Exception) {
-            reject(exception.message!!)
+            reject(exception.message ?: exception.javaClass.name)
           }
         }
     }).addJsCommunicator(jsCommunicator)
