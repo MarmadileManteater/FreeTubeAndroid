@@ -226,35 +226,30 @@ class FreeTubeJavaScriptInterface(
   @OptIn(ExperimentalEncodingApi::class)
   @JavascriptInterface
   fun appendFile(uri: String, content: String): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject ->
-        AmbiguousFileUri(uri)
-          .ifContentUri {
-              uri ->
-                val bytes = if (content.startsWith("data:")) {
-                  Base64.decode(content.split("base64,")[1])
-                } else {
-                  content.toByteArray()
-                }
-                context.contentResolver.writeBytes(
-                  uri,
-                  bytes,
-                  WriteMode.Append
-                )
-                resolve("")
+    return Promise(coroutineScope) { resolve, reject ->
+      AmbiguousFileUri(uri)
+        .ifContentUri { uri ->
+          val bytes = if (content.startsWith("data:")) {
+            Base64.decode(content.split("base64,")[1])
+          } else {
+            content.toByteArray()
           }
-          .ifDataUri {
-              fileName ->
-                val path = getDirectory(DATA_DIRECTORY)
-                File(path, fileName).writeText(content, WriteMode.Append)
-                resolve("")
-          }
-          .catch {
-              ex ->
-                reject(ex.stackTraceToString())
-          }
-    }).addJsCommunicator(jsCommunicator)
+          context.contentResolver.writeBytes(
+            uri,
+            bytes,
+            WriteMode.Append
+          )
+          resolve("")
+        }
+        .ifDataUri { fileName ->
+          val path = getDirectory(DATA_DIRECTORY)
+          File(path, fileName).writeText(content, WriteMode.Append)
+          resolve("")
+        }
+        .catch { ex ->
+          reject(ex.stackTraceToString())
+        }
+    }.addJsCommunicator(jsCommunicator)
   }
   // endregion
 
@@ -265,82 +260,75 @@ class FreeTubeJavaScriptInterface(
    */
   @JavascriptInterface
   fun requestSaveDialog(fileName: String, fileType: String): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject
-      ->
+    return Promise(coroutineScope) { resolve, reject ->
       methods.launchIntent(
         Intent(Intent.ACTION_CREATE_DOCUMENT)
-        .addCategory(Intent.CATEGORY_OPENABLE)
-        .setType(fileType)
-        .putExtra(Intent.EXTRA_TITLE, fileName)
+          .addCategory(Intent.CATEGORY_OPENABLE)
+          .setType(fileType)
+          .putExtra(Intent.EXTRA_TITLE, fileName)
       ).then {
-          if (it!!.resultCode == Activity.RESULT_CANCELED) {
-            resolve("USER_CANCELED")
-          }
-          try {
-            val payload = JSONObject()
-            payload.put("uri", it.data!!.data)
-            resolve(payload)
-          } catch (ex: Exception) {
-            reject(ex.toString())
-          }
+        if (it!!.resultCode == Activity.RESULT_CANCELED) {
+          resolve("USER_CANCELED")
         }
-    }).addJsCommunicator(jsCommunicator)
+        try {
+          val payload = JSONObject()
+          payload.put("uri", it.data!!.data)
+          resolve(payload)
+        } catch (ex: Exception) {
+          reject(ex.toString())
+        }
+      }
+    }.addJsCommunicator(jsCommunicator)
   }
 
   @JavascriptInterface
   fun requestOpenDialog(fileTypes: String): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject ->
-        methods.launchIntent(
-          Intent(Intent.ACTION_GET_CONTENT)
+    return Promise(coroutineScope) { resolve, reject ->
+      methods.launchIntent(
+        Intent(Intent.ACTION_GET_CONTENT)
           .setType("*/*")
           .putExtra(Intent.EXTRA_MIME_TYPES, fileTypes.split(",").toTypedArray())
-        ).then {
-            if (it!!.resultCode == Activity.RESULT_CANCELED) {
-              resolve("USER_CANCELED")
-            }
-            try {
-              val uri = it.data!!.data
-              val mimeType = context.contentResolver.getType(uri!!)
-              val fileName = context.contentResolver.getFileName(uri)
-              val payload = JSONObject()
-              payload.put("uri", uri)
-              payload.put("type", mimeType)
-              payload.put("fileName", fileName)
-              resolve(payload)
-            } catch (ex: Exception) {
-              reject(ex.toString())
-            }
-          }
-    }).addJsCommunicator(jsCommunicator)
+      ).then {
+        if (it!!.resultCode == Activity.RESULT_CANCELED) {
+          resolve("USER_CANCELED")
+        }
+        try {
+          val uri = it.data!!.data
+          val mimeType = context.contentResolver.getType(uri!!)
+          val fileName = context.contentResolver.getFileName(uri)
+          val payload = JSONObject()
+          payload.put("uri", uri)
+          payload.put("type", mimeType)
+          payload.put("fileName", fileName)
+          resolve(payload)
+        } catch (ex: Exception) {
+          reject(ex.toString())
+        }
+      }
+    }.addJsCommunicator(jsCommunicator)
   }
 
   @JavascriptInterface
   fun requestDirectoryAccessDialog(): String {
-    return Promise(coroutineScope, {
-      resolve,
-      reject ->
+    return Promise(coroutineScope) { resolve, reject ->
       methods.launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
-          if (it!!.resultCode == Activity.RESULT_CANCELED) {
-            resolve("USER_CANCELED")
-          }
-          try {
-            val uri = it.data!!.data!!
-            context.contentResolver.takePersistableUriPermission(
-              uri,
-              Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
-            resolve(uri)
-          } catch (ex: Exception) {
-            reject(ex.toString())
-          }
+        if (it!!.resultCode == Activity.RESULT_CANCELED) {
+          resolve("USER_CANCELED")
         }
-    }).addJsCommunicator(jsCommunicator)
+        try {
+          val uri = it.data!!.data!!
+          context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+          )
+          resolve(uri)
+        } catch (ex: Exception) {
+          reject(ex.toString())
+        }
+      }
+    }.addJsCommunicator(jsCommunicator)
   }
 
   // endregion
