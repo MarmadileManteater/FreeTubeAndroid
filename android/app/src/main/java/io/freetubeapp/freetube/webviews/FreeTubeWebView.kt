@@ -31,14 +31,14 @@ import org.json.JSONObject
 @SuppressLint("ViewConstructor")
 class FreeTubeWebView (
   context: Context,
+  windowInsetsControllerCompat: WindowInsetsControllerCompat,
   private val state: ApplicationState,
-  methods: ApplicationMethods,
-  insetsControllerCompat: WindowInsetsControllerCompat
+  methods: ApplicationMethods
 ) : BackgroundPlayWebView(context, null) {
-  private val insetsController = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && windowInsetsController != null) {
+  private val windowInsetsControllerWrapper = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && windowInsetsController != null) {
     WindowInsetsControllerWrapper(windowInsetsController)
   } else {
-    WindowInsetsControllerWrapper(insetsControllerCompat)
+    WindowInsetsControllerWrapper(windowInsetsControllerCompat)
   }
   val jsInterface = FreeTubeJavaScriptInterface(context, this, state, methods)
 
@@ -101,8 +101,8 @@ class FreeTubeWebView (
           // hide system ui
           viewGroup.fitsSystemWindows = false
 
-          insetsController.hide(WindowInsetsCompat.Type.systemBars())
-          insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+          windowInsetsControllerWrapper.hide(WindowInsetsCompat.Type.systemBars())
+          windowInsetsControllerWrapper.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
           viewGroup.addView(view)
           fullscreenView = view
@@ -115,7 +115,7 @@ class FreeTubeWebView (
 
         // show system ui
         viewGroup.fitsSystemWindows = true
-        insetsController.show(WindowInsetsCompat.Type.systemBars())
+        windowInsetsControllerWrapper.show(WindowInsetsCompat.Type.systemBars())
 
         viewGroup.removeView(fullscreenView)
         dispatchEvent("end-fullscreen")

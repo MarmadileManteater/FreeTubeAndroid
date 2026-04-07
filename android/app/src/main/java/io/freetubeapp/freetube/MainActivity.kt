@@ -72,6 +72,8 @@ class MainActivity : AppCompatActivity() {
   }
   // endregion
 
+  private val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+
   // region Overridden methods
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,14 +123,19 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    webView = FreeTubeWebView(this, state, ApplicationMethods(
-      restart = { restart() },
-      launchIntent = { intent -> launchIntent(intent) },
-      setKeepScreenOn = { newState -> setKeepScreenOn(newState) },
-      themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
-        themeSystemUI(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
-      }
-    ), WindowCompat.getInsetsController(window, window.decorView))
+    webView = FreeTubeWebView(
+      this,
+      windowInsetsController,
+      state,
+      ApplicationMethods(
+        restart = { restart() },
+        launchIntent = { intent -> launchIntent(intent) },
+        setKeepScreenOn = { newState -> setKeepScreenOn(newState) },
+        themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
+          themeSystemUI(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
+        }
+      )
+    )
 
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)
@@ -228,8 +235,6 @@ class MainActivity : AppCompatActivity() {
 
   private fun themeSystemUI(navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) {
     runOnUiThread {
-      val windowInsetsController =
-        WindowCompat.getInsetsController(window, window.decorView)
       windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
       windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
       window.navigationBarColor = navigationHex.hexToColour()
