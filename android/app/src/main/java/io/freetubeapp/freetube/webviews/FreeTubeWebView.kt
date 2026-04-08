@@ -14,7 +14,7 @@ import android.webkit.WebViewClient
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.R
-import io.freetubeapp.freetube.helpers.ApplicationMethods
+import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.WindowInsetsControllerWrapper
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
@@ -23,20 +23,17 @@ import org.json.JSONObject
 
 @SuppressLint("ViewConstructor")
 class FreeTubeWebView (
-  context: Context,
-  windowInsetsControllerCompat: WindowInsetsControllerCompat,
-  private val state: ApplicationState,
-  methods: ApplicationMethods
+  context: FreeTubeActivity
 ) : BackgroundPlayWebView(context, null) {
   private val windowInsetsControllerWrapper = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && windowInsetsController != null) {
     WindowInsetsControllerWrapper(windowInsetsController)
   } else {
-    WindowInsetsControllerWrapper(windowInsetsControllerCompat)
+    WindowInsetsControllerWrapper(context.windowInsetsController)
   }
-  val jsInterface = FreeTubeJavaScriptInterface(context, this, state, methods)
+  val jsInterface = FreeTubeJavaScriptInterface(context, this)
 
   val onConsoleMessage: (JSONObject) -> Unit = { messageData: JSONObject ->
-    state.consoleMessages.add(messageData)
+    context.state.consoleMessages.add(messageData)
     dispatchEvent("console-message", "data", messageData)
   }
 
@@ -59,7 +56,7 @@ class FreeTubeWebView (
 
     webViewClient = object: WebViewClient() {
       override fun onPageFinished(view: WebView?, url: String?) {
-        state.currentPage = url
+        context.state.currentPage = url
         super.onPageFinished(view, url)
       }
       override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {

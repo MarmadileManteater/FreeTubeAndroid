@@ -2,26 +2,14 @@ package io.freetubeapp.freetube
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.activity.addCallback
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
+import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
-import io.freetubeapp.freetube.helpers.ApplicationMethods
-import io.freetubeapp.freetube.helpers.ApplicationState
-import io.freetubeapp.freetube.helpers.Promise
-import io.freetubeapp.freetube.helpers.hexToColour
 import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.helpers.toYtUrl
 import io.freetubeapp.freetube.javascript.dispatchEvent
@@ -29,28 +17,15 @@ import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import java.net.URLEncoder
 import java.nio.charset.Charset
 
-class MainActivity : AppCompatActivity() {
-
+class MainActivity: FreeTubeActivity() {
   private val keepGoingService: Intent
     get() {
       return Intent(this, KeepAliveService::class.java)
     }
-  private val activityResultListeners: MutableList<(ActivityResult?) -> Unit> = mutableListOf()
-  private val activityResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-    for (listener in activityResultListeners) {
-      listener(it)
-    }
-    // clear the listeners
-    activityResultListeners.removeAll { true }
-  }
-  private val state = ApplicationState()
   private lateinit var webView: FreeTubeWebView
-  private lateinit var windowInsetsController: WindowInsetsControllerCompat
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
 
     // this keeps android from shutting off the app to conserve battery
     startService(keepGoingService)
@@ -95,19 +70,7 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    webView = FreeTubeWebView(
-      this,
-      windowInsetsController,
-      state,
-      ApplicationMethods(
-        restart = { restart() },
-        launchIntent = { intent -> launchIntent(intent) },
-        setKeepScreenOn = { newState -> setKeepScreenOn(newState) },
-        themeSystemUi = { navigationHex, statusHex, navigationDarkMode,  statusDarkMode ->
-          themeSystemUI(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
-        }
-      )
-    )
+    webView = FreeTubeWebView(this)
 
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)
@@ -162,59 +125,6 @@ class MainActivity : AppCompatActivity() {
     webView.destroy()
     // call `super`
     super.onDestroy()
-  }
-
-  private fun listenForActivityResults(listener: (ActivityResult?) -> Unit) {
-    activityResultListeners.add(listener)
-  }
-
-  private fun restart() {
-    finish()
-    startActivity(Intent(Intent.ACTION_MAIN)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setClass(this,  MainActivity::class.java))
-  }
-
-  private fun launchIntent(intent: Intent): Promise<ActivityResult?, Exception> {
-    return Promise { resolve, reject ->
-      try {
-        listenForActivityResults {
-          resolve(it)
-        }
-        activityResultLauncher.launch(intent)
-      } catch (exception: Exception) {
-        reject(exception)
-      }
-    }
-  }
-
-  private fun setKeepScreenOn(newState: Boolean) {
-    if (state.keepScreenOn != newState) {
-      state.keepScreenOn = newState
-      runOnUiThread {
-        if (state.keepScreenOn) {
-          window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-          window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-      }
-    }
-  }
-
-  private fun themeSystemUI(navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) {
-    runOnUiThread {
-      windowInsetsController.isAppearanceLightNavigationBars = !navigationDarkMode
-      windowInsetsController.isAppearanceLightStatusBars = !statusDarkMode
-      window.navigationBarColor = navigationHex.hexToColour()
-      window.statusBarColor = statusHex.hexToColour()
-
-      val bitmap = createBitmap(24, 24)
-      bitmap.eraseColor(navigationHex.hexToColour())
-      val canvas = Canvas(bitmap)
-      canvas.drawColor(navigationHex.hexToColour())
-      val bitmapDrawable = bitmap.toDrawable(resources)
-      window.setBackgroundDrawable(bitmapDrawable)
-    }
   }
 
   private fun urlEncode(url: String): String {

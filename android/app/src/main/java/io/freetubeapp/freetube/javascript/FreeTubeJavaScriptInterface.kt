@@ -1,14 +1,12 @@
 package io.freetubeapp.freetube.javascript
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.media.session.PlaybackState.STATE_PAUSED
 import android.webkit.JavascriptInterface
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import io.freetubeapp.freetube.helpers.ApplicationMethods
-import io.freetubeapp.freetube.helpers.ApplicationState
+import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.helpers.MediaSessionFacade
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
@@ -30,10 +28,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 const val DATA_DIRECTORY = "data://"
 
 class FreeTubeJavaScriptInterface(
-  private val context: Context,
-  private val webView: FreeTubeWebView,
-  private val state: ApplicationState,
-  private val methods: ApplicationMethods
+  private val context: FreeTubeActivity,
+  private val webView: FreeTubeWebView
 ) {
   private val coroutineScope = CoroutineScope(Dispatchers.Main)
   private val mediaSession: MediaSessionFacade = MediaSessionFacade(
@@ -224,7 +220,7 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun requestSaveDialog(fileName: String, fileType: String): String {
     return Promise(coroutineScope) { resolve, reject ->
-      methods.launchIntent(
+      context.launchIntent(
         Intent(Intent.ACTION_CREATE_DOCUMENT)
           .addCategory(Intent.CATEGORY_OPENABLE)
           .setType(fileType)
@@ -247,7 +243,7 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun requestOpenDialog(fileTypes: String): String {
     return Promise(coroutineScope) { resolve, reject ->
-      methods.launchIntent(
+      context.launchIntent(
         Intent(Intent.ACTION_GET_CONTENT)
           .setType("*/*")
           .putExtra(Intent.EXTRA_MIME_TYPES, fileTypes.split(",").toTypedArray())
@@ -278,7 +274,7 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun requestDirectoryAccessDialog(): String {
     return Promise(coroutineScope) { resolve, reject ->
-      methods.launchIntent(
+      context.launchIntent(
         Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
       ).then {
         if (it?.resultCode == Activity.RESULT_CANCELED) {
@@ -316,7 +312,7 @@ class FreeTubeJavaScriptInterface(
   @JavascriptInterface
   fun getLogs(): String {
     var logs = "["
-    for (message in state.consoleMessages) {
+    for (message in context.state.consoleMessages) {
       logs += "${message},"
     }
     // get rid of trailing comma
@@ -329,7 +325,7 @@ class FreeTubeJavaScriptInterface(
 
   @JavascriptInterface
   fun restart() {
-    methods.restart()
+    context.restart()
   }
 
   /**
@@ -337,18 +333,17 @@ class FreeTubeJavaScriptInterface(
    */
   @JavascriptInterface
   fun hideSplashScreen() {
-    state.showSplashScreen = false
+    context.state.showSplashScreen = false
   }
 
   @JavascriptInterface
   fun enableKeepScreenOn() {
-    methods.setKeepScreenOn(true)
-
+    context.setKeepScreenOn(true)
   }
 
   @JavascriptInterface
   fun disableKeepScreenOn() {
-    methods.setKeepScreenOn(false)
+    context.setKeepScreenOn(false)
   }
 
   /**
@@ -364,12 +359,12 @@ class FreeTubeJavaScriptInterface(
    */
   @JavascriptInterface
   fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
-    methods.themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
+    context.themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
   }
 
   @JavascriptInterface
   fun getSystemTheme(): String {
-    return if (state.darkMode) {
+    return if (context.state.darkMode) {
       "dark"
     } else {
       "light"
@@ -378,19 +373,19 @@ class FreeTubeJavaScriptInterface(
 
   @JavascriptInterface
   fun isAppPaused(): Boolean {
-    return state.paused
+    return context.state.paused
   }
 
   @JavascriptInterface
   fun enterPromptMode() {
     webView.isVerticalScrollBarEnabled = false
-    state.isInAPrompt = true
+    context.state.isInAPrompt = true
   }
 
   @JavascriptInterface
   fun exitPromptMode() {
     webView.isVerticalScrollBarEnabled = true
-    state.isInAPrompt = false
+    context.state.isInAPrompt = false
   }
 
   @JavascriptInterface
