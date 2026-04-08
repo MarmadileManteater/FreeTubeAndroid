@@ -30,14 +30,17 @@ class BotGuardWebView @JvmOverloads constructor(
           view: WebView?,
           request: WebResourceRequest?
         ): WebResourceResponse? {
-          if (request!!.url.toString().startsWith("data:text/html") || request.url.toString().startsWith("https://www.youtube.com/api/jnn/v1/GenerateIT")) {
+          if (request?.url.toString().startsWith("data:text/html") || request?.url.toString().startsWith("https://www.youtube.com/api/jnn/v1/GenerateIT")) {
             return super.shouldInterceptRequest(view, request)
           }
-          with(URL(request.url.toString()).openConnection() as HttpURLConnection) {
-            requestMethod = request.method
+          with(URL(request?.url.toString()).openConnection() as HttpURLConnection) {
+            requestMethod = request?.method
             // map headers
-            for (header in request.requestHeaders) {
-              setRequestProperty(header.key, header.value)
+            val headers = request?.requestHeaders
+            if (headers != null) {
+              for (header in headers) {
+                setRequestProperty(header.key, header.value)
+              }
             }
 
             if (url.toString().startsWith("https://www.youtube.com/youtubei/")) {
@@ -54,18 +57,20 @@ class BotGuardWebView @JvmOverloads constructor(
               setRequestProperty("Sec-Fetch-Site", "cross-site")
               setRequestProperty("Accept-Language", "*")
             }
-            if (request.requestHeaders.containsKey("x-fta-request-id")) {
-              if (jsInterface.pendingRequestBodies.containsKey(request.requestHeaders["x-fta-request-id"])) {
-                val body = jsInterface.pendingRequestBodies[request.requestHeaders["x-fta-request-id"]]
-                jsInterface.pendingRequestBodies.remove(request.requestHeaders["x-fta-request-id"])
-                outputStream.write(body!!.toByteArray())
+
+            if (headers != null && headers.containsKey("x-fta-request-id")) {
+              if (jsInterface.pendingRequestBodies.containsKey(headers["x-fta-request-id"])) {
+                val body = jsInterface.pendingRequestBodies[headers["x-fta-request-id"]]
+                jsInterface.pendingRequestBodies.remove(headers["x-fta-request-id"])
+                outputStream.write(body?.toByteArray())
               }
             }
+
             try {
               // 🧝‍♀️ magic
-              return WebResourceResponse(this.contentType, this.contentEncoding, inputStream!!)
+              return WebResourceResponse(this.contentType, this.contentEncoding, inputStream)
             } catch (ex: Exception) {
-              consoleLog(ex.message!!, "error")
+              consoleLog(ex.stackTraceToString(), "error")
               return super.shouldInterceptRequest(view, request)
             }
           }

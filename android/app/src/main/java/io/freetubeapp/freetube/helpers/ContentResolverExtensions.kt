@@ -9,10 +9,10 @@ enum class WriteMode {
   Append
 }
 
-fun ContentResolver.readBytes(uri: Uri): ByteArray {
+fun ContentResolver.readBytes(uri: Uri): ByteArray? {
   val stream = openInputStream(uri)
-  val content = stream!!.readBytes()
-  stream.close()
+  val content = stream?.readBytes()
+  stream?.close()
   return content
 }
 
@@ -26,28 +26,22 @@ fun ContentResolver.writeBytes(uri: Uri, bytes: ByteArray, writeMode: WriteMode 
       }
   }
   val stream = openOutputStream(uri, mode)
-  stream!!.write(bytes)
-  stream.flush()
-  stream.close()
+  stream?.write(bytes)
+  stream?.flush()
+  stream?.close()
 }
 
 fun ContentResolver.getFileName(uri: Uri): String {
   var result: String? = null
   val cursor = query(uri,  null, null, null, null)
-  try {
+  cursor.use { cursor ->
     if (cursor != null && cursor.moveToFirst()) {
       val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
       if (index != -1) {
         result = cursor.getString(index)
       }
     }
-  } finally {
-    cursor!!.close()
   }
 
-  if (result == null) {
-    result = uri.toString().split(Regex("(/)|(%2F)")).last()
-  }
-
-  return result
+  return result ?: uri.toString().split(Regex("(/)|(%2F)")).last()
 }

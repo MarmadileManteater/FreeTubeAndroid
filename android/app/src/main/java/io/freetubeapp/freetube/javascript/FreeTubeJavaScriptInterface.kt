@@ -160,7 +160,7 @@ class FreeTubeJavaScriptInterface(
       if (file != null) {
         resolve(context.contentResolver
           .readBytes(file.uri)
-          .toString(Charset.forName("utf-8")))
+          ?.toString(Charset.forName("utf-8")) ?: "")
       } else {
         reject("File not found from given uri")
       }
@@ -355,7 +355,7 @@ class FreeTubeJavaScriptInterface(
    * used on the JS side for async js communication
    */
   @JavascriptInterface
-  fun getSyncMessage(promise: String): String {
+  fun getSyncMessage(promise: String): String? {
     return jsCommunicator.getSyncMessage(promise)
   }
 

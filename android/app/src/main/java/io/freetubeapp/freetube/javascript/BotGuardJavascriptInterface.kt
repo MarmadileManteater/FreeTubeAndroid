@@ -26,8 +26,9 @@ class BotGuardJavascriptInterface {
   }
 
   fun onReturnToken(callback: (String) -> Unit) {
+    val poToken = poToken
     if (poToken != null) {
-      callback(poToken!!)
+      callback(poToken)
     } else {
       tokenListeners.add(callback)
     }

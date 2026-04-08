@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
   private val state = ApplicationState()
   private lateinit var webView: FreeTubeWebView
   private lateinit var windowInsetsController: WindowInsetsControllerCompat
-  
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

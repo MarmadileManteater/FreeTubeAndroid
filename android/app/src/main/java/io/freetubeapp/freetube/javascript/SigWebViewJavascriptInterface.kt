@@ -10,7 +10,7 @@ class SigWebViewJavascriptInterface(
   val jsCommunicator = AsyncJSCommunicator(webView)
 
   @JavascriptInterface
-  fun readSync(id: String): String {
+  fun readSync(id: String): String? {
     return jsCommunicator.getSyncMessage(id)
   }
 
