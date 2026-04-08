@@ -46,8 +46,7 @@ class MainActivity : AppCompatActivity() {
   private val state = ApplicationState()
   private lateinit var webView: FreeTubeWebView
   private lateinit var windowInsetsController: WindowInsetsControllerCompat
-
-  // region Overridden methods
+  
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -166,8 +165,6 @@ class MainActivity : AppCompatActivity() {
     // call `super`
     super.onDestroy()
   }
-
-  // endregion
 
   private fun listenForActivityResults(listener: (ActivityResult?) -> Unit) {
     activityResultListeners.add(listener)
