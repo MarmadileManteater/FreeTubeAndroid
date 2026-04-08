@@ -17,11 +17,9 @@ class Promise<T, G>(coroutineScope: CoroutineScope, runnable: ((T) -> Unit, (G) 
 
   init {
     coroutineScope.launch {
-      runnable.invoke({
-          result ->
+      runnable.invoke({ result ->
         notifySuccess(result)
-      }, {
-          result ->
+      }, { result ->
         notifyError(result)
       })
     }
