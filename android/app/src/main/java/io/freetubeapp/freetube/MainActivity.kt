@@ -77,8 +77,7 @@ class MainActivity : AppCompatActivity() {
       }
     )
 
-    MediaControlsReceiver.notifyMediaSessionListeners = {
-        action ->
+    MediaControlsReceiver.notifyMediaSessionListeners = { action ->
       webView.dispatchEvent("media-$action")
     }
 
