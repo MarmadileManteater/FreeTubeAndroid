@@ -3,8 +3,6 @@ package io.freetubeapp.freetube
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.View
-import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.activity.addCallback
 import io.freetubeapp.freetube.activities.FreeTubeActivity
@@ -33,23 +31,6 @@ class MainActivity: FreeTubeActivity() {
 
     state.darkMode = resources.configuration.isDarkMode()
 
-    val content: View = findViewById(android.R.id.content)
-    content.viewTreeObserver.addOnPreDrawListener(
-      object : ViewTreeObserver.OnPreDrawListener {
-        override fun onPreDraw(): Boolean {
-          // Check whether the initial data is ready.
-          return if (!state.showSplashScreen) {
-            // The content is ready. Start drawing.
-            content.viewTreeObserver.removeOnPreDrawListener(this)
-            true
-          } else {
-            // The content isn't ready. Suspend.
-            false
-          }
-        }
-      }
-    )
-
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
       if (state.isInAPrompt) {
@@ -68,6 +49,16 @@ class MainActivity: FreeTubeActivity() {
 
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)
+      root.viewTreeObserver.addOnPreDrawListener {
+        // Check whether the initial data is ready.
+        if (!state.showSplashScreen) {
+          // The content is ready. Start drawing.
+          true
+        } else {
+          // The content isn't ready. Suspend.
+          false
+        }
+      }
       root.addView(webView)
     }
 
