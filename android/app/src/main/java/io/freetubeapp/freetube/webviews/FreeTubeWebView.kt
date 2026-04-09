@@ -15,7 +15,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.activities.FreeTubeActivity
-import io.freetubeapp.freetube.helpers.ApplicationState
 import io.freetubeapp.freetube.helpers.WindowInsetsControllerWrapper
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
