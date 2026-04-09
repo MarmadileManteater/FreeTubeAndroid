@@ -22,30 +22,15 @@ class MainActivity: FreeTubeActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    // this keeps android from shutting off the app to conserve battery
-    startService(keepGoingService)
-
-    // allow fullscreen shaka player to use whole window width
-    window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-
-    state.darkMode = resources.configuration.isDarkMode()
-
-    // bind the back button to the web-view history
-    onBackPressedDispatcher.addCallback {
-      if (state.isInAPrompt) {
-        webView.dispatchEvent("exit-prompt")
-        webView.jsInterface.exitPromptMode()
-      } else {
-        if (webView.canGoBack()) {
-          webView.goBack()
-        } else {
-          moveTaskToBack(true)
-        }
-      }
-    }
-
     webView = FreeTubeWebView(this)
+
+    val url = intent?.toYtUrl()
+    val postfix = if (url != null) {
+      "?intent=${url.urlEncode()}"
+    } else {
+      ""
+    }
+    webView.loadUrl("file:///android_asset/index.html$postfix")
 
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)
@@ -62,13 +47,27 @@ class MainActivity: FreeTubeActivity() {
       root.addView(webView)
     }
 
-    val url = intent?.toYtUrl()
-    val postfix = if (url != null) {
-      "?intent=${url.urlEncode()}"
-    } else {
-      ""
+    // this keeps android from shutting off the app to conserve battery
+    startService(keepGoingService)
+
+    state.darkMode = resources.configuration.isDarkMode()
+
+    // allow fullscreen shaka player to use whole window width
+    window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+
+    // bind the back button to the web-view history
+    onBackPressedDispatcher.addCallback {
+      if (state.isInAPrompt) {
+        webView.dispatchEvent("exit-prompt")
+        webView.jsInterface.exitPromptMode()
+      } else {
+        if (webView.canGoBack()) {
+          webView.goBack()
+        } else {
+          moveTaskToBack(true)
+        }
+      }
     }
-    webView.loadUrl("file:///android_asset/index.html$postfix")
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
