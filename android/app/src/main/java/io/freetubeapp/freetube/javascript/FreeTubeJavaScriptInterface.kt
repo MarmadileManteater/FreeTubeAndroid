@@ -154,9 +154,13 @@ class FreeTubeJavaScriptInterface(
     return Promise(coroutineScope) { resolve, reject ->
       val file = context.resolveAmbiguousUri(uri)
       if (file != null) {
-        resolve(context.contentResolver
-          .readBytes(file.uri)
-          ?.toString(Charset.forName("utf-8")) ?: "")
+        try {
+          resolve(context.contentResolver
+            .readBytes(file.uri)
+            ?.toString(Charset.forName("utf-8")))
+        } catch (ex: Throwable) {
+          reject(ex.stackTraceToString())
+        }
       } else {
         reject("File not found from given uri")
       }
