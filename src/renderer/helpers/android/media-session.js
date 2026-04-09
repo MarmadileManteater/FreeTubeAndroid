@@ -3,6 +3,7 @@ import android from 'android'
 
 export const STATE_PLAYING = 3
 export const STATE_PAUSED = 2
+export const STATE_BUFFERING = 6
 
 /**
  * creates a new media session / or updates the previous one

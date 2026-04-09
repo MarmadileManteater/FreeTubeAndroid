@@ -30,7 +30,7 @@ import {
 } from '../../helpers/utils'
 import { MANIFEST_TYPE_SABR } from '../../helpers/player/SabrManifestParser'
 import { setupSabrScheme } from '../../helpers/player/SabrSchemePlugin'
-import { STATE_PAUSED, STATE_PLAYING, updateMediaSessionState } from '../../helpers/android/media-session'
+import { STATE_BUFFERING, STATE_PAUSED, STATE_PLAYING, updateMediaSessionState } from '../../helpers/android/media-session'
 import android from 'android'
 
 /** @typedef {import('../../helpers/sponsorblock').SponsorBlockCategory} SponsorBlockCategory */
@@ -2697,6 +2697,7 @@ export default defineComponent({
     const mediaPause = () => {
       video.value.pause()
     }
+    let updateBufferInterval = null
 
     onMounted(async () => {
       const videoElement = video.value
@@ -2714,6 +2715,11 @@ export default defineComponent({
         videoElement.addEventListener('timeupdate', () => {
           updateMediaSessionState(videoElement.paused ? STATE_PAUSED : STATE_PLAYING, Math.floor(videoElement.currentTime * 1000))
         })
+        updateBufferInterval = setInterval(() => {
+          if (videoElement.buffered.length == 0) {
+            updateMediaSessionState(videoElement.paused ? STATE_PAUSED : STATE_BUFFERING, Math.floor(videoElement.currentTime * 1000))
+          }
+        }, 0)
       }
 
       const volume = sessionStorage.getItem('volume')
@@ -3226,6 +3232,7 @@ export default defineComponent({
 
       window.removeEventListener('media-play', mediaPlay)
       window.removeEventListener('media-pause', mediaPause)
+      clearInterval(updateBufferInterval)
     })
 
     // #endregion tear down
