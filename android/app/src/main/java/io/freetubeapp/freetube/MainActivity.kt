@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.activity.addCallback
 import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.isDarkMode
@@ -55,19 +54,6 @@ class MainActivity: FreeTubeActivity() {
     // allow fullscreen shaka player to use whole window width
     window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
-    // bind the back button to the web-view history
-    onBackPressedDispatcher.addCallback {
-      if (state.isInAPrompt) {
-        webView.dispatchEvent("exit-prompt")
-        webView.jsInterface.exitPromptMode()
-      } else {
-        if (webView.canGoBack()) {
-          webView.goBack()
-        } else {
-          moveTaskToBack(true)
-        }
-      }
-    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -98,6 +84,20 @@ class MainActivity: FreeTubeActivity() {
     super.onResume()
     state.paused = false
     webView.dispatchEvent("app-resume")
+  }
+
+  override fun onBack() {
+    // bind the back button to the web-view history
+    if (state.isInAPrompt) {
+      webView.dispatchEvent("exit-prompt")
+      webView.jsInterface.exitPromptMode()
+    } else {
+      if (webView.canGoBack()) {
+        webView.goBack()
+      } else {
+        moveTaskToBack(true)
+      }
+    }
   }
 
   override fun onDestroy() {

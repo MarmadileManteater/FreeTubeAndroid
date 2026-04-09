@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.addCallback
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
@@ -22,6 +23,13 @@ open class FreeTubeActivity: LaunchIntentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     windowInsetsControllerCompat = WindowCompat.getInsetsController(window, window.decorView)
+    onBackPressedDispatcher.addCallback {
+      onBack()
+    }
+  }
+
+  open fun onBack() {
+
   }
 
   fun restart() {
