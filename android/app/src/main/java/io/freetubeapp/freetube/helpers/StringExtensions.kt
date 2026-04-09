@@ -1,6 +1,9 @@
 package io.freetubeapp.freetube.helpers
 
 import android.graphics.Color
+import android.os.Build
+import java.net.URLEncoder
+import java.nio.charset.Charset
 
 fun String.hexToColour() : Int {
   return when (length) {
@@ -24,5 +27,15 @@ fun String.hexToColour() : Int {
       else -> {
         Color.TRANSPARENT
       }
+  }
+}
+
+
+fun String.urlEncode(): String {
+  return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    URLEncoder.encode(this, Charset.defaultCharset())
+  } else {
+    @Suppress("DEPRECATION")
+    URLEncoder.encode(this)
   }
 }

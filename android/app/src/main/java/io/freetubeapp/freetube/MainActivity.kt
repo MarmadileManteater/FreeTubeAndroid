@@ -2,7 +2,6 @@ package io.freetubeapp.freetube
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
@@ -12,10 +11,9 @@ import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
 import io.freetubeapp.freetube.helpers.isDarkMode
 import io.freetubeapp.freetube.helpers.toYtUrl
+import io.freetubeapp.freetube.helpers.urlEncode
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
-import java.net.URLEncoder
-import java.nio.charset.Charset
 
 class MainActivity: FreeTubeActivity() {
   private val keepGoingService: Intent
@@ -52,10 +50,6 @@ class MainActivity: FreeTubeActivity() {
       }
     )
 
-    MediaControlsReceiver.notifyMediaSessionListeners = { action ->
-      webView.dispatchEvent("media-$action")
-    }
-
     // bind the back button to the web-view history
     onBackPressedDispatcher.addCallback {
       if (state.isInAPrompt) {
@@ -79,7 +73,7 @@ class MainActivity: FreeTubeActivity() {
 
     val url = intent?.toYtUrl()
     val postfix = if (url != null) {
-      "?intent=${urlEncode(url)}"
+      "?intent=${url.urlEncode()}"
     } else {
       ""
     }
@@ -125,14 +119,5 @@ class MainActivity: FreeTubeActivity() {
     webView.destroy()
     // call `super`
     super.onDestroy()
-  }
-
-  private fun urlEncode(url: String): String {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      URLEncoder.encode(url, Charset.defaultCharset())
-    } else {
-      @Suppress("DEPRECATION")
-      URLEncoder.encode(url)
-    }
   }
 }
