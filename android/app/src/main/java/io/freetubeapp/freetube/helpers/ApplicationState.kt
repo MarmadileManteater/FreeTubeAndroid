@@ -9,5 +9,6 @@ data class ApplicationState(
   var paused: Boolean = false,
   var isInAPrompt: Boolean = false,
   var keepScreenOn: Boolean = false,
-  var currentPage: String? = null
+  var currentPage: String? = null,
+  var scale: Float = 1.0f
 )

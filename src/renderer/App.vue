@@ -9,6 +9,7 @@
       hideLabelsSideBar: hideLabelsSideBar && !isSideNavOpen,
       noTapHighlight: !tapHighlight
     }"
+    :style="insetsStyle"
   >
     <TopNav
       :inert="isAnyPromptOpen"
@@ -109,7 +110,7 @@
 
 <script setup>
 import { marked } from 'marked'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from './composables/use-i18n-polyfill'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -176,6 +177,8 @@ const defaultInvidiousInstance = computed(() => store.getters.getDefaultInvidiou
 
 const dataReady = ref(false)
 
+const insetsStyle = reactive({})
+
 onMounted(async () => {
   await store.dispatch('grabUserSettings')
 
@@ -207,6 +210,17 @@ onMounted(async () => {
     }
 
     if (process.env.IS_ANDROID) {
+      window.addEventListener('update-insets', ({ left, top, bottom, cornerRadius }) => {
+        insetsStyle['--left-inset'] = `${left}px`
+        insetsStyle['--top-inset'] = `${top}px`
+        insetsStyle['--bottom-inset'] = `${bottom}px`
+        if (left > 0 || top > 0) {
+          insetsStyle['--corner-radius'] = `${left}px`
+        } else {
+          insetsStyle['--corner-radius'] = `${cornerRadius}px`
+        }
+      })
+
       window.addEventListener('youtube-link', ({ link }) => {
         handleYoutubeLink(link)
       })

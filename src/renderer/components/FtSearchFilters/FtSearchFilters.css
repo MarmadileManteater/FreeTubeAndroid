@@ -73,7 +73,7 @@
 
 @media only screen and (width <= 420px) {
   .radioFlexBox {
-    max-block-size: calc(100vh - 8.5em);
+    max-block-size: calc(100vh - 8.5em - var(--top-inset) - var(--bottom-inset));
     margin-bottom: 0.75em;
     overflow-y: scroll;
     justify-content: start;

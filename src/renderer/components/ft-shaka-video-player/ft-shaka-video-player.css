@@ -187,6 +187,8 @@
 
   /* copied from .shaka-scrim-container */
   transition: opacity cubic-bezier(0.4, 0, 0.6, 1) 0.6s;
+  margin-block-start: var(--top-inset);
+  margin-inline-start: var(--corner-radius);
 }
 
 :deep(.playerFullscreenTitleOverlay:dir(rtl)) {

@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 
 class VersionInfo {
@@ -51,14 +52,14 @@ android {
       };
     }
     namespace = "io.freetubeapp.freetube"
-    compileSdk = 34
+    compileSdk = 35
     dataBinding {
         enable = true
     }
     defaultConfig {
         applicationId = versionInfo.appId
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = versionInfo.versionCode
         versionName = versionInfo.version
 
@@ -84,8 +85,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+      compilerOptions {
+        jvmTarget = JvmTarget.JVM_1_8
+      }
     }
     buildFeatures {
         viewBinding = true

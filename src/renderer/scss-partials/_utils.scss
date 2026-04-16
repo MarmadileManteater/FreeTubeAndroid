@@ -20,16 +20,16 @@
   position: fixed;
   inset-block-start: 60px;
   inset-inline-end: 0;
-  inline-size: calc(100% - 80px);
+  inline-size: calc(100% - 80px - var(--left-inset));
   margin-inline: 0;
   z-index: 3;
 
   @include is-side-nav-open {
-    inline-size: calc(100% - 200px);
+    inline-size: calc(100% - 200px - var(--left-inset));
   }
 
   @include are-side-bar-labels-hidden {
-    inline-size: calc(100% - 60px);
+    inline-size: calc(100% - 60px - var(--left-inset));
   }
 
   @media only screen and (width <= 680px) {

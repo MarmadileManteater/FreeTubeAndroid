@@ -14,7 +14,7 @@ class KeepAliveService : Service() {
     private const val CHANNEL_ID = "keep_alive"
   }
   override fun onBind(intent: Intent?): IBinder? {
-    TODO("Not yet implemented")
+    throw NotImplementedError()
   }
   override fun onCreate() {
     super.onCreate()

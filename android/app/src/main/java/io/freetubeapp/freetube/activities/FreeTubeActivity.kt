@@ -52,19 +52,10 @@ open class FreeTubeActivity: LaunchIntentActivity() {
     }
   }
 
-  fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean,  statusDarkMode: Boolean) {
+  fun themeSystemUi(navigationDarkMode: Boolean,  statusDarkMode: Boolean) {
     runOnUiThread {
       windowInsetsControllerCompat.isAppearanceLightNavigationBars = !navigationDarkMode
       windowInsetsControllerCompat.isAppearanceLightStatusBars = !statusDarkMode
-      window.navigationBarColor = navigationHex.hexToColour()
-      window.statusBarColor = statusHex.hexToColour()
-
-      val bitmap = createBitmap(24, 24)
-      bitmap.eraseColor(navigationHex.hexToColour())
-      val canvas = Canvas(bitmap)
-      canvas.drawColor(navigationHex.hexToColour())
-      val bitmapDrawable = bitmap.toDrawable(resources)
-      window.setBackgroundDrawable(bitmapDrawable)
     }
   }
 }

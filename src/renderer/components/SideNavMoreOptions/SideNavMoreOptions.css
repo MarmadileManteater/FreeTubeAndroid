@@ -30,6 +30,7 @@
   inline-size: 70px;
   z-index: 0;
   box-shadow: 3px -3px 5px 0 rgb(0 0 0 / 20%);
+  bottom: calc(var(--bottom-inset) + 60px);
 }
 
 @media only screen and (width <= 680px) {
