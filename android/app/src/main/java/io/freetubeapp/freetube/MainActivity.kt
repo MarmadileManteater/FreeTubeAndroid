@@ -46,7 +46,9 @@ class MainActivity: FreeTubeActivity() {
         // Check whether the initial data is ready.
         if (!state.showSplashScreen) {
           // The content is ready. Start drawing.
-          webView.dispatchEvent("update-insets", (webView.insets / state.scale).toJSON())
+          val insets = (webView.insets / state.scale).toJSON()
+          insets.put("cornerRadius", webView.cornerRadius / state.scale)
+          webView.dispatchEvent("update-insets", insets)
           true
         } else {
           // The content isn't ready. Suspend.

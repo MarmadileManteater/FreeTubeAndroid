@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Insets
 import android.os.Build
+import android.view.RoundedCorner
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -36,10 +37,21 @@ class FreeTubeWebView (
   } else {
     WindowInsetsControllerWrapper(context.windowInsetsController)
   }
+  val cornerRadius: Float
+    get() {
+      val radius = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        rootWindowInsets.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)?.radius
+      } else {
+        null
+      } ?: 0
+
+      return radius / context.resources.displayMetrics.density
+    }
   val insets: Insets
     get() {
       val insets = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        rootWindowInsets.getInsets(WindowInsets.Type.displayCutout()).addSystemBars(rootWindowInsets.getInsets(WindowInsets.Type.systemBars()))
+        rootWindowInsets.getInsets(WindowInsets.Type.displayCutout())
+          .addSystemBars(rootWindowInsets.getInsets(WindowInsets.Type.systemBars()))
       } else {
         rootWindowInsets.systemWindowInsets
       }

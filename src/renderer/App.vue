@@ -210,10 +210,15 @@ onMounted(async () => {
     }
 
     if (process.env.IS_ANDROID) {
-      window.addEventListener('update-insets', ({ left, top, bottom }) => {
+      window.addEventListener('update-insets', ({ left, top, bottom, cornerRadius }) => {
         insetsStyle['--left-inset'] = `${left}px`
         insetsStyle['--top-inset'] = `${top}px`
         insetsStyle['--bottom-inset'] = `${bottom}px`
+        if (left > 0 || top > 0) {
+          insetsStyle['--corner-radius'] = `${left}px`
+        } else {
+          insetsStyle['--corner-radius'] = `${cornerRadius}px`
+        }
       })
 
       window.addEventListener('youtube-link', ({ link }) => {
