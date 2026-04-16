@@ -20,6 +20,14 @@
   margin-inline: 10px;
 }
 
+@media only screen and (width > 680px) {
+  /** this is painful */
+  .routerView.flexBox:has(.ftNotificationBanner):not(:has(.floatingRefreshSection)) {
+    top: -40px;
+    position: relative;
+  }
+}
+
 .banner {
   inline-size: 85%;
   margin-block: 40px 0;
@@ -69,6 +77,11 @@
   .routerView {
     margin-block: 20px 68px;
     margin-inline: 8px;
+  }
+
+  .routerView.flexBox {
+    padding-block-start: var(--top-inset);
+    padding-block-end: var(--bottom-inset);
   }
 
   .banner {

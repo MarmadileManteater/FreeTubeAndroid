@@ -10,11 +10,13 @@ import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.helpers.MediaSessionFacade
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
+import io.freetubeapp.freetube.helpers.div
 import io.freetubeapp.freetube.helpers.getDataDirectory
 import io.freetubeapp.freetube.helpers.getFileName
 import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.resolveAmbiguousUri
+import io.freetubeapp.freetube.helpers.toJSON
 import io.freetubeapp.freetube.helpers.writeBytes
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import kotlinx.coroutines.CoroutineScope
@@ -362,8 +364,8 @@ class FreeTubeJavaScriptInterface(
    *
    */
   @JavascriptInterface
-  fun themeSystemUi(navigationHex: String, statusHex: String, navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
-    context.themeSystemUi(navigationHex, statusHex, navigationDarkMode, statusDarkMode)
+  fun themeSystemUi(navigationDarkMode: Boolean  = true,  statusDarkMode: Boolean = true) {
+    context.themeSystemUi(navigationDarkMode, statusDarkMode)
   }
 
   @JavascriptInterface
@@ -394,7 +396,17 @@ class FreeTubeJavaScriptInterface(
 
   @JavascriptInterface
   fun setScale(scale: Int) {
+    context.state.scale = scale / 100.0f
+    if (scale == 0) {
+      context.state.scale = 1f
+    }
     webView.setScale(scale / 100.0, context)
+    webView.dispatchEvent("update-insets", (webView.insets / context.state.scale).toJSON())
+  }
+
+  @JavascriptInterface
+  fun getInsets(): String {
+    return "${(webView.insets / context.state.scale).toJSON()}"
   }
 
   // endregion

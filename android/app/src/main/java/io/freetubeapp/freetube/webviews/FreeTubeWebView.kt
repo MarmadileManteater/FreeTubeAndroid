@@ -4,19 +4,26 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Insets
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.WindowInsets
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnAttach
 import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.helpers.WindowInsetsControllerWrapper
+import io.freetubeapp.freetube.helpers.addSystemBars
+import io.freetubeapp.freetube.helpers.div
+import io.freetubeapp.freetube.helpers.plus
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
+import io.freetubeapp.freetube.javascript.consoleLog
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import org.json.JSONObject
 
@@ -29,6 +36,15 @@ class FreeTubeWebView (
   } else {
     WindowInsetsControllerWrapper(context.windowInsetsController)
   }
+  val insets: Insets
+    get() {
+      val insets = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        rootWindowInsets.getInsets(WindowInsets.Type.displayCutout()).addSystemBars(rootWindowInsets.getInsets(WindowInsets.Type.systemBars()))
+      } else {
+        rootWindowInsets.systemWindowInsets
+      }
+      return insets / context.resources.displayMetrics.density
+    }
   val jsInterface = FreeTubeJavaScriptInterface(context, this)
 
   val onConsoleMessage: (JSONObject) -> Unit = { messageData: JSONObject ->
@@ -87,9 +103,6 @@ class FreeTubeWebView (
         if (view != null) {
           val viewGroup = (parent as ViewGroup)
 
-          // hide system ui
-          viewGroup.fitsSystemWindows = false
-
           windowInsetsControllerWrapper.hide(WindowInsetsCompat.Type.systemBars())
           windowInsetsControllerWrapper.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
@@ -102,8 +115,6 @@ class FreeTubeWebView (
       override fun onHideCustomView() {
         val viewGroup = (parent as ViewGroup)
 
-        // show system ui
-        viewGroup.fitsSystemWindows = true
         windowInsetsControllerWrapper.show(WindowInsetsCompat.Type.systemBars())
 
         viewGroup.removeView(fullscreenView)

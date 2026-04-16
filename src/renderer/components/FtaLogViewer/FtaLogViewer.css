@@ -4,7 +4,7 @@
 }
 
 .logs {
-  max-block-size: calc(100vh - 164px);
+  max-block-size: calc(100vh - 164px - var(--top-inset) - var(--bottom-inset));
   overflow-y: scroll;
   display: flex;
   flex-direction: column-reverse;

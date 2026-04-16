@@ -3,6 +3,7 @@
 .floatingRefreshSection {
   box-sizing: border-box;
   padding-block: 5px;
+  padding-block-start: calc(var(--top-inset) + 5px);
   padding-inline: 10px;
   box-shadow: 0 2px 1px 0 var(--primary-shadow-color);
   background-color: var(--card-bg-color);

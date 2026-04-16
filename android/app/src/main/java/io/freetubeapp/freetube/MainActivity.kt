@@ -2,11 +2,18 @@ package io.freetubeapp.freetube
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowInsets
 import android.view.WindowManager
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnAttach
 import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.databinding.ActivityMainBinding
+import io.freetubeapp.freetube.helpers.div
 import io.freetubeapp.freetube.helpers.isDarkMode
+import io.freetubeapp.freetube.helpers.toJSON
 import io.freetubeapp.freetube.helpers.toYtUrl
 import io.freetubeapp.freetube.helpers.urlEncode
 import io.freetubeapp.freetube.javascript.dispatchEvent
@@ -21,6 +28,7 @@ class MainActivity: FreeTubeActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
     webView = FreeTubeWebView(this)
 
     val url = intent?.toYtUrl()
@@ -33,10 +41,12 @@ class MainActivity: FreeTubeActivity() {
 
     ActivityMainBinding.inflate(layoutInflater).apply {
       setContentView(root)
+
       root.viewTreeObserver.addOnPreDrawListener {
         // Check whether the initial data is ready.
         if (!state.showSplashScreen) {
           // The content is ready. Start drawing.
+          webView.dispatchEvent("update-insets", (webView.insets / state.scale).toJSON())
           true
         } else {
           // The content isn't ready. Suspend.
@@ -61,6 +71,9 @@ class MainActivity: FreeTubeActivity() {
     state.darkMode = newConfig.isDarkMode()
     val colorString = if (state.darkMode) { "dark" } else { "light" }
     webView.dispatchEvent("enabled-$colorString-mode")
+    webView.postDelayed({
+      webView.dispatchEvent("update-insets", (webView.insets / state.scale).toJSON())
+    }, 10)
   }
 
   /**
