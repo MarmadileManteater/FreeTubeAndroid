@@ -403,12 +403,16 @@ Settings:
       Quality Label: Chất lượng chụp màn hình
       File Name Label: Mẫu tên tệp
       Folder Label: Thư mục ảnh chụp màn hình
-      Ask Path: Yêu cầu thư mục lưu
+      Modes:
+        Ask Path: Yêu cầu thư mục lưu
+        Save To Folder: Lưu vào Thư mục
+        Clipboard: Sao chéo vào Bộ nhớ tạm
       Folder Button: Chọn thư mục
       Error:
         Empty File Name: Tên tệp trống
         Forbidden Characters: Các ký từ bị cấm
       File Name Tooltip: Bạn có thể dùng các biến số dưới đây. %Y Năm 4 chữ số. %M Tháng 2 chữ số. %D Ngày 2 chữ số. %H Giờ 2 chữ số. %N Phút 2 chữ số. %S Giây 2 chữ số. %T Phầm trăm giây 3 chữ số. %s Giây Video. %t Phần trăm giây Video 3 chữ số. %i Video ID.
+      Mode: Chế độ Chụp màn hình
     Max Video Playback Rate: Tốc độ phát lại tối đa
     Video Playback Rate Interval: Khoảng cách tốc độ phát
     Enter Fullscreen on Display Rotate: Bật toàn màn hình khi xoay
@@ -591,6 +595,7 @@ Settings:
     Show Family Friendly Only: Chỉ hiển thị nội dung thân thiện với gia đình
     Hide Search Bar: Ẩn thanh tìm kiếm
     Hide Uploader on Watch page: Ẩn Người tải lên trên trang Xem
+    Disable Channel Links: Tắt Liên kết Kênh
   Password Dialog:
     Password: Mật khẩu
     Enter Password To Unlock: Nhập mật khẩu để mở cài đặt
@@ -611,7 +616,6 @@ About:
   #& About
 #On Channel Page
   Mastodon: Mastodon
-  Email: Email
   Source code: Mã nguồn
   FAQ: Câu hỏi thường gặp
   Report a problem: Báo cáo sự cố
@@ -812,6 +816,7 @@ Video:
   Watch:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Thời gian quảng cáo đầu video còn lại: {remindingTimeSeconds}s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Thời gian chờ SABR còn lại: {remindingTimeSeconds}s'
+  Private: Video riêng tư không thể xem trên FreeTube vì chúng có đăng nhập tài khoản Google và sở hữu video đó.
 Playlist:
   #& About
   View Full Playlist: 'Xem danh sách phát hoàn chỉnh'
@@ -862,7 +867,6 @@ Mini Player: 'Trình phát Mini'
 Comments:
   Comments: 'Bình luận'
   Click to View Comments: 'Nhấn để xem bình luận'
-  Getting comment replies, please wait: 'Đang lấy trả lời bình luận, vui lòng chờ'
   Hide Comments: 'Ẩn bình luận'
   # Context: View 10 Replies, View 1 Reply
   There are no comments available for this video: 'Không có bình luận nào cho video này'
@@ -1110,3 +1114,5 @@ KeyboardShortcutPrompt:
 shortcutLabelSeparator: ｜
 Compact side navigation: Điều hướng bên nhỏ gọn
 Expand side navigation: Mở rộng điều hướng bên
+Screenshot Clipboard Success: Đã lưu ảnh chụp màn hình vào bộ nhớ tạm
+Screenshot Clipboard Error: Sao chép ảnh chụp màn hình vào bộ nhớ tạm thất bại

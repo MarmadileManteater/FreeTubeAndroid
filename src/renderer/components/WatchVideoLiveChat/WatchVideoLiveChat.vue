@@ -81,8 +81,7 @@
           role="button"
           tabindex="0"
           @click="showSuperChatComment(comment)"
-          @keydown.space.prevent="showSuperChatComment(comment)"
-          @keydown.enter.prevent="showSuperChatComment(comment)"
+          @keydown.enter.space.prevent="showSuperChatComment(comment)"
         >
           <img
             :src="comment.author.thumbnailUrl"
@@ -107,8 +106,7 @@
         role="button"
         tabindex="0"
         @click="hideSuperChat"
-        @keydown.space.prevent="hideSuperChat"
-        @keydown.enter.prevent="hideSuperChat"
+        @keydown.enter.space.prevent="hideSuperChat"
       >
         <div
           class="superChatMessage"
@@ -233,8 +231,7 @@
         role="button"
         tabindex="0"
         @click="scrollToBottom"
-        @keydown.space.prevent="scrollToBottom"
-        @keydown.enter.prevent="scrollToBottom"
+        @keydown.enter.space.prevent="scrollToBottom"
       >
         <FontAwesomeIcon
           class="icon"
@@ -249,7 +246,7 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import autolinker from 'autolinker'
 import { computed, nextTick, onBeforeUnmount, ref, shallowReactive, useTemplateRef } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 import { YTNodes } from 'youtubei.js'
 
 import FtLoader from '../FtLoader/FtLoader.vue'

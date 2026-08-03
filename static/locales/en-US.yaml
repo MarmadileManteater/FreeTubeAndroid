@@ -164,6 +164,8 @@ User Playlists:
   Add to Favorites: Add to {playlistName}
   Remove from Favorites: Remove from {playlistName}
 
+  Move Video to the Top: Move Video to the Top
+  Move Video to the Bottom: Move Video to the Bottom
   Move Video Up: Move Video Up
   Move Video Down: Move Video Down
   Remove from Playlist: Remove from Playlist
@@ -445,6 +447,9 @@ Settings:
       Full Screen: Full Screen
       Picture in Picture: Picture in Picture
       External Player: External Player ({externalPlayerName})
+      Full Window (Always On): Full Window (Always On)
+      Full Screen (Always On): Full Screen (Always On)
+      Tooltip: Most default viewing modes are only applied at the start of each watch session. Changes made during the session persist until it ends. Always-on viewing modes are applied whenever you switch to a new video, regardless of any viewing mode changes made when viewing the previous video.
     Scroll Volume Over Video Player: Scroll Volume Over Video Player
     Scroll Playback Rate Over Video Player: Scroll Playback Rate Over Video Player
     Skip by Scrolling Over Video Player: Skip by Scrolling Over Video Player
@@ -476,9 +481,13 @@ Settings:
       8k: 8k
     Screenshot:
       Enable: Enable Screenshot
+      Mode: Screenshot Mode
+      Modes:
+        Ask Path: Ask for Save Folder
+        Save To Folder: Save to Folder
+        Clipboard: Copy to Clipboard
       Format Label: Screenshot Format
       Quality Label: Screenshot Quality
-      Ask Path: Ask for Save Folder
       Folder Label: Screenshot Folder
       Folder Button: Select Folder
       File Name Label: Filename Pattern
@@ -589,6 +598,7 @@ Settings:
     History File: History File
     Playlist File: Playlist File
     Search history file: Search history file
+    Settings File: Settings File
     Export Subscriptions: Export Subscriptions
     Export FreeTube: Export FreeTube
     Export YouTube: Export YouTube
@@ -600,6 +610,9 @@ Settings:
     Search history: Search history
     Import search history: Import search history
     Export search history: Export search history
+    Import Settings: Import Settings
+    Export Settings: Export Settings
+    Settings Tooltip: Settings that are OS/user-specific or experimental cannot be exported or imported (e.g., proxy, external player, screenshot folder...)
     Profile object has insufficient data, skipping item: Profile object has insufficient
       data, skipping item
     All subscriptions and profiles have been successfully imported: All subscriptions
@@ -625,9 +638,16 @@ Settings:
       successfully imported
     All search history has been successfully exported: All search history has been
       successfully exported
+    All settings have been successfully imported: All settings have been
+      successfully imported
+    All settings have been successfully exported: All settings have been
+      successfully exported
     Unable to read file: Unable to read file
     Unable to write file: Unable to write file
     Unknown data key: Unknown data key
+    Setting object has insufficient data, skipping item: Setting object has insufficient data, skipping item
+    Unknown setting key: 'Unknown setting key: {key}'
+    Non-transferable setting key: 'Non-transferable setting key: {key}'
     How do I import my subscriptions?: How do I import my subscriptions?
     Manage Subscriptions: Manage Subscriptions
   Proxy Settings:
@@ -668,6 +688,7 @@ Settings:
     Hide Uploader on Watch page: Hide Uploader on Watch page
     Show Family Friendly Only: Show Family Friendly Only
     Hide Search Bar: Hide Search Bar
+    Disable Channel Links: Disable Channel Links
   Experimental Settings:
     Experimental Settings: Experimental
     Warning: These settings are experimental, they may cause crashes while enabled. Making backups is highly recommended. Use at your own risk!
@@ -697,7 +718,6 @@ About:
   GitHub issues: GitHub issues
   Please check for duplicates before posting: Please check for duplicates before posting
   Website: Website
-  Email: Email
   Mastodon: Mastodon
   Chat on Matrix: Chat on Matrix
   Please read the {roomRulesLink}: Please read the {roomRulesLink}
@@ -770,6 +790,7 @@ Channel:
   This channel does not allow searching: This channel does not allow searching
   This channel is age-restricted and currently cannot be viewed in FreeTube.: This channel is age-restricted and currently cannot be viewed in FreeTube.
   Channel Tabs: Channel Tabs
+  View All: View All
   Videos:
     Videos: Videos
     This channel does not currently have any videos: This channel does not currently
@@ -826,6 +847,7 @@ Video:
   MembersOnly: Members-only videos cannot be watched with FreeTube as they require Google login and paid membership to the uploader's channel.
   AgeRestricted: Age-restricted videos cannot be watched with FreeTube as they require Google login and using an age-verified YouTube account.
   DRMProtected: DRM protected videos cannot be played in FreeTube, as they require proprietary, closed source components. If you want to watch this video please watch it on the official YouTube website in a DRM enabled web browser.
+  Private: Private videos cannot be watched in FreeTube as they require Google login and ownership of the video.
   More Options: More Options
   Mark As Watched: Mark As Watched
   Remove From History: Remove From History
@@ -1002,13 +1024,13 @@ Mini Player: Mini Player
 Comments:
   Comments: Comments
   Click to View Comments: Click to View Comments
-  Getting comment replies, please wait: Getting comment replies, please wait
   There are no more comments for this video: There are no more comments for this video
   Hide Comments: Hide Comments
   Top comments: Top comments
   Newest first: Newest First
   View {replyCount} replies: View 1 reply | View {replyCount} replies
   Hide {replyCount} replies: Hide 1 reply | Hide {replyCount} replies
+  Loading replies: Loading replies...
   View 1 reply from {channelName}: View 1 reply from {channelName}
   View {replyCount} replies from {channelName} and others: View {replyCount} replies from {channelName} and others
   Show More Replies: Show More Replies
@@ -1117,7 +1139,9 @@ Age Restricted:
   This video is age restricted: This video is age restricted
 External link opening has been disabled in the general settings: 'External link opening has been disabled in the general settings'
 Screenshot Success: Saved screenshot
+Screenshot Clipboard Success: Saved screenshot to clipboard
 Screenshot Error: Screenshot failed. {error}
+Screenshot Clipboard Error: Screenshot copy to clipboard failed
 Channel Hidden: '{channel} added to channel filter'
 Channel Unhidden: '{channel} removed from channel filter'
 Trimmed input must be at least N characters long: Trimmed input must be at least 1 character long | Trimmed input must be at least {length} characters long

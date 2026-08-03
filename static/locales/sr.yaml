@@ -50,6 +50,8 @@ Search Filters:
   Search Filters: 'Филтери претраге'
   Prioritize:
     Most Relevant: 'Најрелевантније'
+    Prioritize: Приоритет има
+    Popularity: Популарност
   Time:
     Time: 'Време'
     Any Time: 'Било које време'
@@ -106,6 +108,7 @@ Trending:
   Trending: 'У тренду'
   Gaming: Видео игре
   Trending Tabs: Картице у тренду
+  Sports: Спорт
 Most Popular: 'Најпопуларније'
 Playlists: 'Плејлисте'
 User Playlists:
@@ -399,7 +402,8 @@ Settings:
       Folder Button: Избор фолдера
       Format Label: Формат снимка екрана
       Enable: Омогући снимак екрана
-      Ask Path: Питај за фолдер за чување
+      Modes:
+        Ask Path: Питај за фолдер за чување
       Quality Label: Квалитет снимка екрана
       File Name Tooltip: Можете да користите променљиве испод. %Y Година 4 цифре. %M Месец 2 цифре. %D Дан 2 цифре. %H Сат 2 цифре. %N Минут 2 цифре. %S Секунда 2 цифре. %T Милисекунда 3 цифре. %s Секунда видео снимка. %t Милисекунда видео снимка 3 цифре. %i ID видео снимка.
       File Name Label: Образац назива фајла
@@ -609,7 +613,6 @@ About:
   GitHub issues: 'Пријава проблема на GitHub-у'
   Please check for duplicates before posting: 'Проверите да ли има дупликата пре објављивања'
   Website: 'Веб-сајт'
-  Email: 'Имејл'
   Mastodon: 'Mastodon'
   Chat on Matrix: 'Ћаскање на Matrix-у'
   room rules: 'правила собе'
@@ -905,7 +908,6 @@ Comments:
   Click to View Comments: Кликни да видиш коментаре
   Top comments: Топ коментари
   Subscribed: Пратите
-  Getting comment replies, please wait: Набављање одговора на коментаре, сачекајте
   Load More Comments: Учитај више коментара
   Hide Comments: Сакриј коментаре
   Show More Replies: Прикажи више одговора

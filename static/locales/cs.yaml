@@ -193,6 +193,8 @@ User Playlists:
   The playlist has been successfully exported: Playlist byl úspěšně exportován
   TotalTimePlaylist: 'Celkový čas: {duration}'
   Export list of URLs: Exportovat seznam adres URL
+  Move Video to the Top: Přesunout video na začátek
+  Move Video to the Bottom: Přesunout video na konec
 History:
   # On History Page
   History: 'Historie'
@@ -410,12 +412,16 @@ Settings:
         Empty File Name: Prázdný název souboru
       File Name Label: Vzor názvu souboru
       File Name Tooltip: Můžete použít proměnné níže. %Y Rok 4 číslice. %M Měsíc 2 číslice. %D Den 2 číslice. %H Hodina 2 číslice. %N Minuta 2 číslice. %S Sekunda 2 číslice. %T Milisekunda 3 číslice. %s Sekunda videa. %t Milisekunda videa 3 číslice. %i ID videa.
-      Ask Path: Zeptat se na složku pro uložení
+      Modes:
+        Ask Path: Zeptat se na složku pro uložení
+        Save To Folder: Uložit do složky
+        Clipboard: Kopírovat do schránky
       Folder Label: Složka snímků obrazovky
       Enable: Povolit snímek obrazovky
       Format Label: Formát snímku obrazovky
       Quality Label: Kvalita snímku obrazovky
       Folder Button: Vybrat složku
+      Mode: Režim snímků obrazovky
     Enter Fullscreen on Display Rotate: Při otočení displeje přejít na celou obrazovku
     Skip by Scrolling Over Video Player: Posouvat čas posuvem kolečka myši na přehrávači
     Autoplay Interruption Timer: Čas přerušení automatického přehrávání
@@ -425,6 +431,9 @@ Settings:
       Full Screen: Celá obrazovka
       External Player: Externí přehrávač ({externalPlayerName})
       Picture in Picture: Obraz v obraze
+      Full Window (Always On): Celé okno (vždy zapnuto)
+      Full Screen (Always On): Celá obrazovka (vždy zapnuto)
+      Tooltip: Nejvíce výchozí režimy sledování jsou použity pouze na začátku každé relace sledování. Změny provedené během relace se zachovají do jejího konce. Režimy s popisem „vždy zapnuto“ budou použity vždy, když přepnete na nové video, nezávisle na změnách režimu sledování provedených během sledování předchozího videa.
   Privacy Settings:
     Privacy Settings: 'Soukromí'
     Remember History: 'Zapamatovat historii sledování'
@@ -548,6 +557,15 @@ Settings:
     Export search history: Exportovat historii vyhledávání
     All search history has been successfully imported: Veškerá historie vyhledávání byla úspěšně importována
     All search history has been successfully exported: Veškerá historie vyhledávání byla úspěšně exportována
+    Settings File: Soubor nastavení
+    Import Settings: Importovat nastavení
+    Export Settings: Exportovat nastavení
+    Settings Tooltip: Nastavení týkající se systému nebo uživatele nebo která jsou experimentální nelze exportovat ani importovat (např. proxy, externí přehrávač, složka snímků…)
+    All settings have been successfully imported: Všechna nastavení byla úspěšně importována
+    All settings have been successfully exported: Všechna nastavení byla úspěšně exportována
+    Setting object has insufficient data, skipping item: Objekt nastavení nemá dostatek dat, přeskakování položky
+    Unknown setting key: 'Neznámý klíč nastavení: {key}'
+    Non-transferable setting key: 'Nepřenositelný klíč nastavení: {key}'
   Proxy Settings:
     Proxy Settings: Proxy
     City: Město
@@ -596,6 +614,7 @@ Settings:
     Show Family Friendly Only: Zobrazit pouze obsah vhodný pro rodiny
     Hide Unsubscribe Button: Skrýt tlačítko ke zrušení odběru
     Hide Uploader on Watch page: Skrýt autora na stránce sledování
+    Disable Channel Links: Vypnout odkazy kanálu
   Experimental Settings:
     Experimental Settings: Experimentální
     Warning: Tato nastavení jsou experimentální, při jejich aktivaci může docházet k pádům. Důrazně doporučujeme vytvářet zálohy. Používejte na vlastní nebezpečí!
@@ -624,7 +643,6 @@ About:
   room rules: pravidla místnosti
   Chat on Matrix: Chat na síti Matrix
   Mastodon: Mastodon
-  Email: E-mail
   Website: Webové stránky
   FAQ: Často kladené dotazy
   FreeTube Wiki: Wiki FreeTube
@@ -744,6 +762,7 @@ Channel:
   Courses:
     Courses: Kurzy
     This channel does not currently have any courses: Tento kanál momentálně nemá žádné kurzy
+  View All: Zobrazit vše
 Video:
   Mark As Watched: 'Označit jako zhlédnuto'
   Remove From History: 'Odstranit z historie'
@@ -860,6 +879,7 @@ Video:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Zbývající čas prvotní reklamy: {remindingTimeSeconds} s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Zbývající čas pauzy SABR: {remindingTimeSeconds} s'
   Popout Live Chat: Vyskakovací chat
+  Private: Soukromá videa nelze sledovat v aplikaci FreeTube, jelikož vyžadují přihlášení k účtu Google a vlastnictví videa.
 Playlist:
   #& About
   View Full Playlist: 'Zobrazit celý seznam skladeb'
@@ -911,7 +931,6 @@ Mini Player: 'Mini přehrávač'
 Comments:
   Comments: 'Komentáře'
   Click to View Comments: 'Kliknutím zobrazíte komentáře'
-  Getting comment replies, please wait: 'Načítání odpovědí na komentář, čekejte prosím'
   There are no more comments for this video: 'U tohoto videa nejsou žádné další komentáře'
   Hide Comments: 'Skrýt komentáře'
   Top comments: 'Nejlepší komentáře'
@@ -929,6 +948,7 @@ Comments:
   Hide {replyCount} replies: Skrýt 1 odpověď | Skrýt {replyCount} odpovědí
   View 1 reply from {channelName}: Zobrazit 1 odpověď od {channelName}
   View {replyCount} replies from {channelName} and others: Zobrazit {replyCount} odpovědí od {channelName} a dalších
+  Loading replies: Načítání odpovědí…
 Up Next: 'Další'
 
 #Tooltips
@@ -1118,3 +1138,5 @@ KeyboardShortcutPrompt:
 shortcutLabelSeparator: ｜
 Compact side navigation: Kompaktní boční navigace
 Expand side navigation: Rozbalit boční navigaci
+Screenshot Clipboard Success: Snímek uložen do schránky
+Screenshot Clipboard Error: Nepodařilo se uložit snímek do schránky

@@ -3,8 +3,7 @@
     class="ft-playlist-selector grid"
     :class="{ selected }"
     @click="toggleSelection"
-    @keydown.enter.prevent="toggleSelection"
-    @keydown.space.prevent="toggleSelection"
+    @keydown.enter.space.prevent="toggleSelection"
   >
     <div
       class="thumbnail"
@@ -55,7 +54,7 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, ref } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 
 import store from '../../store/index'
 

@@ -43,7 +43,7 @@
           @change="updateOpenDeepLinksInNewWindow"
         />
         <FtToggleSwitch
-          v-if="!IS_MAC && USING_ELECTRON"
+          v-if="!IS_MAC && !isLinuxWayland && USING_ELECTRON"
           :label="t('Settings.General Settings.Minimize to system tray')"
           :default-value="hideToTrayOnMinimize"
           :compact="true"
@@ -127,13 +127,14 @@
     >
       <FtFlexBox class="settingsFlexStart460px">
         <FtInput
+          ref="currentInvidiousInstanceInput"
           :placeholder="t('Settings.General Settings.Current Invidious Instance')"
           :show-action-button="false"
           :show-label="true"
           :value="currentInvidiousInstance"
           :data-list="invidiousInstancesList"
           :tooltip="t('Tooltips.General Settings.Invidious Instance')"
-          @input="handleInvidiousInstanceInput"
+          @blur="handleInvidiousInstanceBlur"
         />
       </FtFlexBox>
       <FtFlexBox>
@@ -174,8 +175,8 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { computed, onMounted, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import FtSettingsSection from '../FtSettingsSection/FtSettingsSection.vue'
@@ -188,8 +189,10 @@ import FtButton from '../FtButton/FtButton.vue'
 import store from '../../store/index'
 
 import allLocales from '../../../../static/locales/activeLocales.json'
-import { debounce, randomArrayItem, showToast } from '../../helpers/utils'
+import { randomArrayItem, showToast } from '../../helpers/utils'
 import { translateWindowTitle } from '../../helpers/strings'
+
+const currentInvidiousInstanceInputRef = useTemplateRef('currentInvidiousInstanceInput')
 
 const USING_ELECTRON = !!process.env.IS_ELECTRON
 const SUPPORTS_LOCAL_API = !!process.env.SUPPORTS_LOCAL_API
@@ -198,6 +201,15 @@ const USING_BROWSER = !process.env.IS_ELECTRON && !process.env.IS_ANDROID
 const USING_ANDROID = process.env.IS_ANDROID
 const { t } = useI18n()
 const router = useRouter()
+
+// The 'minimize' event doesn't fire on wayland
+// https://github.com/electron/electron/issues/51766
+const isLinuxWayland = ref(false)
+if (process.env.IS_ELECTRON && process.platform === 'linux') {
+  onMounted(async () => {
+    isLinuxWayland.value = await window.ftElectron.isWaylandPlatform()
+  })
+}
 
 /** @type {import('vue').ComputedRef<boolean>} */
 const checkForUpdates = computed(() => store.getters.getCheckForUpdates)
@@ -464,21 +476,20 @@ onBeforeUnmount(() => {
   }
 })
 
-const setCurrentInvidiousInstanceBounce = debounce((/** @type {string} */instance) => {
-  store.commit('setCurrentInvidiousInstance', instance)
-}, 500)
-
 /**
  * @param {string} input
  */
-function handleInvidiousInstanceInput(input) {
+function handleInvidiousInstanceBlur(input) {
   let instance = input
   // If NOT something like https:// (1-2 slashes), remove trailing slash
   if (!/^https?:\/{1,2}$/.test(input)) {
-    instance = input.replace(/\/$/, '')
+    instance = input.replace(/\/+$/, '')
   }
 
-  setCurrentInvidiousInstanceBounce(instance)
+  store.commit('setCurrentInvidiousInstance', instance)
+  if (instance !== input) {
+    currentInvidiousInstanceInputRef.value?.setText(instance)
+  }
 }
 
 /** @type {import('vue').ComputedRef<string>} */

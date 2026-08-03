@@ -39,6 +39,12 @@
         :related-channels="relatedChannels"
       />
       <div class="select-container">
+        <FtButton
+          v-if="showViewAllButton"
+          style="margin-top: 33px;"
+          :label="$t('Channel.View All')"
+          @click="router.push(currentTabViewAllRoute)"
+        />
         <FtSelect
           v-if="showVideoSortBy"
           v-show="currentTab === 'videos' && (showFetchMoreButton || filteredVideos.length > 1)"
@@ -230,7 +236,7 @@
           </p>
         </FtFlexBox>
         <FtAutoLoadNextPageWrapper
-          v-if="showFetchMoreButton"
+          v-if="showFetchMoreButton && !isFetchMoreLoading"
           @load-next-page="handleFetchMore"
         >
           <div
@@ -238,8 +244,7 @@
             role="button"
             tabindex="0"
             @click="handleFetchMore"
-            @keydown.space.prevent="handleFetchMore"
-            @keydown.enter.prevent="handleFetchMore"
+            @keydown.enter.space.prevent="handleFetchMore"
           >
             <FontAwesomeIcon :icon="['fas', 'search']" /> {{ $t("Search Filters.Fetch more results") }}
           </div>
@@ -266,7 +271,7 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import autolinker from 'autolinker'
 import { computed, onMounted, ref, shallowRef, watch } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 import { isNavigationFailure, NavigationFailureType, useRoute, useRouter } from 'vue-router'
 import { YTNodes } from 'youtubei.js'
 
@@ -280,6 +285,7 @@ import FtElementList from '../../components/FtElementList/FtElementList.vue'
 import FtFlexBox from '../../components/ft-flex-box/ft-flex-box.vue'
 import FtLoader from '../../components/FtLoader/FtLoader.vue'
 import FtSelect from '../../components/FtSelect/FtSelect.vue'
+import FtButton from '../../components/FtButton/FtButton.vue'
 
 import store from '../../store/index'
 
@@ -338,6 +344,7 @@ let mayContainContentFromOtherChannels = false
 const isLoading = ref(true)
 const isElementListLoading = ref(false)
 const isSearchTabLoading = ref(false)
+const isFetchMoreLoading = ref(false)
 const currentTab = ref('videos')
 
 const isCurrentTabLoading = computed(() => {
@@ -508,6 +515,24 @@ const tabInfoValues = computed(() => {
   }
 
   return values
+})
+
+const showViewAllButton = computed(() => {
+  switch (currentTab.value) {
+    case 'videos': return (videoSortBy.value === 'newest' || videoSortBy.value === 'popular') && (showFetchMoreButton.value || filteredVideos.value.length > 1)
+    case 'shorts': return (shortSortBy.value === 'newest' || shortSortBy.value === 'popular') && (showFetchMoreButton.value || filteredShorts.value.length > 1)
+    case 'live': return (liveSortBy.value === 'newest' || liveSortBy.value === 'popular') && (showFetchMoreButton.value || filteredLive.value.length > 1)
+    default: return false
+  }
+})
+
+const currentTabViewAllRoute = computed(() => {
+  switch (currentTab.value) {
+    case 'videos': return `/playlist/${getChannelPlaylistId(id.value, 'videos', videoSortBy.value)}`
+    case 'shorts': return `/playlist/${getChannelPlaylistId(id.value, 'shorts', shortSortBy.value)}`
+    case 'live': return `/playlist/${getChannelPlaylistId(id.value, 'live', liveSortBy.value)}`
+    default: return ''
+  }
 })
 
 watch(route, () => {
@@ -1111,7 +1136,9 @@ async function getChannelVideosLocal() {
         return
       }
 
-      latestVideos.value = parseLocalChannelVideos(videosTab.videos, id.value, channelName.value)
+      // TODO: restore usage of official API instead of memo after youtubei.js 17.1.0 released
+      // latestVideos.value = parseLocalChannelVideos(videosTab.videos, id.value, channelName.value)
+      latestVideos.value = parseLocalChannelVideos([...videosTab.memo.getType(YTNodes.LockupView)], id.value, channelName.value)
       videoContinuationData.value = videosTab.has_continuation ? videosTab : null
       isElementListLoading.value = false
     }
@@ -1156,7 +1183,9 @@ async function getChannelVideosLocalMore() {
        */
       const continuation = await videoContinuationData.value.getContinuation()
 
-      latestVideos.value = latestVideos.value.concat(parseLocalChannelVideos(continuation.videos, id.value, channelName.value))
+      // TODO: restore usage of official API instead of memo after youtubei.js 17.1.0 released
+      // latestVideos.value = latestVideos.value.concat(parseLocalChannelVideos(continuation.videos, id.value, channelName.value))
+      latestVideos.value = latestVideos.value.concat(parseLocalChannelVideos([...continuation.memo.getType(YTNodes.LockupView)], id.value, channelName.value))
       videoContinuationData.value = continuation.has_continuation ? continuation : null
     }
   } catch (err) {
@@ -1395,10 +1424,14 @@ async function getChannelLiveLocal() {
     // work around YouTube bug where it will return a bunch of responses with only continuations in them
     // e.g. https://www.youtube.com/@TWLIVES/streams
 
-    let videos = liveTab.videos
+    // TODO: restore usage of official API instead of memo after youtubei.js 17.1.0 released
+    // let videos = liveTab.videos
+    let videos = [...liveTab.memo.getType(YTNodes.LockupView)]
     while (videos.length === 0 && liveTab.has_continuation) {
       liveTab = await liveTab.getContinuation()
-      videos = liveTab.videos
+      // TODO: restore usage of official API instead of memo after youtubei.js 17.1.0 released
+      // videos = liveTab.videos
+      videos = [...liveTab.memo.getType(YTNodes.LockupView)]
     }
 
     latestLive.value = parseLocalChannelVideos(videos, id.value, channelName.value)
@@ -1433,7 +1466,9 @@ async function getChannelLiveLocalMore() {
      */
     const continuation = await liveContinuationData.value.getContinuation()
 
-    latestLive.value = latestLive.value.concat(parseLocalChannelVideos(continuation.videos, id.value, channelName.value))
+    // TODO: restore usage of official API instead of memo after youtubei.js 17.1.0 released
+    // latestLive.value = latestLive.value.concat(parseLocalChannelVideos(continuation.videos, id.value, channelName.value))
+    latestLive.value = latestLive.value.concat(parseLocalChannelVideos([...continuation.memo.getType(YTNodes.LockupView)], id.value, channelName.value))
     liveContinuationData.value = continuation.has_continuation ? continuation : null
   } catch (err) {
     console.error(err)
@@ -2225,74 +2260,80 @@ const showFetchMoreButton = computed(() => {
   }
 })
 
-function handleFetchMore() {
+async function handleFetchMore() {
+  if (isFetchMoreLoading.value) return
+
+  isFetchMoreLoading.value = true
+
   switch (currentTab.value) {
     case 'videos':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelVideosLocalMore()
+        await getChannelVideosLocalMore()
       } else {
-        channelInvidiousVideos()
+        await channelInvidiousVideos()
       }
       break
     case 'shorts':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelShortsLocalMore()
+        await getChannelShortsLocalMore()
       } else {
-        channelInvidiousShorts()
+        await channelInvidiousShorts()
       }
       break
     case 'live':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelLiveLocalMore()
+        await getChannelLiveLocalMore()
       } else {
-        channelInvidiousLive()
+        await channelInvidiousLive()
       }
       break
     case 'releases':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelReleasesLocalMore()
+        await getChannelReleasesLocalMore()
       } else {
-        channelInvidiousReleasesMore()
+        await channelInvidiousReleasesMore()
       }
       break
     case 'podcasts':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelPodcastsLocalMore()
+        await getChannelPodcastsLocalMore()
       } else {
-        channelInvidiousPodcastsMore()
+        await channelInvidiousPodcastsMore()
       }
       break
     case 'courses':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelCoursesLocalMore()
+        await getChannelCoursesLocalMore()
       } else {
-        channelInvidiousCoursesMore()
+        await channelInvidiousCoursesMore()
       }
       break
     case 'playlists':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getChannelPlaylistsLocalMore()
+        await getChannelPlaylistsLocalMore()
       } else {
-        getPlaylistsInvidiousMore()
+        await getPlaylistsInvidiousMore()
       }
       break
     case 'search':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        searchChannelLocal()
+        await searchChannelLocal()
       } else {
-        searchChannelInvidious()
+        await searchChannelInvidious()
       }
       break
     case 'community':
       if (process.env.SUPPORTS_LOCAL_API && apiUsed === 'local') {
-        getCommunityPostsLocalMore()
+        await getCommunityPostsLocalMore()
       } else {
-        getCommunityPostsInvidious()
+        await getCommunityPostsInvidious()
       }
       break
     default:
       console.error(currentTab.value)
   }
+
+  isFetchMoreLoading.value = false
 }
 
 function changeTab(tab) {

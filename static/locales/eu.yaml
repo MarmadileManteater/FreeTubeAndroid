@@ -408,11 +408,15 @@ Settings:
         Forbidden Characters: Debekatutako karaktereak
       Format Label: Pantaila-argazkiaren formatua
       Quality Label: Pantaila-argazkiaren kalitatea
-      Ask Path: Galdetu zein karpetan gordeko den
+      Modes:
+        Ask Path: Galdetu zein karpetan gordeko den
+        Save To Folder: Karpetan gorde
+        Clipboard: Kopiatu arbelean
       Folder Label: Pantaila-argazkien karpeta
       Folder Button: Hautatu karpeta
       File Name Label: Fitxategi-izenen eredua
       File Name Tooltip: Hurrengo aldagaiak balia ditzakezu. %U Urtea 4 digitu. %H Hilabetea 2 digitu. %E Eguna 2 digitu. %O Ordua 2 digitu. %M Minutu 2 digitu. %S segundo 2 digitu. %T milisegundo 3 digitu. %s Bideoaren segundoa. %t Bideoaren milisegundoa 3 digitu. %i Bideoaren Identifikatzailea.
+      Mode: Pantaila-argazkia modua
     Scroll Playback Rate Over Video Player: Aldatu erreprodukzio-tasa bideo-erreproduzitzailean
     Display Play Button In Video Player: Bistaratu erreproduzitzeko botoia bideo-erreproduzitzailean
     Max Video Playback Rate: Bideoen gehieneko erreprodukzio-tasa
@@ -596,6 +600,7 @@ Settings:
     Parental Control Settings: Gurasoen kontrola
     Hide Search Bar: Ezkutatu bilaketa-barra
     Hide Uploader on Watch page: Ezkutatu igotzailea ikusitakoen orrian
+    Disable Channel Links: Desgaitu kanalaren estekak
   Password Dialog:
     Password: Pasahitza
     Enter Password To Unlock: Sartu pasahitza ezarpenak desblokeatzeko
@@ -624,7 +629,6 @@ About:
   GitHub issues: 'Github-en gaiak'
   Please check for duplicates before posting: 'Mesedez, egiaztatu bikoiztutakoak ote dauden argitaratu aurretik'
   Website: 'Webgunea'
-  Email: 'Posta elektronikoa'
   Mastodon: 'Mastodon'
   Chat on Matrix: 'Matrix-en txata'
   room rules: 'Gelaren arauak'
@@ -857,6 +861,7 @@ Video:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Aurre-iragarkiaren gainerako denbora: {remindingTimeSeconds}s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'SABR atzerapen denbora geratzen da: {remindingTimeSeconds}s'
   Popout Live Chat: Erakutsi txata
+  Private: Bideo pribatuak ezin dira ikusi FreeTube-n, Google-ren saioa irekitzea eta bideoaren jabetza behar baitute.
 Playlist:
   #& About
   View Full Playlist: 'Ikusi erreprodukzio-zerrenda osoa'
@@ -908,7 +913,6 @@ Mini Player: 'Erreproduzitzaile txikia'
 Comments:
   Comments: 'Iruzkinak'
   Click to View Comments: 'Egin klik iruzkinak ikusteko'
-  Getting comment replies, please wait: 'Iruzkinen erantzunak eskuratzen. Itxaron mesedez'
   There are no more comments for this video: 'Ez dago iruzkin gehiagorik bideo honentzat'
   Hide Comments: 'Ezkutatu iruzkinak'
   Top comments: 'Iruzkin nagusiak'
@@ -1114,3 +1118,5 @@ KeyboardShortcutPrompt:
 shortcutLabelSeparator: ｜
 Compact side navigation: Trinkotu alboko nabigazioa
 Expand side navigation: Zabaldu alboko nabigazioa
+Screenshot Clipboard Success: Pantaila-argazkia arbelean gorde da
+Screenshot Clipboard Error: Pantaila-argazkia arbelean kopiatzeak huts egin du

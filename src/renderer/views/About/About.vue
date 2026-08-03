@@ -40,7 +40,7 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 
 import FtCard from '../../components/ft-card/ft-card.vue'
 import FtLogoFull from '../../components/FtLogoFull/FtLogoFull.vue'
@@ -84,17 +84,12 @@ const chunks = computed(() => [
     content: '<a href="https://freetubeapp.io/">https://freetubeapp.io/</a>',
   },
   {
-    icon: ['fas', 'envelope'],
-    title: t('About.Email'),
-    content: '<a href="mailto:FreeTubeApp@protonmail.com">FreeTubeApp@protonmail.com</a>',
-  },
-  {
     icon: ['fab', 'mastodon'],
     title: t('About.Mastodon'),
     content: '<a href="https://fosstodon.org/@FreeTube">@FreeTube@fosstodon.org</a>',
   },
   {
-    icon: ['fas', 'comment-dots'],
+    icon: ['fab', 'matrix'],
     title: t('About.Chat on Matrix'),
     content: [
       '<a href="https://matrix.to/#/#freetube:matrix.org">#freetube:matrix.org</a>',

@@ -22,6 +22,8 @@
       :can-move-video-up="canMoveVideoUp"
       :can-move-video-down="canMoveVideoDown"
       :can-remove-from-playlist="canRemoveFromPlaylist"
+      @move-video-to-the-top="moveVideoToTheTop"
+      @move-video-to-the-bottom="moveVideoToTheBottom"
       @pause-player="pausePlayer"
       @move-video-up="moveVideoUp"
       @move-video-down="moveVideoDown"
@@ -33,7 +35,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 
-import FtListVideo from './ft-list-video/ft-list-video.vue'
+import FtListVideo from './FtListVideo/FtListVideo.vue'
 
 import store from '../store/index'
 
@@ -158,10 +160,33 @@ function onVisibilityChanged(isVisible) {
   }
 }
 
-const emit = defineEmits(['pause-player', 'move-video-up', 'move-video-down', 'remove-from-playlist'])
+const emit = defineEmits([
+  'pause-player',
+  'move-video-up',
+  'move-video-down',
+  'move-video-to-the-top',
+  'move-video-to-the-bottom',
+  'remove-from-playlist'
+])
 
 function pausePlayer() {
   emit('pause-player')
+}
+
+/**
+ * @param {string} videoId
+ * @param {string} playlistItemId
+ */
+function moveVideoToTheTop(videoId, playlistItemId) {
+  emit('move-video-to-the-top', videoId, playlistItemId)
+}
+
+/**
+ * @param {string} videoId
+ * @param {string} playlistItemId
+ */
+function moveVideoToTheBottom(videoId, playlistItemId) {
+  emit('move-video-to-the-bottom', videoId, playlistItemId)
 }
 
 /**

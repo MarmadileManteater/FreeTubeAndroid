@@ -8,10 +8,11 @@
       appearance="result"
       :data="result"
       :data-type="dataType || result.type"
-      :first-screen="index < 16"
+      :first-screen="!renderAllItemsLazily && index < 16"
       :layout="displayValue"
       :show-video-with-last-viewed-playlist="showVideoWithLastViewedPlaylist"
       :use-channels-hidden-preference="useChannelsHiddenPreference"
+      :use-hide-upcoming-premieres-preference="useHideUpcomingPremieresPreference"
       :hide-forbidden-titles="hideForbiddenTitles"
       :always-show-add-to-playlist-button="alwaysShowAddToPlaylistButton"
       :quick-bookmark-button-enabled="quickBookmarkButtonEnabled"
@@ -30,6 +31,8 @@
       @drag-video-end="afterDrag"
       @move-video-up="moveVideoUp"
       @move-video-down="moveVideoDown"
+      @move-video-to-the-top="moveVideoToTheTop"
+      @move-video-to-the-bottom="moveVideoToTheBottom"
       @remove-from-playlist="removeFromPlaylist"
     />
   </FtAutoGrid>
@@ -52,6 +55,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  renderAllItemsLazily: {
+    type: Boolean,
+    default: false
+  },
   display: {
     type: String,
     required: false,
@@ -62,6 +69,10 @@ const props = defineProps({
     default: false
   },
   useChannelsHiddenPreference: {
+    type: Boolean,
+    default: true,
+  },
+  useHideUpcomingPremieresPreference: {
     type: Boolean,
     default: true,
   },
@@ -120,7 +131,16 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['move-dragged-video', 'move-video-down', 'move-video-up', 'remove-from-playlist', 'drag-video', 'drag-video-end'])
+const emit = defineEmits([
+  'move-dragged-video',
+  'move-video-down',
+  'move-video-up',
+  'move-video-to-the-top',
+  'move-video-to-the-bottom',
+  'remove-from-playlist',
+  'drag-video',
+  'drag-video-end'
+])
 
 /** @type {import('vue').ComputedRef<'grid' | 'list'>} */
 const listType = computed(() => {
@@ -146,6 +166,22 @@ function moveVideoUp(videoId, playlistItemId) {
  */
 function moveVideoDown(videoId, playlistItemId) {
   emit('move-video-down', videoId, playlistItemId)
+}
+
+/**
+ * @param {string} videoId
+ * @param {string} playlistItemId
+ */
+function moveVideoToTheTop(videoId, playlistItemId) {
+  emit('move-video-to-the-top', videoId, playlistItemId)
+}
+
+/**
+ * @param {string} videoId
+ * @param {string} playlistItemId
+ */
+function moveVideoToTheBottom(videoId, playlistItemId) {
+  emit('move-video-to-the-bottom', videoId, playlistItemId)
 }
 
 /**

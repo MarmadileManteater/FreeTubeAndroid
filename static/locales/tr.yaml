@@ -193,6 +193,8 @@ User Playlists:
   The playlist has been successfully exported: Oynatma listesi başarılı bir şekilde dışa aktarıldı
   TotalTimePlaylist: 'Toplam süre: {duration}'
   Export list of URLs: URL'lerin listesini dışa aktar
+  Move Video to the Top: Videoyu En Üste Taşı
+  Move Video to the Bottom: Videoyu En Alta Taşı
 History:
   # On History Page
   History: 'Geçmiş'
@@ -405,7 +407,10 @@ Settings:
     Max Video Playback Rate: En Yüksek Video Oynatma Hızı
     Screenshot:
       Quality Label: Ekran Görüntüsü Kalitesi
-      Ask Path: Kaydedileceği Klasörü Sor
+      Modes:
+        Ask Path: Kaydedileceği Klasörü Sor
+        Save To Folder: Klasöre Kaydet
+        Clipboard: Panoya Kopyala
       Folder Label: Ekran Görüntüsü Klasörü
       File Name Label: Dosya Adı Kalıbı
       Error:
@@ -415,6 +420,7 @@ Settings:
       Enable: Ekran Görüntüsünü Etkinleştir
       Folder Button: Klasör Seç
       File Name Tooltip: Aşağıda değişkenleri kullanabilirsiniz. %Y Yıl 4 basamak. %M Ay 2 basamak. %D Gün 2 basamak. %H Saat 2 basamak. %N Dakika 2 basamak. %S Saniye 2 basamak. %T Milisaniye 3 basamak. %s Video Saniyesi. %t Video Milisaniyesi 3 basamak. %i Video Kimliği.
+      Mode: Ekran Görüntüsü Modu
     Enter Fullscreen on Display Rotate: Ekran Döndürüldüğünde Tam Ekrana Geç
     Skip by Scrolling Over Video Player: Video Oynatıcı Üzerinde Kaydırarak Atla
     Autoplay Interruption Timer: Otomatik Oynatma Durdurma Sayacı
@@ -424,6 +430,9 @@ Settings:
       Default Viewing Mode: Varsayılan Görüntüleme Modu
       Theater: Sinema
       External Player: Harici Oynatıcı ({externalPlayerName})
+      Full Window (Always On): Tam Pencere (Her Zaman Açık)
+      Full Screen (Always On): Tam Ekran (Her Zaman Açık)
+      Tooltip: Çoğu öntanımlı izleme modu, yalnızca her izleme oturumunun başında uygulanır. Oturum sırasında yapılan değişiklikler, oturum sona erene kadar geçerliliğini korur. Her zaman açık görüntüleme modları ise, önceki videoyu izlerken yapılan görüntleme modu değişikliklerinden bağımsız olarak, yeni bir videoya geçtiğinizde her zaman uygulanır.
   Privacy Settings:
     Privacy Settings: 'Gizlilik'
     Remember History: 'İzleme Geçmişini Hatırla'
@@ -467,13 +476,13 @@ Settings:
     Export NewPipe: 'NewPipe Biçiminde Dışa Aktar'
     Import History: 'Geçmişi İçe Aktar'
     Export History: 'Geçmişi Dışa Aktar'
-    Profile object has insufficient data, skipping item: 'Profil nesnesinde yetersiz veri var, öğe atlanıyor'
+    Profile object has insufficient data, skipping item: 'Profil nesnesinde yeterli veri yok, öge atlanıyor'
     All subscriptions and profiles have been successfully imported: 'Tüm abonelikler ve profiller başarılı bir şekilde içe aktarıldı'
     All subscriptions have been successfully imported: 'Tüm abonelikler başarılı bir şekilde içe aktarıldı'
     Invalid subscriptions file: 'Geçersiz aboneler dosyası'
     Invalid history file: 'Geçersiz geçmiş dosyası'
     Subscriptions have been successfully exported: 'Tüm abonelikler başarılı bir şekilde dışa aktarıldı'
-    History object has insufficient data, skipping item: 'Geçmiş nesnesinde yetersiz veri var, öğe atlanıyor'
+    History object has insufficient data, skipping item: 'Geçmiş nesnesinde yeterli veri yok, öge atlanıyor'
     All watched history has been successfully imported: 'Tüm izleme geçmişi başarılı bir şekilde içe aktarıldı'
     All watched history has been successfully exported: 'Tüm izleme geçmişi başarılı bir şekilde dışa aktarıldı'
     Unable to read file: 'Dosya okunamadı'
@@ -499,6 +508,15 @@ Settings:
     Export search history: Arama geçmişini dışa aktar
     All search history has been successfully imported: Tüm arama geçmişi başarıyla içe aktarıldı
     All search history has been successfully exported: Tüm arama geçmişi başarıyla dışa aktarıldı
+    Settings File: Ayarlar Dosyası
+    Import Settings: Ayarları İçe Aktar
+    Export Settings: Ayarları Dışa Aktar
+    Settings Tooltip: İşletim sistemine/kullanıcıya özgü veya deneysel ayarlar dışa veya içe aktarılamaz (örn. vekil sunucu, harici oynatıcı, ekran görüntüsü klasörü...)
+    All settings have been successfully imported: Tüm ayarlar başarıyla içe aktarıldı
+    All settings have been successfully exported: Tüm ayarlar başarıyla dışa aktarıldı
+    Setting object has insufficient data, skipping item: Ayar nesnesinde yeterli veri yok, öge atlanıyor
+    Unknown setting key: 'Bilinmeyen ayar anahtarı: {key}'
+    Non-transferable setting key: 'Aktarılamayan ayar anahtarı: {key}'
   Distraction Free Settings:
     Hide Live Chat: Canlı Sohbeti Gizle
     Hide Popular Videos: Popüler Videoları Gizle
@@ -543,7 +561,7 @@ Settings:
     Hide Videos, Playlists and Channels Containing Text: Metin İçeren Videoları ve Oynatma Listelerini Gizle
     Hide Videos, Playlists and Channels Containing Text Placeholder: Sözcük, Sözcük Parçası veya İfade
     Hide Channel Home: Kanal "Ana Sayfa" Sekmesini Gizle
-    Show Added Items: Eklenen Öğeleri Göster
+    Show Added Items: Eklenen Ögeleri Göster
     Hide Channel Courses: Kanal "Kurslar" Sekmesini Gizle
     Hide Channel Posts: Kanalın "Gönderiler" sekmesini gizle
     Hide Subscriptions Posts: Abonelik gönderilerini gizle
@@ -596,6 +614,7 @@ Settings:
     Hide Unsubscribe Button: Abonelikten Çık Düğmesini Gizle
     Hide Search Bar: Arama Çubuğunu Gizle
     Hide Uploader on Watch page: İzleme sayfasında yükleyiciyi gizle
+    Disable Channel Links: Kanal Bağlantılarını Devre Dışı Bırak
   Experimental Settings:
     Replace HTTP Cache: HTTP Önbelleğini Değiştir
     Warning: Bu ayarlar deneyseldir, etkin durumdayken çökmelere neden olabilirler. Yedekleme yapılması şiddetle tavsiye edilir. Kullanmanız durumunda risk size aittir!
@@ -620,7 +639,6 @@ About:
   Website: Web sitesi
   Credits: Katkıda Bulunanlar
   FAQ: SSS
-  Email: E-posta
   Beta: Beta
   Donate: Bağış Yap
   Help: Yardım
@@ -744,6 +762,7 @@ Channel:
   Courses:
     Courses: Kurslar
     This channel does not currently have any courses: Bu kanalda şu anda herhangi bir kurs bulunmamaktadır
+  View All: Tümünü Görüntüle
 Video:
   Mark As Watched: 'İzlendi Olarak İşaretle'
   Remove From History: 'Geçmişten Kaldır'
@@ -860,6 +879,7 @@ Video:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Kalan ön reklam süresi: {remindingTimeSeconds}s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Kalan SABR bekleme süresi: {remindingTimeSeconds}s'
   Popout Live Chat: Açılır Sohbet
+  Private: Özel videolar, Google ile oturum açma ve videonun sahibi olma gerekliliği nedeniyle FreeTube'da izlenemez.
 Playlist:
   #& About
   View Full Playlist: 'Tüm oynatma listesini görüntüle'
@@ -910,7 +930,6 @@ Mini Player: 'Mini Oynatıcı'
 Comments:
   Comments: 'Yorumlar'
   Click to View Comments: 'Yorumları Görüntülemek İçin Tıklayın'
-  Getting comment replies, please wait: 'Yorum yanıtları yükleniyor, lütfen bekleyin'
   There are no more comments for this video: 'Bu video için daha fazla yorum yok'
   Hide Comments: 'Yorumları Gizle'
   # Context: View 10 Replies, View 1 Reply
@@ -928,6 +947,7 @@ Comments:
   Hide {replyCount} replies: 1 yanıtı gizle | {replyCount} yanıtı gizle
   View 1 reply from {channelName}: '{channelName} kanalından 1 yanıtı görüntüle'
   View {replyCount} replies from {channelName} and others: '{channelName} kanalından ve diğerlerinden {replyCount} yanıtı görüntüle'
+  Loading replies: Yanıtlar yükleniyor...
 Up Next: 'Sonraki'
 
 # Toast Messages
@@ -1115,3 +1135,5 @@ KeyboardShortcutPrompt:
   Skip to Previous Video: Oynatma listesindeki bir önceki videoya atla
 Compact side navigation: Yan gezinmeyi daralt
 Expand side navigation: Yan gezinmeyi genişlet
+Screenshot Clipboard Success: Ekran görüntüsü panoya kaydedildi
+Screenshot Clipboard Error: Ekran görüntüsü panoya kopyalanamadı

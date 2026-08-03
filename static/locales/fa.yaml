@@ -388,7 +388,8 @@ Settings:
       Quality Label: کیفیت اسکرین شات
       File Name Tooltip: می توانید از متغیرهای زیر استفاده کنید. %Y سال 4 رقم. رقم %M ماه 2. %D رقم روز 2. %H ساعت 2 رقمی. %N دقیقه 2 رقم. %S 2 رقم دوم. %T میلی ثانیه 3 رقمی. %s ویدیو دوم. %t ویدیو میلی ثانیه 3 رقمی. %i شناسه ویدیو.
       Enable: اسکرین شات فعال باشد
-      Ask Path: پرسش برای محل ذخیره
+      Modes:
+        Ask Path: پرسش برای محل ذخیره
       Folder Label: پوشه اسکرین شات
       Folder Button: پوشه را انتخاب کنید
     Skip by Scrolling Over Video Player: با پیمایش روی پخش‌کننده ویدیو از آن بگذرید
@@ -787,7 +788,6 @@ Search Bar:
   Remove: حذف
 Are you sure you want to open this link?: آیا مطمئن هستید که میخواهید این لینک را باز کنید؟
 About:
-  Email: پست الکترونیکی
   Discussions: گفتگو
   Downloads / Changelog: دانلودها / تغییرات
   Please check for duplicates before posting: لطفاً قبل از ارسال موارد تکراری را بررسی کنید
@@ -878,7 +878,6 @@ Comments:
   Load More Comments: بارگذاری نظرات بیشتر
   There are no comments available for this video: هیچ نظری برای این ویدیو موجود نیست
   Comments: نظرات
-  Getting comment replies, please wait: در حال دریافت پاسخ نظرات، لطفا صبر کنید
   There are no more comments for this video: هیچ نظر دیگری برای این ویدیو وجود ندارد
   Hide Comments: پنهان کردن نظرات
   Top comments: نظرات برتر

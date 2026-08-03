@@ -17,8 +17,7 @@
               tabindex="0"
               role="button"
               @click="profileBgColor = color"
-              @keydown.space.prevent="profileBgColor = color"
-              @keydown.enter.prevent="profileBgColor = color"
+              @keydown.enter.space.prevent="profileBgColor = color"
             />
           </FtFlexBox>
           <div class="customColorSection">
@@ -110,7 +109,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 
 import FtCard from '../ft-card/ft-card.vue'
 import FtPrompt from '../FtPrompt/FtPrompt.vue'

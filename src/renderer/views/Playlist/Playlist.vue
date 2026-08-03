@@ -80,6 +80,7 @@
             :playlist-type="infoSource"
             :show-video-with-last-viewed-playlist="true"
             :use-channels-hidden-preference="false"
+            :use-hide-upcoming-premieres-preference="false"
             :hide-forbidden-titles="false"
             :always-show-add-to-playlist-button="true"
             :quick-bookmark-button-enabled="quickBookmarkButtonEnabled"
@@ -95,6 +96,8 @@
             @move-dragged-video="moveDraggedVideoTemporarilyThrottled"
             @move-video-up="moveVideoUp"
             @move-video-down="moveVideoDown"
+            @move-video-to-the-top="moveVideoToTheTop"
+            @move-video-to-the-bottom="moveVideoToTheBottom"
             @remove-from-playlist="removeVideoFromPlaylist"
           />
           <TransitionGroup
@@ -128,6 +131,8 @@
               @move-dragged-video="moveDraggedVideoTemporarilyThrottled"
               @move-video-up="moveVideoUp"
               @move-video-down="moveVideoDown"
+              @move-video-to-the-top="moveVideoToTheTop"
+              @move-video-to-the-bottom="moveVideoToTheBottom"
               @remove-from-playlist="removeVideoFromPlaylist"
             />
           </TransitionGroup>
@@ -172,7 +177,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 import { isNavigationFailure, NavigationFailureType, onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import FtLoader from '../../components/FtLoader/FtLoader.vue'
@@ -713,6 +718,10 @@ function moveVideoUp(videoId, playlistItemId) {
     return video.videoId === videoId && video.playlistItemId === playlistItemId
   })
 
+  if (index === -1) {
+    return
+  }
+
   if (index === 0) {
     showToast(t('User Playlists.SinglePlaylistView.Toast["This video cannot be moved up."]'))
     return
@@ -748,12 +757,98 @@ function moveVideoDown(videoId, playlistItemId) {
     return video.videoId === videoId && video.playlistItemId === playlistItemId
   })
 
+  if (index === -1) {
+    return
+  }
+
   if (index + 1 >= playlistItems_.length) {
     showToast(t('User Playlists.SinglePlaylistView.Toast["This video cannot be moved down."]'))
     return
   }
 
   [playlistItems_[index], playlistItems_[index + 1]] = [playlistItems_[index + 1], playlistItems_[index]]
+
+  const playlist = {
+    playlistName: playlistTitle.value,
+    protected: selectedUserPlaylist.value.protected,
+    description: playlistDescription.value,
+    videos: deepCopy(playlistItems_),
+    _id: playlistId.value
+  }
+
+  try {
+    store.dispatch('updatePlaylist', playlist)
+    playlistItems.value = playlistItems_
+  } catch (e) {
+    showToast(t('User Playlists.SinglePlaylistView.Toast["There was an issue with updating this playlist."]'))
+    console.error(e)
+  }
+}
+
+/**
+ * @param {string} videoId
+ * @param {string} playlistItemId
+ */
+function moveVideoToTheTop(videoId, playlistItemId) {
+  const playlistItems_ = playlistItems.value.slice()
+
+  const index = playlistItems_.findIndex((video) => {
+    return video.videoId === videoId && video.playlistItemId === playlistItemId
+  })
+
+  if (index === -1) {
+    return
+  }
+
+  if (index === 0) {
+    showToast(t('User Playlists.SinglePlaylistView.Toast["This video cannot be moved up."]'))
+    return
+  }
+
+  const videoObject = playlistItems_[index]
+  playlistItems_.splice(index, 1)
+  playlistItems_.unshift(videoObject)
+
+  const playlist = {
+    playlistName: playlistTitle.value,
+    protected: selectedUserPlaylist.value.protected,
+    description: playlistDescription.value,
+    videos: deepCopy(playlistItems_),
+    _id: playlistId.value
+  }
+
+  try {
+    store.dispatch('updatePlaylist', playlist)
+    playlistItems.value = playlistItems_
+  } catch (e) {
+    showToast(t('User Playlists.SinglePlaylistView.Toast["There was an issue with updating this playlist."]'))
+    console.error(e)
+  }
+}
+
+/**
+ * @param {string} videoId
+ * @param {string} playlistItemId
+ */
+function moveVideoToTheBottom(videoId, playlistItemId) {
+  const playlistItems_ = playlistItems.value.slice()
+
+  const index = playlistItems_.findIndex((video) => {
+    return video.videoId === videoId && video.playlistItemId === playlistItemId
+  })
+
+  if (index === -1) {
+    return
+  }
+
+  if (index === playlistItems_.length - 1) {
+    showToast(t('User Playlists.SinglePlaylistView.Toast["This video cannot be moved down."]'))
+    return
+  }
+
+  const videoObject = playlistItems_[index]
+  playlistItems_.splice(index, 1)
+  playlistItems_.push(videoObject)
 
   const playlist = {
     playlistName: playlistTitle.value,

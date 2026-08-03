@@ -406,7 +406,10 @@ Settings:
       Enable: Ebligi ekrankopiojn
       Format Label: Dosiertipo de ekrankopioj
       Quality Label: Kvalito de ekrankopioj
-      Ask Path: Peti konservan dosierujon
+      Modes:
+        Ask Path: Peti konservan dosierujon
+        Save To Folder: Konservi al dosierujo
+        Clipboard: Kopii al la tondujo
       Folder Label: Dosierujo de ekrankopioj
       Folder Button: Elekti dosierujon
       File Name Label: Dosiernoma ŝablono
@@ -414,6 +417,7 @@ Settings:
       Error:
         Forbidden Characters: Malpermesitaj signoj
         Empty File Name: Malplena dosiernomo
+      Mode: Ekrankopia reĝimo
   Sort Settings Sections (A-Z): Ordigi agordosekciojn (A-Z)
   Return to Settings Menu: Reveni al agordomenuo
   The app needs to restart for changes to take effect. Restart and apply change?: Necesas restartigi la aplikaĵon por ke ŝanĝoj estu aplikitaj. Ĉu restarti kaj apliki ŝanĝojn?
@@ -581,6 +585,7 @@ Settings:
     Hide Uploader on Watch page: Kaŝi kanalon sur spektopaĝo
     Show Family Friendly Only: Nur montri enhavon taŭgan por familioj
     Hide Search Bar: Kaŝi serĉobreton
+    Disable Channel Links: Malŝalti ligilojn al kanaloj
   Experimental Settings:
     Experimental Settings: Eksperimenta
     Warning: Ĉi tiuj agordoj estas eksperimentaj kaj povus kaŭzi kolapsojn dum ŝaltitaj. Savkopioj ege farindas. Vi estas avertita!
@@ -596,7 +601,6 @@ Settings:
 About:
   #On About page
   Website: Retejo
-  Email: Retpoŝto
   About: Pri
   Beta: Beta
   Source code: Fontkodo
@@ -784,8 +788,8 @@ Video:
       Bandwidth: 'Kapacito: {bandwidth} kbps'
       Buffered: 'Bufrita: {bufferedPercentage}%'
       Dropped Frames / Total Frames: 'Perditaj bildoj: {droppedFrames} / Tutaj bildoj: {totalFrames}'
-      CodecAudio: 'Kodeko: {audioCodec} ({audioltag})'
-      CodecsVideoAudio: 'Kodekoj: {videoCodec} ({videoltag}) / {audioCodec} ({audioltag})'
+      CodecAudio: 'Kodeko: {audioCodec} ({audioItag})'
+      CodecsVideoAudio: 'Kodekoj: {videoCodec} ({videoItag}) / {audioCodec} ({audioItag})'
       CodecsVideoAudioNoItags: 'Kodekoj: {videoCodec} / {audioCodec}'
     You appear to be offline: Vi ŝajne ne havas retkonekton.
     Playback will resume automatically when your connection comes back: La ludado ados aŭtomate kiam via retkonekto revenos.
@@ -793,6 +797,7 @@ Video:
   Watch:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Restanta tempo de komenca anonco: {remindingTimeSeconds}s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Restanta tempo de atendo por SABR: {remindingTimeSeconds}s'
+  Private: Privataj videaĵoj ne spekteblas per FreeTube, ĉar ili postulas ensaluton de Google kaj la videaĵo devas aparteni al la uzanto.
 More: Pli
 Search Bar:
   Clear Input: Klarigi enigon
@@ -802,7 +807,7 @@ Open New Window: Malfermi novan fenestron
 Preferences: Preferoj
 New Window: Nova Fenestro
 Go to page: Iri al {page}
-Actual size: Reala grando
+Actual size: Fakta grandeco
 Profile:
   Select All: Elekti ĉiujn
   Profile Settings: Profilo
@@ -971,7 +976,6 @@ Mini Player: Ludileto
 Comments:
   Comments: Komentoj
   Click to View Comments: Alklaku por vidi komentojn
-  Getting comment replies, please wait: Venigado de respondoj, bonvolu atendi
   There are no more comments for this video: Ne estas pli da komentoj por tiu ĉi videaĵo
   Hide Comments: Kaŝi komentojn
   Top comments: Plej bonaj komentoj
@@ -1083,3 +1087,5 @@ Keys:
   arrowleft: Maldekstra sago
   arrowright: Dekstra sago
   arrowup: Supra sago
+Screenshot Clipboard Success: Konservis ekrankopion al la tondujo
+Screenshot Clipboard Error: Malsukcesis kopii ekrankopion al la tondujo

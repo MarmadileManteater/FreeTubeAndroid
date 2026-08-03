@@ -407,7 +407,8 @@ Settings:
       Folder Button: Velg mappe
       Format Label: Skjermbildeformat
       Quality Label: Skjermbildekvalitet
-      Ask Path: Spør om hvor ting skal lagres
+      Modes:
+        Ask Path: Spør om hvor ting skal lagres
       File Name Tooltip: Du kan bruke variablene nedenfor. %Y år, i 4 siffer. %M måned, i 2 siffer. %D dag, i to siffer. %H time, i to siffer. %N minutt, i to siffer. %s sekund, i to siffer. %T millisekunder, i tre siffer. %s videosekund. %t videomillisekunder, i tre siffer. %i video-ID.
     Max Video Playback Rate: Maksimal hastighet for videoavspilling
     Scroll Playback Rate Over Video Player: Juster avspillingshastighet ved rulling over videoavspiller
@@ -620,7 +621,6 @@ About:
   Report a problem: Rapporter et problem
   Source code: Kildekode
   Mastodon: Mastodon
-  Email: E-post
   Translate: Oversett
   Please check for duplicates before posting: Vennligst sjekk om problemet ditt allerede har blitt sendt inn før du sender inn en melding
   these people and projects: disse folkene og prosjektene
@@ -863,7 +863,6 @@ Mini Player: 'Miniavspiller'
 Comments:
   Comments: 'Kommentarer'
   Click to View Comments: 'Klikk her for å vise kommentarer'
-  Getting comment replies, please wait: 'Henter kommentarsvar...'
   Hide Comments: 'Skjul kommentarer'
   # Context: View 10 Replies, View 1 Reply
   There are no comments available for this video: 'Det er ingen kommentarer tilgjengelig på denne videoen'

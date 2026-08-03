@@ -16,7 +16,7 @@ Toggle Developer Tools: 'Comutar ferramentas de desenvolvimento'
 Actual size: 'Tamanho real'
 Zoom in: 'Ampliar'
 Zoom out: 'Reduzir'
-Toggle fullscreen: 'Alternar ecrã completo'
+Toggle fullscreen: 'Comutar ecrã completo'
 Window: 'Janela'
 Minimize: 'Minimizar'
 Close: 'Fechar'
@@ -412,7 +412,8 @@ Settings:
         Empty File Name: Nome de ficheiro vazio
       File Name Tooltip: 'Pode utilizar estas variáveis: %Y ano com 4 dígitos, %M mês com 2 dígitos, %D dia com 2 dígitos, %H hora com 2 dígitos, %N minuto com 2 dígitos, %S segundos com 2 dígitos, %T milissegundos com 3 dígitos, %s segundos do vídeo, %t milissegundos do vídeo com 3 dígitos, %i ID do vídeo.'
       Folder Label: Pasta para as capturas de ecrã
-      Ask Path: Perguntar onde guardar
+      Modes:
+        Ask Path: Perguntar onde guardar
     Enter Fullscreen on Display Rotate: Ativar modo de ecrã completo ao rodar o ecrã
     Skip by Scrolling Over Video Player: Avançar ou recuar no vídeo com a roda do rato
     Default Viewing Mode:
@@ -612,9 +613,8 @@ About:
   #On About page
   About: 'Acerca'
   #& About
-  FAQ: FAQ
+  FAQ: Perguntas frequentes
   Website: Página web
-  Email: E-mail
   Donate: Doar
   these people and projects: estas pessoas e projetos
   Credits: Créditos
@@ -907,7 +907,6 @@ Mini Player: 'Mini-reprodutor'
 Comments:
   Comments: 'Comentários'
   Click to View Comments: 'Clicar para ver os comentários'
-  Getting comment replies, please wait: 'A obter respostas ao comentário, por favor aguarde'
   Hide Comments: 'Ocultar comentários'
   # Context: View 10 Replies, View 1 Reply
   There are no comments available for this video: 'Este vídeo não tem comentários'

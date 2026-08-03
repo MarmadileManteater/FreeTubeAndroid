@@ -3,7 +3,7 @@ import packageDetails from '../package.json' with { type: 'json' }
 /** @type {import('electron-builder').Configuration} */
 export default {
   appId: `io.freetubeapp.${packageDetails.name}`,
-  copyright: 'Copyleft © 2020-2026 freetubeapp@protonmail.com',
+  copyright: 'Copyleft © 2020-2026',
   // asar: false,
   // compression: 'store',
   productName: packageDetails.productName,
@@ -73,6 +73,9 @@ export default {
       'libsecret-1-0'
     ]
   },
+  toolsets: {
+    appimage: '1.0.3'
+  },
   mac: {
     category: 'public.app-category.utilities',
     icon: '_icons/iconMac.icns',
@@ -93,7 +96,12 @@ export default {
       NSBluetoothPeripheralUsageDescription: undefined,
       NSCameraUsageDescription: undefined,
       NSMicrophoneUsageDescription: undefined,
-    }
+    },
+
+    // Enable ad-hoc signing
+    // If we skip signing entirely, macOS says that the application is damaged, which makes users open bug reports.
+    // With an ad-hoc signature it still refuses to launch by default but with the reason that it cannot verify the signature
+    identity: '-'
   },
   win: {
     icon: '_icons/icon.ico',

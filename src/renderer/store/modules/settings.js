@@ -122,6 +122,15 @@ import android from 'android'
  * to evaluate if it is truly necessary
  * and to ensure that the implementation works as intended.
  *
+ ***
+ * `NON_TRANSFERABLE_SETTINGS`
+ * This set contains setting keys
+ * that should not be exported when a user chooses to "Export settings".
+ *
+ * When adding a new setting, it should be considered
+ * whether this setting can be exported or not. For example, settings
+ * that are OS or user specific like paths should not be exported.
+ *
  ****
  * ENDING NOTES
  *
@@ -144,7 +153,7 @@ import android from 'android'
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 const defaultGetterId = settingId => 'get' + capitalize(settingId)
 const defaultMutationId = settingId => 'set' + capitalize(settingId)
-const defaultUpdaterId = settingId => 'update' + capitalize(settingId)
+export const defaultUpdaterId = settingId => 'update' + capitalize(settingId)
 const defaultSideEffectsTriggerId = settingId =>
   'trigger' + capitalize(settingId) + 'SideEffects'
 /*****/
@@ -169,6 +178,7 @@ const state = {
   defaultViewingMode: 'default',
   defaultVideoFormat: 'dash',
   disableSmoothScrolling: false,
+  disableChannelLinks: false,
   displayVideoPlayButton: true,
   enableSearchSuggestions: true,
   enableSubtitlesByDefault: false,
@@ -288,9 +298,9 @@ const state = {
   videoSkipMouseScroll: false,
   videoPlaybackRateInterval: 0.25,
   enableScreenshot: false,
+  screenshotMode: 'prompt_folder',
   screenshotFormat: 'png',
   screenshotQuality: 95,
-  screenshotAskPath: !process.env.IS_ELECTRON,
   screenshotFolderPath: '',
   screenshotFilenamePattern: '%Y%M%D-%H%N%S',
   settingsSectionSortEnabled: false,
@@ -379,7 +389,7 @@ const sideEffectHandlers = {
 
     await Promise.allSettled(loadPromises)
 
-    i18n.global.locale = targetLocale
+    i18n.global.locale.value = targetLocale
     await dispatch('getRegionData', targetLocale)
     if (process.env.IS_ANDROID) {
       android.hideSplashScreen()
@@ -438,6 +448,34 @@ const sideEffectHandlers = {
 }
 
 const settingsWithSideEffects = Object.keys(sideEffectHandlers)
+
+export const NON_TRANSFERABLE_SETTINGS = new Set([
+  /* Depends on process.env.IS_ELECTRON */
+  // ProxySettings
+  'useProxy',
+  'proxyProtocol',
+  'proxyHostname',
+  'proxyPort',
+  'proxyUsername',
+  'proxyPassword',
+  // ExternalPlayerSettings
+  'externalPlayer',
+  'externalPlayerExecutable',
+  'externalPlayerIgnoreWarnings',
+  'externalPlayerIgnoreDefaultArgs',
+  'externalPlayerCustomArgs',
+  'showAddedExternalPlayerCustomArgs',
+  // Others
+  'disableSmoothScrolling',
+  'hideToTrayOnMinimize',
+  'screenshotAskPath',
+  'screenshotFolderPath',
+
+  /* Depends on process.env.SUPPORTS_LOCAL_API */
+  'backendFallback',
+  'backendPreference',
+  'proxyVideos',
+])
 
 const customState = {
 }

@@ -190,6 +190,8 @@ User Playlists:
   The playlist has been successfully exported: La playlist se ha exportado correctamente
   TotalTimePlaylist: 'Duración total: {duration}'
   Export list of URLs: Exportar lista de URLs
+  Move Video to the Top: Mover vídeo al principio
+  Move Video to the Bottom: Mover vídeo al final
 History:
   # On History Page
   History: 'Historial'
@@ -410,8 +412,12 @@ Settings:
       Format Label: Formato de las capturas de pantalla
       File Name Label: Patrón de nombre de archivo
       Folder Label: Carpeta de capturas de pantalla
-      Ask Path: Pedir la Carpeta para Guardar
+      Modes:
+        Ask Path: Pedir la Carpeta para Guardar
+        Save To Folder: Guardar en carpeta
+        Clipboard: Copiar al Portapapeles
       File Name Tooltip: Puede utilizar las siguientes variables. %Y Año 4 dígitos. %M Mes 2 dígitos. %D Día 2 dígitos. %H Hora 2 dígitos. %N Minuto 2 dígitos. %S Segundo 2 dígitos. %T Milisegundo 3 dígitos. %s Video Segundo. %t Video Milisegundo 3 dígitos. %i Video ID.
+      Mode: Modo Captura De Pantalla
     Enter Fullscreen on Display Rotate: Entrar en pantalla completa al girar la pantalla
     Skip by Scrolling Over Video Player: Omitir al desplazarse sobre el reproductor de vídeo
     Autoplay Interruption Timer: Temporizador de interrupción de reproducción automática
@@ -593,6 +599,7 @@ Settings:
     Parental Control Settings: Control parental
     Show Family Friendly Only: Mostrar solo lo apto para las familias
     Hide Uploader on Watch page: Ocultar Canal en la página de Reproducción
+    Disable Channel Links: Deshabilitar Links de Canales
   Experimental Settings:
     Experimental Settings: Experimental
     Warning: Estas configuraciones son experimentales, pueden causar fallos mientras están habilitadas. Es muy recomendable hacer copias de seguridad. ¡Úselo bajo su propio riesgo!
@@ -618,7 +625,6 @@ About:
   room rules: reglas de la sala
   Chat on Matrix: Chat en Matrix
   Mastodon: Mastodon (red social)
-  Email: Correo electrónico
   Website: Sitio web
   Please check for duplicates before posting: Por favor, antes de publicar asegúrate de no duplicar temas
   GitHub issues: Sugerencias en GitHub
@@ -854,6 +860,7 @@ Video:
   Watch:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Tiempo restante previo al anuncio: {remindingTimeSeconds} s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Tiempo restante de retroceso de SABR: {remindingTimeSeconds} s'
+  Private: Videos privados no pueden ser vistos en FreeTube, se necesita iniciar sesión con Google y permiso del dueño del video.
 Playlist:
   #& About
   View Full Playlist: 'Ver la lista de reproducción completa'
@@ -904,7 +911,6 @@ Mini Player: 'Minirreproductor'
 Comments:
   Comments: 'Comentarios'
   Click to View Comments: 'Pulse para ver comentarios'
-  Getting comment replies, please wait: 'Obteniendo las respuestas. Espere'
   Hide Comments: 'Ocultar comentarios'
   # Context: View 10 Replies, View 1 Reply
   There are no comments available for this video: 'Aún no hay comentarios'
@@ -1111,3 +1117,5 @@ KeyboardShortcutPrompt:
 shortcutLabelSeparator: ｜
 Compact side navigation: Navegación lateral compacta
 Expand side navigation: Expandir navegación lateral
+Screenshot Clipboard Success: Captura de pantalla guardada en el portapapeles
+Screenshot Clipboard Error: Error al copiar la captura de pantalla al portapapeles

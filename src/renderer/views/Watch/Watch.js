@@ -13,7 +13,9 @@ import WatchVideoLiveChat from '../../components/WatchVideoLiveChat/WatchVideoLi
 import WatchVideoPlaylist from '../../components/WatchVideoPlaylist/WatchVideoPlaylist.vue'
 import WatchVideoRecommendations from '../../components/WatchVideoRecommendations/WatchVideoRecommendations.vue'
 import FtAgeRestricted from '../../components/FtAgeRestricted/FtAgeRestricted.vue'
+import { calculateColorLuminance } from '../../helpers/colors'
 import {
+  buildChaptersVttFile,
   buildVTTFileLocally,
   copyToClipboard,
   extractNumberFromString,
@@ -38,6 +40,7 @@ import {
 } from '../../helpers/api/invidious'
 import { sortCaptions } from '../../helpers/player/utils'
 import { MANIFEST_TYPE_SABR } from '../../helpers/player/SabrManifestParser'
+import { useI18n } from 'vue-i18n'
 
 /**
  * @typedef {{
@@ -59,6 +62,10 @@ import android from 'android'
 
 const MANIFEST_TYPE_DASH = 'application/dash+xml'
 const MANIFEST_TYPE_HLS = 'application/x-mpegurl'
+const UNAVAILABLE_VIDEO_THUMBNAILS = {
+  light: 'https://www.youtube.com/img/desktop/unavailable/unavailable_video.png',
+  dark: 'https://www.youtube.com/img/desktop/unavailable/unavailable_video_dark_theme.png'
+}
 
 export default defineComponent({
   name: 'Watch',
@@ -85,6 +92,11 @@ export default defineComponent({
     }
 
     next()
+  },
+  setup: function () {
+    const { t, locale } = useI18n()
+
+    return { t, currentLocale: locale }
   },
   data: function () {
     return {
@@ -254,9 +266,6 @@ export default defineComponent({
       return (!this.watchingPlaylist && !this.hideRecommendedVideos && !!this.nextRecommendedVideo) ||
       (this.watchingPlaylist && !this.$refs.watchVideoPlaylist?.shouldStopDueToPlaylistEnd)
     },
-    currentLocale: function () {
-      return this.$i18n.locale
-    },
     hideChapters: function () {
       return this.$store.getters.getHideChapters
     },
@@ -318,6 +327,16 @@ export default defineComponent({
       // `this.$refs.player?.hasLoaded` cannot be used in computed property
       return !this.isLoading
     },
+
+    chaptersSrc() {
+      if (this.videoChapters.length > 0) {
+        const vttText = buildChaptersVttFile(this.videoChapters)
+
+        return `data:text/vtt,${encodeURIComponent(vttText)}`
+      } else {
+        return ''
+      }
+    }
   },
   watch: {
     async $route() {
@@ -366,21 +385,15 @@ export default defineComponent({
 
       // react to route changes...
       this.videoId = this.$route.params.id
+      this.resetVideoState()
 
       this.firstLoad = true
       this.videoPlayerLoaded = false
-      this.errorMessage = null
-      this.customErrorIcon = null
       this.activeFormat = this.defaultVideoFormat
-      this.sabrData = null
-      this.videoStoryboardSrc = ''
-      this.captions = []
-      this.vrProjection = null
-      this.videoCurrentChapterIndex = 0
-      this.videoGenreIsMusic = false
 
       this.checkIfTimestamp()
       this.checkIfPlaylist()
+      this.setViewingModeOnRouteChange()
 
       switch (this.backendPreference) {
         case 'local':
@@ -431,6 +444,53 @@ export default defineComponent({
       })
       this.previousHistoryOffset++
     },
+
+    resetVideoState: function () {
+      this.isLoading = true
+      this.isFamilyFriendly = false
+      this.isLive = false
+      this.liveChat = null
+      this.isLiveContent = false
+      this.isUpcoming = false
+      this.isPostLiveDvr = false
+      this.isUnlisted = false
+      this.upcomingTimestamp = null
+      this.upcomingTimeLeft = null
+      this.thumbnail = ''
+      this.videoTitle = ''
+      this.videoDescription = ''
+      this.videoDescriptionHtml = ''
+      this.license = ''
+      this.videoViewCount = 0
+      this.videoLikeCount = 0
+      this.videoDislikeCount = 0
+      this.videoLengthSeconds = 0
+      this.videoChapters = []
+      this.videoCurrentChapterIndex = 0
+      this.videoChaptersKind = 'chapters'
+      this.channelName = ''
+      this.channelThumbnail = ''
+      this.channelId = ''
+      this.channelSubscriptionCountText = ''
+      this.videoPublished = 0
+      this.premiereDate = undefined
+      this.videoStoryboardSrc = ''
+      this.manifestSrc = null
+      this.manifestMimeType = MANIFEST_TYPE_DASH
+      this.sabrData = null
+      this.legacyFormats = []
+      this.captions = []
+      this.vrProjection = null
+      this.recommendedVideos = []
+      this.playabilityStatus = ''
+      this.adEndTimeUnixMs = 0
+      this.errorMessage = null
+      this.customErrorIcon = null
+      this.videoGenreIsMusic = false
+      this.streamingDataExpiryDate = null
+      this.updateTitle()
+    },
+
     onMountedDependOnLocalStateLoading() {
       // Prevent running twice
       if (this.onMountedRun) { return }
@@ -465,13 +525,26 @@ export default defineComponent({
           this.useTheatreMode = this.theatrePossible
           break
         case 'fullscreen':
+        case 'fullscreen_always_on':
           this.startNextVideoInFullscreen = true
           break
         case 'fullwindow':
+        case 'fullwindow_always_on':
           this.startNextVideoInFullwindow = true
           break
         case 'pip':
           this.startNextVideoInPip = true
+      }
+    },
+
+    setViewingModeOnRouteChange: function () {
+      switch (this.defaultViewingMode) {
+        case 'fullscreen_always_on':
+          this.startNextVideoInFullscreen = true
+          break
+        case 'fullwindow_always_on':
+          this.startNextVideoInFullwindow = true
+          break
       }
     },
 
@@ -492,6 +565,19 @@ export default defineComponent({
         const videoInfo = await getLocalVideoInfo(this.videoId)
         const { info: result, poToken, clientInfo, adEndTimeUnixMs } = videoInfo
 
+        const playabilityStatus = result.playability_status
+        this.playabilityStatus = playabilityStatus.status
+
+        if (playabilityStatus.status === 'LOGIN_REQUIRED' && playabilityStatus.error_screen?.reason?.text === 'Private video') {
+          // Private videos cannot be played in FreeTube, as they require to be logged as the owner of the video
+          // so there is no point continuing or trying any other backends as it will always fail
+          this.errorMessage = this.t('Video.Private')
+          this.thumbnail = this.getUnavailableVideoThumbnail()
+          this.isLoading = false
+          this.updateTitle()
+          return
+        }
+
         this.adEndTimeUnixMs = adEndTimeUnixMs
 
         this.isFamilyFriendly = result.basic_info.is_family_safe
@@ -501,7 +587,7 @@ export default defineComponent({
             return item.type === 'CompactVideo' || item.type === 'CompactMovie' ||
               (item.type === 'LockupView' && item.content_type === 'VIDEO')
           })
-          .map(parseLocalWatchNextVideo)
+          .map(parseLocalWatchNextVideo).filter(_ => _)
           // place watched recommended videos last
           .sort(this.sortWatchedVideosLast) ?? []
 
@@ -592,6 +678,7 @@ export default defineComponent({
         }
 
         let chapters = []
+        let chaptersKind = 'chapters'
         if (!this.hideChapters) {
           const rawChapters = result.player_overlays?.decorated_player_bar?.player_bar?.markers_map
             ?.find(marker => marker.marker_key === 'DESCRIPTION_CHAPTERS')?.value.chapters
@@ -625,7 +712,7 @@ export default defineComponent({
                   })
                 }
               }
-              this.videoChaptersKind = 'keyMoments'
+              chaptersKind = 'keyMoments'
             } else {
               chapters = this.extractChaptersFromDescription(result.basic_info.short_description ?? result.secondary_info.description.text)
             }
@@ -643,9 +730,7 @@ export default defineComponent({
         }
 
         this.videoChapters = chapters
-
-        const playabilityStatus = result.playability_status
-        this.playabilityStatus = playabilityStatus.status
+        this.videoChaptersKind = chaptersKind
 
         // The apostrophe is intentionally that one (char code 8217), because that is the one YouTube uses
         const BOT_MESSAGE = 'Sign in to confirm you’re not a bot'
@@ -656,7 +741,7 @@ export default defineComponent({
           if (playabilityStatus.error_screen?.offer_id === 'sponsors_only_video') {
             // Members-only videos can only be watched while logged into a Google account that is a paid channel member
             // so there is no point trying any other backends as it will always fail
-            this.errorMessage = this.$t('Video.MembersOnly')
+            this.errorMessage = this.t('Video.MembersOnly')
             this.customErrorIcon = ['fas', 'money-check-dollar']
             this.isLoading = false
             this.updateTitle()
@@ -664,14 +749,14 @@ export default defineComponent({
           } else if (playabilityStatus.reason === 'Sign in to confirm your age' || (result.has_trailer && result.getTrailerInfo() === null)) {
             // Age-restricted videos can only be watched while logged into a Google account that is age-verified
             // so there is no point trying any other backends as it will always fail
-            this.errorMessage = this.$t('Video.AgeRestricted')
+            this.errorMessage = this.t('Video.AgeRestricted')
             this.isLoading = false
             this.updateTitle()
             return
           } else if (isDrmProtected) {
             // DRM protected videos (e.g. movies) cannot be played in FreeTube,
             // as they require the proprietary and closed source Wideview CDM which is understandably not included in standard Electron builds
-            this.errorMessage = this.$t('Video.DRMProtected')
+            this.errorMessage = this.t('Video.DRMProtected')
             this.isLoading = false
             this.updateTitle()
             return
@@ -680,7 +765,7 @@ export default defineComponent({
           let errorText
 
           if (playabilityStatus.reason === BOT_MESSAGE || playabilityStatus.reason === 'Please sign in') {
-            errorText = this.$t('Video.IP block')
+            errorText = this.t('Video.IP block')
           } else {
             errorText = `[${playabilityStatus.status}] ${playabilityStatus.reason}`
 
@@ -783,7 +868,7 @@ export default defineComponent({
             // Displays when less than a minute remains
             // Looks better than `Premieres in x seconds`
             if (upcomingTimeLeft < 1) {
-              this.upcomingTimeLeft = this.$t('Video.Published.In less than a minute').toLowerCase()
+              this.upcomingTimeLeft = this.t('Video.Published.In less than a minute').toLowerCase()
             } else {
               // TODO a I18n entry for time format might be needed here
               this.upcomingTimeLeft = new Intl.RelativeTimeFormat(this.currentLocale).format(upcomingTimeLeft, timeUnit)
@@ -852,7 +937,7 @@ export default defineComponent({
           } else {
             // video might be region locked or something else. This leads to no formats being available
             showToast(
-              this.$t('This video is unavailable because of missing formats. This can happen due to country unavailability.'),
+              this.t('This video is unavailable because of missing formats. This can happen due to country unavailability.'),
               7000
             )
             this.handleVideoEnded()
@@ -921,16 +1006,21 @@ export default defineComponent({
         this.isLoading = false
         this.updateTitle()
       } catch (err) {
-        const errorMessage = this.$t('Local API Error (Click to copy)')
-        showToast(`${errorMessage}: ${err}`, 10000, () => {
-          copyToClipboard(err)
-        })
         console.error(err)
-        if (this.backendPreference === 'local' && this.backendFallback && !err.toString().includes('private')) {
-          showToast(this.$t('Falling back to Invidious API'))
+        if (this.backendPreference === 'local' && this.backendFallback && !err.toString().includes('private') && !err.toString().includes('unavailable')) {
+          const errorMessage = this.t('Local API Error (Click to copy)')
+          showToast(`${errorMessage}: ${err}`, 10000, () => {
+            copyToClipboard(err)
+          })
+          showToast(this.t('Falling back to Invidious API'))
           this.getVideoInformationInvidious()
         } else {
           this.isLoading = false
+
+          if (!this.thumbnail) {
+            this.thumbnail = this.getUnavailableVideoThumbnail()
+          }
+          this.errorMessage = err.message || err.toString()
         }
       }
     },
@@ -1039,6 +1129,7 @@ export default defineComponent({
             }
           }
           this.videoChapters = chapters
+          this.videoChaptersKind = 'chapters'
 
           if (this.isLive || this.isPostLiveDvr) {
             // The live DASH manifest is currently unusable as it returns 403s after 1 minute of playback
@@ -1107,16 +1198,20 @@ export default defineComponent({
         })
         .catch(err => {
           console.error(err)
-          const errorMessage = this.$t('Invidious API Error (Click to copy)')
-          showToast(`${errorMessage}: ${err}`, 10000, () => {
-            copyToClipboard(err)
-          })
-          console.error(err)
           if (process.env.SUPPORTS_LOCAL_API && this.backendPreference === 'invidious' && this.backendFallback) {
-            showToast(this.$t('Falling back to Local API'))
+            const errorMessage = this.t('Invidious API Error (Click to copy)')
+            showToast(`${errorMessage}: ${err}`, 10000, () => {
+              copyToClipboard(err)
+            })
+            showToast(this.t('Falling back to Local API'))
             this.getVideoInformationLocal()
           } else {
             this.isLoading = false
+
+            if (!this.thumbnail) {
+              this.thumbnail = this.getUnavailableVideoThumbnail()
+            }
+            this.errorMessage = err.message || err.toString()
           }
         })
     },
@@ -1125,6 +1220,15 @@ export default defineComponent({
       const expireString = new URL(url).searchParams.get('expire')
 
       return new Date(parseInt(expireString) * 1000)
+    },
+
+    getUnavailableVideoThumbnail: function () {
+      const backgroundColor = window.getComputedStyle(document.body).backgroundColor
+      const isLightTheme = calculateColorLuminance(backgroundColor) === '#000000'
+
+      return isLightTheme
+        ? UNAVAILABLE_VIDEO_THUMBNAILS.light
+        : UNAVAILABLE_VIDEO_THUMBNAILS.dark
     },
 
     /**
@@ -1220,7 +1324,7 @@ export default defineComponent({
     handleWatchProgressManualSave() {
       // Should be called by manual action, settings should be checked in UI
       this._saveWatchProgress()
-      showToast(this.$t('Video.Watched Progress Saved'))
+      showToast(this.t('Video.Watched Progress Saved'))
     },
     handleWatchProgressAutoSave() {
       if (!this.rememberHistory || !this.autosaveWatchedProgress) { return }
@@ -1377,7 +1481,7 @@ export default defineComponent({
       }
 
       if (this.manifestSrc === null) {
-        showToast(this.$t('Change Format.Dash formats are not available for this video'))
+        showToast(this.t('Change Format.Dash formats are not available for this video'))
         return
       }
 
@@ -1390,7 +1494,7 @@ export default defineComponent({
       }
 
       if (this.isLive || this.isPostLiveDvr || this.legacyFormats.length === 0) {
-        showToast(this.$t('Change Format.Legacy formats are not available for this video'))
+        showToast(this.t('Change Format.Legacy formats are not available for this video'))
         return
       }
 
@@ -1407,7 +1511,7 @@ export default defineComponent({
         // The WEB HLS manifests only contain combined audio and video files, so we can't do audio only
         // The IOS HLS manifests have audio-only streams
           this.manifestMimeType === MANIFEST_TYPE_HLS && !this.manifestSrc.includes('/demuxed/1'))) {
-        showToast(this.$t('Change Format.Audio formats are not available for this video'))
+        showToast(this.t('Change Format.Audio formats are not available for this video'))
         return
       }
 
@@ -1421,7 +1525,7 @@ export default defineComponent({
       }
 
       if (this.blockVideoAutoplay) {
-        showToast(this.$t('Autoplay Interruption Timer',
+        showToast(this.t('Autoplay Interruption Timer',
           this.defaultAutoplayInterruptionIntervalHours,
           {
             autoplayInterruptionIntervalHours: this.defaultAutoplayInterruptionIntervalHours
@@ -1458,7 +1562,7 @@ export default defineComponent({
             this.$router.push({
               path: `/watch/${nextVideoId}`
             })
-            showToast(this.$t('Playing Next Video'))
+            showToast(this.t('Playing Next Video'))
           }
         }
         this.playNextTimeout = null
@@ -1469,7 +1573,7 @@ export default defineComponent({
         showToast(
           ({ remainingMs }) => {
             const countDownTimeLeftInSecond = remainingMs / 1000
-            return this.$t('Playing Next Video Interval', { nextVideoInterval: countDownTimeLeftInSecond }, countDownTimeLeftInSecond)
+            return this.t('Playing Next Video Interval', { nextVideoInterval: countDownTimeLeftInSecond }, countDownTimeLeftInSecond)
           },
           // So that we don't see last countdown text like 0/N
           nextVideoInterval * 1000,
@@ -1487,7 +1591,7 @@ export default defineComponent({
         this.$router.push({
           path: `/watch/${this.nextRecommendedVideo.videoId}`
         })
-        showToast(this.$t('Playing Next Video'))
+        showToast(this.t('Playing Next Video'))
       }
     },
 
@@ -1502,15 +1606,12 @@ export default defineComponent({
       this.playNextTimeout = null
 
       if (!hideToast) {
-        showToast(this.$t('Canceled next video autoplay'))
+        showToast(this.t('Canceled next video autoplay'))
       }
     },
 
     handleRouteChange: function () {
       this.abortAutoplayCountdown(true)
-      this.videoChapters = []
-      this.videoChaptersKind = 'chapters'
-
       this.handleWatchProgressAutoSave()
     },
 
@@ -1658,6 +1759,7 @@ export default defineComponent({
           colorPrimaries: format.color_info?.primaries
         })),
         captions: this.captions,
+        chapters: this.videoChapters,
         storyboards
       }
 
@@ -1797,7 +1899,7 @@ export default defineComponent({
       let translationName, translationCode
       // otherwise just fallback to the FreeTube display language and hope that YouTube will be able to handle it
       if (!translationLanguage) {
-        translationName = this.$t('Locale Name')
+        translationName = this.t('Locale Name')
         translationCode = userLanguages.values().next().value
       } else {
         translationName = translationLanguage.language_name.text
@@ -1823,7 +1925,7 @@ export default defineComponent({
       url.searchParams.set('fmt', 'srt')
       url.searchParams.set('tlang', translationCode)
 
-      const label = this.$t('Video.Player.TranslatedCaptionTemplate', {
+      const label = this.t('Video.Player.TranslatedCaptionTemplate', {
         language: translationName,
         originalLanguage: trackToTranslate.name.text
       })

@@ -142,22 +142,22 @@ export async function getLocalPlaylist(id) {
  */
 
 /**
- * @param {import('youtubei.js').YTNodes.ContinuationItem} continuationItem
+ * @param {import('youtubei.js').YTNodes.ContinuationItem | import('youtubei.js').YTNodes.ContinuationItemView} continuationItemOrView
  * @param {import('youtubei.js').Actions} actions
  */
-function serializeContinuationItem(continuationItem, actions) {
+function serializeContinuation(continuationItemOrView, actions) {
   let path, payload
 
   // Based on YouTube.js' NavigationEndpoint#call()
-  if (continuationItem.endpoint.command.is(YTNodes.CommandExecutorCommand)) {
+  if (continuationItemOrView.endpoint.command.is(YTNodes.CommandExecutorCommand)) {
     /** @type {import('youtubei.js').Helpers.YTNode & import('youtubei.js').APIResponseTypes.IEndpoint} */
-    const command = continuationItem.endpoint.command.commands.at(-1)
+    const command = continuationItemOrView.endpoint.command.commands.at(-1)
 
     path = command.getApiPath()
     payload = command.buildRequest()
   } else {
-    path = continuationItem.endpoint.metadata.api_url
-    payload = continuationItem.endpoint.payload
+    path = continuationItemOrView.endpoint.metadata.api_url
+    payload = continuationItemOrView.endpoint.payload
   }
 
   /** @type {SerializedContinuation} */
@@ -171,18 +171,21 @@ function serializeContinuationItem(continuationItem, actions) {
 }
 
 /**
+ * @template {import('youtubei.js').YTNodes} N
  * @param {import('youtubei.js').Mixins.Feed} feed
+ * @param {import('youtubei.js').YTNodeConstructor<N>[]} types
+ * @return {N}
  */
-function extractFeedContinuationItem(feed) {
+function extractFeedContinuation(feed, types) {
   let continuationItem
 
   if (feed.page.header_memo) {
-    const headerContinuations = feed.page.header_memo.getType(YTNodes.ContinuationItem)
-    continuationItem = feed.memo.getType(YTNodes.ContinuationItem).find(
+    const headerContinuations = feed.page.header_memo.getType(...types)
+    continuationItem = feed.memo.getType(...types).find(
       (continuation) => !headerContinuations.includes(continuation)
     )
   } else {
-    continuationItem = feed.memo.getType(YTNodes.ContinuationItem)[0]
+    continuationItem = feed.memo.getType(types)[0]
   }
 
   if (!continuationItem) {
@@ -199,22 +202,22 @@ function extractFeedContinuationItem(feed) {
 export function extractLocalCacheablePlaylistContinuation(playlist) {
   const sectionList = playlist.memo.getType(YTNodes.SectionList)[0]
 
-  let continuationItem
+  let continuationItemOrView
 
   // No section list means there can't be additional continuation nodes here,
   // so no need to check.
   if (!sectionList) {
-    continuationItem = extractFeedContinuationItem(playlist)
+    continuationItemOrView = extractFeedContinuation(playlist, [YTNodes.ContinuationItem, YTNodes.ContinuationItemView])
   } else {
-    continuationItem = playlist.memo.getType(YTNodes.ContinuationItem)
+    continuationItemOrView = playlist.memo.getType(YTNodes.ContinuationItem, YTNodes.ContinuationItemView)
       .find((node) => !sectionList.contents.includes(node))
   }
 
-  if (!continuationItem) {
+  if (!continuationItemOrView) {
     throw new Utils.InnertubeError('There are no continuations.')
   }
 
-  return serializeContinuationItem(continuationItem, playlist.actions)
+  return serializeContinuation(continuationItemOrView, playlist.actions)
 }
 
 /**
@@ -223,9 +226,9 @@ export function extractLocalCacheablePlaylistContinuation(playlist) {
  * @returns {SerializedContinuation}
  */
 export function extractLocalCacheableSearchContinuation(search) {
-  const continuationItem = extractFeedContinuationItem(search)
+  const continuationItem = extractFeedContinuation(search, [YTNodes.ContinuationItem])
 
-  return serializeContinuationItem(continuationItem, search.actions)
+  return serializeContinuation(continuationItem, search.actions)
 }
 
 /**
@@ -345,7 +348,7 @@ export async function getLocalTrending(location, tab) {
   const response = await innertube.actions.execute('/browse', args)
   const feed = new Mixins.Feed(innertube.actions, response)
 
-  return feed.videos.map(video => parseLocalListVideo(video))
+  return feed.videos.map(video => parseLocalListVideo(video)).filter(_ => _)
 }
 
 /**
@@ -1088,7 +1091,10 @@ export function parseLocalChannelVideos(videos, channelId, channelName) {
     if (video.is(YTNodes.Video) && video.badges.some(badge => badge.style === 'BADGE_STYLE_TYPE_MEMBERS_ONLY')) {
       continue
     }
-    parsedVideos.push(parseLocalListVideo(video, channelId, channelName))
+    const parsedVideo = parseLocalListVideo(video, channelId, channelName)
+    if (parsedVideo != null) {
+      parsedVideos.push(parsedVideo)
+    }
   }
 
   return parsedVideos
@@ -1291,7 +1297,7 @@ export function parseChannelHomeTab(homeTab, channelId, channelName) {
         const shelf = section.content
         shelves.push({
           title: shelf.title?.text,
-          content: shelf.contents.map(e => parseListItem(e.content, channelId, channelName)),
+          content: shelf.contents.map(e => parseListItem(e.content, channelId, channelName)).filter(_ => _),
           subtitle: shelf.subtitle?.text,
           playlistId: shelf.endpoint?.metadata.url.includes('/playlist') ? shelf.endpoint?.metadata.url.replace('/playlist?list=', '') : null
         })
@@ -1329,7 +1335,7 @@ export function parseLocalPlaylistVideo(video) {
     if (shortsLockupView.accessibility_text) {
       // the `.*\s+` at the start of the regex, ensures we match the last occurence
       // just in case the video title also contains that pattern
-      const match = shortsLockupView.accessibility_text.match(/.*\s+(\d+(?:[,.]\d+)?\s?(?:[BKMbkm]|million)?|no)\s+views?/)
+      const match = shortsLockupView.accessibility_text.match(/.*\s+(\d+(?:[,.]\d+)?\s?(?:[BKMbkm]|thousand|[bm]illion)?|no)\s+views?/)
 
       if (match) {
         const count = match[1]
@@ -1355,13 +1361,15 @@ export function parseLocalPlaylistVideo(video) {
       viewCount,
       lengthSeconds: ''
     }
+  } else if (video.type === 'LockupView') {
+    return parseLockupView(video)
   } else {
     /** @type {import('youtubei.js').YTNodes.PlaylistVideo} */
     const video_ = video
 
     let viewCount = null
 
-    const viewsText = video_.video_info.runs?.find(run => VIEWS_OR_WATCHING_REGEX.test(run.text))?.text
+    const viewsText = video_.video_info.runs?.find(run => isViewCountText(run.text))?.text
 
     if (viewsText) {
       const views = parseLocalSubscriberCount(viewsText)
@@ -1476,9 +1484,16 @@ export function parseLocalListVideo(item, channelId, channelName) {
       isUpcoming: movie.is_upcoming,
       premiereDate: movie.upcoming
     }
+  } else if (item.type === 'LockupView') {
+    return parseLockupView(item, channelId, channelName)
   } else {
     /** @type {import('youtubei.js').YTNodes.Video} */
     const video = item
+
+    // When video is passed in via like community post attachment
+    if (video.title?.text === 'This video isn\'t publicly available') {
+      return null
+    }
 
     let publishedText
 
@@ -1525,7 +1540,38 @@ export function parseLocalListVideo(item, channelId, channelName) {
   }
 }
 
-const VIEWS_OR_WATCHING_REGEX = /views?|watching/i
+const VIEWS_OR_WATCHING_REGEX = /views?|watching|waiting/i
+const VIEWS_IN_NUMBER_ONLY = /^\d+(\.\d)?[bkm]?$/i
+const PREMIERES_TIME_REGEX = /^(premieres|scheduled for) /i
+// Sometimes got `Streamed N (unit) ago`
+const PUBLISH_TIME_REGEX = /^(streamed )?\d+ ?\w+? ago/i
+
+/**
+ * @param {string | undefined} text
+ */
+function isViewCountText(text) {
+  if (typeof text !== 'string') { return false }
+
+  return VIEWS_OR_WATCHING_REGEX.test(text) || VIEWS_IN_NUMBER_ONLY.test(text)
+}
+
+/**
+ * @param {string | undefined} text
+ */
+function isPremieresTimeText(text) {
+  if (typeof text !== 'string') { return false }
+
+  return PREMIERES_TIME_REGEX.test(text)
+}
+
+/**
+ * @param {string | undefined} text
+ */
+function isPublishTimeText(text) {
+  if (typeof text !== 'string') { return false }
+
+  return PUBLISH_TIME_REGEX.test(text)
+}
 
 /**
  * @param {import('youtubei.js').YTNodes.LockupView} lockupView
@@ -1566,6 +1612,7 @@ function parseLockupView(lockupView, channelId = undefined, channelName = undefi
         videoCount: extractNumberFromString(thumbnailOverlayBadgeView.badges[0].text)
       }
     }
+    case 'SHORT':
     case 'VIDEO': {
       let publishedText
       let lengthSeconds = ''
@@ -1573,17 +1620,28 @@ function parseLockupView(lockupView, channelId = undefined, channelName = undefi
       let isUpcoming = false
       let premiereDate
 
+      const isMemberOnly = lockupView.metadata.metadata?.metadata_rows.some(row => {
+        return row.badges.some(badge => badge.style === 'BADGE_MEMBERS_ONLY')
+      })
+      if (isMemberOnly) {
+        return null
+      }
+
       /** @type {YTNodes.ThumbnailBottomOverlayView | undefined } */
       const thumbnailBottomOverlayView = lockupView.content_image?.overlays?.firstOfType(YTNodes.ThumbnailBottomOverlayView)
 
       if (thumbnailBottomOverlayView) {
         if (thumbnailBottomOverlayView.badges.some(badge => badge.badge_style === 'THUMBNAIL_OVERLAY_BADGE_STYLE_LIVE')) {
           liveNow = true
-        } else if (thumbnailBottomOverlayView.badges.some(badge => badge.text.toLowerCase() === 'upcoming')) {
+        } else if (thumbnailBottomOverlayView.badges.some(badge => badge.text?.toLowerCase() === 'upcoming')) {
           isUpcoming = true
 
-          if (lockupView.metadata.metadata?.metadata_rows[1].metadata_parts?.[1].text?.text) {
-            premiereDate = new Date(lockupView.metadata.metadata.metadata_rows[1].metadata_parts[1].text.text)
+          for (const row of lockupView.metadata.metadata.metadata_rows) {
+            const foundText = row.metadata_parts?.find(part => isPremieresTimeText(part.text?.text))?.text?.text
+            if (foundText != null) {
+              premiereDate = new Date(foundText)
+              break
+            }
           }
         } else {
           const durationBadge = thumbnailBottomOverlayView.badges.find(badge => /^[\d:]+$/.test(badge.text))
@@ -1592,15 +1650,31 @@ function parseLockupView(lockupView, channelId = undefined, channelName = undefi
             lengthSeconds = Utils.timeToSeconds(durationBadge.text)
           }
 
-          publishedText = lockupView.metadata.metadata?.metadata_rows[1].metadata_parts?.find(part => part.text?.text?.endsWith('ago'))?.text?.text
+          if (lockupView.metadata.metadata?.metadata_rows != null) {
+            for (const row of lockupView.metadata.metadata.metadata_rows) {
+              const foundText = row.metadata_parts?.find(part => isPublishTimeText(part.text?.text))?.text?.text
+              if (foundText != null) {
+                publishedText = foundText
+                break
+              }
+            }
+          }
         }
       }
 
       let viewCount = null
-
-      const viewsText = lockupView.metadata.metadata?.metadata_rows[1].metadata_parts?.find(part => {
-        return part.text?.text && VIEWS_OR_WATCHING_REGEX.test(part.text.text)
-      })?.text?.text
+      let viewsText = null
+      if (lockupView.metadata.metadata?.metadata_rows != null) {
+        for (const row of lockupView.metadata.metadata.metadata_rows) {
+          const foundText = row.metadata_parts?.find(part => {
+            return isViewCountText(part.text?.text)
+          })?.text?.text
+          if (foundText != null) {
+            viewsText = foundText
+            break
+          }
+        }
+      }
 
       if (viewsText) {
         const views = parseLocalSubscriberCount(viewsText)
@@ -1610,12 +1684,18 @@ function parseLockupView(lockupView, channelId = undefined, channelName = undefi
         }
       }
 
+      const maybeAuthorText = lockupView.metadata.metadata?.metadata_rows[0].metadata_parts?.[0].text?.text
+      let author = channelName
+      if (maybeAuthorText && !isViewCountText(maybeAuthorText) && !isPremieresTimeText(maybeAuthorText)) {
+        author = maybeAuthorText
+      }
+
       return {
         type: 'video',
         videoId: lockupView.content_id,
         title: lockupView.metadata.title.text?.trim(),
-        author: lockupView.metadata.metadata?.metadata_rows[0].metadata_parts?.[0].text?.text,
-        authorId: lockupView.metadata.image?.renderer_context?.command_context?.on_tap?.payload.browseId,
+        author,
+        authorId: lockupView.metadata.image?.renderer_context?.command_context?.on_tap?.payload.browseId ?? channelId,
         viewCount,
         published: calculatePublishedDate(publishedText, liveNow, isUpcoming, premiereDate),
         lengthSeconds,
@@ -2026,7 +2106,7 @@ export function parseLocalComment(comment, commentThread = undefined) {
  * @param {string} text
  */
 export function parseLocalSubscriberCount(text) {
-  const match = text.match(/(\d+)(?:[,.](\d+))?\s?([BKMbkm]|million)\b/)
+  const match = text.match(/(\d+)(?:[,.](\d+))?\s?([BKMbkm]|thousand|[bm]illion)\b/)
 
   if (match) {
     let multiplier = 0
@@ -2034,6 +2114,7 @@ export function parseLocalSubscriberCount(text) {
     switch (match[3]) {
       case 'K':
       case 'k':
+      case 'thousand':
         multiplier = 3
         break
       case 'M':
@@ -2043,6 +2124,7 @@ export function parseLocalSubscriberCount(text) {
         break
       case 'B':
       case 'b':
+      case 'billion':
         multiplier = 9
         break
     }
@@ -2124,9 +2206,12 @@ function parseLocalAttachment(attachment) {
       content: attachment.image
     }
   } else if (attachment.type === 'Video') {
+    const parsedVideo = parseLocalListVideo(attachment)
+    if (parsedVideo == null) return null
+
     return {
       type: 'video',
-      content: parseLocalListVideo(attachment)
+      content: parsedVideo
     }
   } else if (attachment.type === 'Playlist') {
     return {

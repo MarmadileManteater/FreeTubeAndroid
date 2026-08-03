@@ -413,10 +413,14 @@ Settings:
         Forbidden Characters: Bannaðir stafir
         Empty File Name: Autt skráaheiti
       File Name Tooltip: Þú getur notað breyturnar hér fyrir neðan. %Y ár 4-stafa. %M mánuður 2-stafa. %D dagur 2-stafa. %H klukkustundir 2-stafa. %N mínútur 2-stafa. %S sekúndur 2-stafa. %T millísekúndur 3-stafa. %s sekúndur í myndskeiði. %t millísekúndur í myndskeiði 3-stafa. %i auðkenni myndskeiðs.
-      Ask Path: Spyrja um möppu til að vista í
+      Modes:
+        Ask Path: Spyrja um möppu til að vista í
+        Save To Folder: Vista í möppu
+        Clipboard: Afrita á klippispjald
       Folder Label: Mappa undir skjámyndir
       Folder Button: Veldu möppu
       File Name Label: Mynstur skráaheita
+      Mode: Skjámyndatökuhamur
     Enter Fullscreen on Display Rotate: Fara í skjáfylli við snúning á skjá
     Skip by Scrolling Over Video Player: Sleppa með því að skruna ofan á myndspilara
     Autoplay Interruption Timer: Niðurtalning í stöðvun á sjálfvirkri spilun
@@ -596,6 +600,7 @@ Settings:
     Hide Search Bar: Fela leitarstiku
     Parental Control Settings: Foreldrastýringar
     Hide Uploader on Watch page: Fela innsendingarsvæði á vöktunarsíðu
+    Disable Channel Links: Gera rásatengla óvirka
   Experimental Settings:
     Experimental Settings: Á tilraunastigi
     Warning: Þessar stillingar eru á tilraunastigi, þær geta valdið hruni þegar þær eru virkjaðar. Mælt er með því að öryggisafrit séu tekin. Notist á eigin ábyrgð!
@@ -624,7 +629,6 @@ About:
   GitHub issues: 'GitHub verkbeiðnir'
   Please check for duplicates before posting: 'Athugaðu hvort fyrir séu eins fyrirspurnir áður en þú sendir nýja'
   Website: 'Vefsvæði'
-  Email: 'Tölvupóstur'
   Mastodon: 'Mastodon'
   Chat on Matrix: 'Spjall á Matrix'
   room rules: 'reglur spjallsins'
@@ -857,6 +861,7 @@ Video:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': 'Tími sem eftir er af forkeyrslu auglýsingar: {remindingTimeSeconds}s'
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Tími sem eftir er af bakkeyrslu SABR: {remindingTimeSeconds}s'
   Popout Live Chat: Spjall í sprettglugga
+  Private: Ekki er hægt að horfa á einkamyndskeið þar sem þau krefjast innskráningar á Google og eignarhaldi á myndskeiðinu.
 Playlist:
   #& About
   View Full Playlist: 'Sjá allan spilunarlistann'
@@ -908,7 +913,6 @@ Mini Player: 'Smáspilari'
 Comments:
   Comments: 'Athugasemdir'
   Click to View Comments: 'Smelltu til að skoða athugasemdir'
-  Getting comment replies, please wait: 'Sæki svör við athugasemdum, bíddu aðeins'
   There are no more comments for this video: 'Það eru engar fleiri athugasemdir við þetta myndskeið'
   Hide Comments: 'Fela athugasemdir'
   Top comments: 'Efstu athugasemdir'
@@ -1114,3 +1118,5 @@ KeyboardShortcutPrompt:
 shortcutLabelSeparator: ｜
 Compact side navigation: Þjöppuð hliðarflakkstika
 Expand side navigation: Fella út hliðarflakkstiku
+Screenshot Clipboard Success: Vistaði skjámynd á klippispjald
+Screenshot Clipboard Error: Mistókst að vista skjámynd á klippispjald

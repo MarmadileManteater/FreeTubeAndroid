@@ -119,7 +119,7 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, reactive, ref, shallowRef, useId, useTemplateRef, watch } from 'vue'
-import { useI18n } from '../../composables/use-i18n-polyfill'
+import { useI18n } from 'vue-i18n'
 
 import FtTooltip from '../FtTooltip/FtTooltip.vue'
 
@@ -196,7 +196,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['clear', 'click', 'input', 'remove'])
+const emit = defineEmits(['clear', 'click', 'input', 'remove', 'blur'])
 
 const id = useId()
 
@@ -372,6 +372,7 @@ function handleOptionClick(index) {
   }
 
   searchState.showOptions = false
+  searchState.isPointerInList = false
   inputData.value = visibleDataList.value[index]
   emit('input', inputData.value)
   handleClick()
@@ -464,6 +465,7 @@ function handleInputBlur() {
   if (!searchState.isPointerInList) {
     searchState.showOptions = false
   }
+  emit('blur', inputData.value)
 }
 
 function handleFocus() {

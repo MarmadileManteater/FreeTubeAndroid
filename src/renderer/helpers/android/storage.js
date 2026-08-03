@@ -1,8 +1,6 @@
 import android from 'android'
 import { awaitAsyncResult } from './jsinterface'
 import { blobToBase64, reverseObject } from './utils'
-import { useI18n } from '../../composables/use-i18n-polyfill'
-import { showToast } from '../utils'
 
 export const DATA_DIRECTORY = 'data://'
 
@@ -11,8 +9,6 @@ const DATA_LOCATION = `${DATA_DIRECTORY}data-location.json`
 const EXPECTED_FILES = ['profiles.db', 'settings.db', 'history.db', 'playlists.db', 'search-history.db', 'subscription-cache.db']
 
 const EXPECTED_FILES_MAP = Object.fromEntries(EXPECTED_FILES.map((file) => { return [file, `${DATA_DIRECTORY}${file}`] }))
-
-const { t } = useI18n()
 
 /**
  * a soft file read which returns '' if the file doesn't exist yet
@@ -257,14 +253,12 @@ export async function selectDataDirectory(copyFiles = false, reset = false) {
       files: filesToEntries(newFiles)
     }))
 
-    showToast(t('Data Settings.Your data directory has been moved successfully'))
     if (!copyFiles) {
       android.restart()
     }
     return android.getDirectory(newDirectory.uri)
   } catch (exception) {
-    showToast(t('Data Settings.Error moving data directory'))
-    console.error(exception)
+    throw exception
   }
 }
 

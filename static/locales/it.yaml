@@ -167,10 +167,10 @@ User Playlists:
     New Playlist Name: Nuovo nome della playlist
   This playlist currently has no videos.: Questa playlist attualmente non contiene video.
   Add to Playlist: Aggiungi alla playlist
-  Move Video Down: Sposta il video in basso
+  Move Video Down: Sposta il video giù
   Playlist Name: Nome della playlist
   Remove Watched Videos: Rimuovi i video guardati
-  Move Video Up: Sposta il video in alto
+  Move Video Up: Sposta il video su
   Cancel: Annulla
   Delete Playlist: Elimina playlist
   Create New Playlist: Crea nuova playlist
@@ -190,6 +190,8 @@ User Playlists:
   The playlist has been successfully exported: La playlist è stata esportata correttamente
   TotalTimePlaylist: 'Tempo totale: {duration}'
   Export list of URLs: Esporta l'elenco degli URL
+  Move Video to the Top: Sposta il video in alto
+  Move Video to the Bottom: Sposta il video in basso
 History:
   # On History Page
   History: 'Cronologia'
@@ -410,8 +412,12 @@ Settings:
       Quality Label: Qualità screenshot
       Enable: Abilita screenshot
       Format Label: Formato screenshot
-      Ask Path: Chiedi cartella di salvataggio
+      Modes:
+        Ask Path: Chiedi cartella di salvataggio
+        Save To Folder: Salva nella cartella
+        Clipboard: Copia negli appunti
       File Name Tooltip: Puoi usare le seguenti variabili. %Y Anno 4 cifre. %M Mese 2 cifre. %D Giorno 2 cifre. %H Ora 2 cifre. %N Minuto 2 cifre. %S Secondo 2 cifre. %T Millisecondo 3 cifre. %s Durata in secondi del video. %t Millisecondi del video 3 cifre. %i ID video.
+      Mode: Modalità screenshot
     Enter Fullscreen on Display Rotate: Entra a schermo intero su Ruota schermo
     Skip by Scrolling Over Video Player: Salta tramite scorrimento sul lettore video
     Autoplay Interruption Timer: Timer di interruzione della riproduzione automatica
@@ -421,6 +427,9 @@ Settings:
       External Player: Lettore esterno ({externalPlayerName})
       Default Viewing Mode: Modalità di visualizzazione predefinita
       Theater: Teatro
+      Full Window (Always On): Finestra intera (sempre attiva)
+      Full Screen (Always On): Schermo intero (sempre attivo)
+      Tooltip: La maggior parte delle modalità di visualizzazione predefinite viene applicata solo all'inizio di ogni sessione di visione. Le modifiche apportate durante la sessione permangono fino alla sua conclusione. Le modalità di visualizzazione sempre attive vengono applicate ogni volta che si passa a un nuovo video, indipendentemente dalle modifiche apportate alla modalità di visualizzazione durante la visione del video precedente.
   Privacy Settings:
     Privacy Settings: 'Privacy'
     Remember History: 'Ricorda la Cronologia delle visualizzazioni'
@@ -442,7 +451,7 @@ Settings:
     Remember Search History: Ricorda la Cronologia delle ricerche
     Clear Search History and Cache: Cancella la Cronologia delle ricerche e la cache
     Watched Progress Saving Mode:
-      Tooltip: Automaico = Salva a ogni uscita dalla pagina video, quando il video è terminato e si è verificato un errore (ad esempio, ratelimited e sessione di visione scaduta). Semiautomatico = Come Automaico, tranne all'uscita dalla pagina video e può salvare manualmente i progressi tramite un pulsante denominato Salva i progressi guardati, situato sotto il lettore video.
+      Tooltip: Automatico = Salva a ogni uscita dalla pagina video, quando il video è terminato e si è verificato un errore (ad esempio, ratelimited e sessione di visione scaduta). Semiautomatico = Come Automatico, tranne all'uscita dalla pagina video e può salvare manualmente i progressi tramite un pulsante denominato Salva i progressi guardati, situato sotto il lettore video.
       Modes:
         Never: Mai
         Semi-auto: Semiautomatico
@@ -496,6 +505,15 @@ Settings:
     Export search history: Esporta cronologia ricerche
     All search history has been successfully imported: Tutta la cronologia ricerche è stata importata correttamente
     All search history has been successfully exported: Tutta la cronologia ricerche è stata esportata correttamente
+    Settings File: File delle impostazioni
+    Import Settings: Importa le impostazioni
+    Export Settings: Esporta le impostazioni
+    All settings have been successfully imported: Tutte le impostazioni sono state importate con sucesso
+    All settings have been successfully exported: Tutte le impostazioni sono state esportate con sucesso
+    Settings Tooltip: Le impostazioni specifiche del sistema operativo/utente o quelle sperimentali non possono essere esportate o importate (ad esempio, proxy, lettore esterno, cartella degli screenshot...)
+    Setting object has insufficient data, skipping item: L'oggetto delle impostazioni ha dati insufficienti, elemento saltato
+    Unknown setting key: 'Chiave delle impostazioni sconosciuta: {key}'
+    Non-transferable setting key: 'Chiave delle impostazioni non trasferibile: {key}'
   Distraction Free Settings:
     Hide Popular Videos: Nascondi i video più popolari
     Hide Trending Videos: Nascondi le tendenze
@@ -519,16 +537,16 @@ Settings:
     Hide Channels Placeholder: ID del canale
     Display Titles Without Excessive Capitalisation: Visualizza i titoli senza maiuscole e punteggiatura eccessive
     Hide Featured Channels: Nascondi i canali in evidenza
-    Hide Channel Playlists: Nascondi la scheda "Playlist" del canale
-    Hide Channel Shorts: Nascondi i "Video brevi" del canale
+    Hide Channel Playlists: Nascondi la scheda Playlist del canale
+    Hide Channel Shorts: Nascondi i Video brevi del canale
     Sections:
       General: Generale
       Watch Page: Pagina di visualizzazione
       Side Bar: Barra laterale
       Channel Page: Pagina del canale
       Subscriptions Page: Pagina delle iscrizioni
-    Hide Channel Podcasts: Nascondi la scheda "Podcast" del canale
-    Hide Channel Releases: Nascondi la scheda "Rilasci" del canale
+    Hide Channel Podcasts: Nascondi la scheda Podcast del canale
+    Hide Channel Releases: Nascondi la scheda Rilasci del canale
     Hide Subscriptions Live: Nascondi le iscrizioni dal vivo
     Hide Subscriptions Videos: Nascondi i video delle iscrizioni
     Hide Subscriptions Shorts: Nascondi le iscrizioni ai video brevi
@@ -539,10 +557,10 @@ Settings:
     Hide Channels API Error: Errore durante il recupero dell'utente con l'ID fornito. Controlla di nuovo se l'ID è corretto.
     Hide Videos, Playlists and Channels Containing Text: Nascondi i video e le playlist contenenti il testo
     Hide Videos, Playlists and Channels Containing Text Placeholder: Parola, frammento di parola o frase
-    Hide Channel Home: Nascondi la scheda "Pagina iniziale" del canale
+    Hide Channel Home: Nascondi la scheda Pagina iniziale del canale
     Show Added Items: Mostra elementi aggiunti
-    Hide Channel Courses: Nascondi la scheda "Corsi" del canale
-    Hide Channel Posts: Nascondi la scheda "Post" del canale
+    Hide Channel Courses: Nascondi la scheda Corsi del canale
+    Hide Channel Posts: Nascondi la scheda Post del canale
     Hide Subscriptions Posts: Nascondi i post delle iscrizioni
   The app needs to restart for changes to take effect. Restart and apply change?: L'app deve essere riavviata affinché le modifiche abbiano effetto. Riavviare e applicare la modifica?
   Proxy Settings:
@@ -593,6 +611,7 @@ Settings:
     Show Family Friendly Only: Mostra Solo per famiglie
     Hide Search Bar: Nascondi la barra di ricerca
     Hide Uploader on Watch page: Nascondi l'autore del caricamento dalla Pagina di visualizzazione
+    Disable Channel Links: Disabilita i collegamenti del canale
   Experimental Settings:
     Replace HTTP Cache: Sostituisci la cache HTTP
     Experimental Settings: Sperimentale
@@ -626,7 +645,6 @@ About:
   room rules: regole stanza
   Chat on Matrix: Chatta su Matrix
   Mastodon: Mastodon
-  Email: E-mail
   Website: Sito web
   Please check for duplicates before posting: Controlla se ci sono duplicati prima di pubblicare
   Source code: Codice sorgente
@@ -697,6 +715,7 @@ Channel:
   Courses:
     This channel does not currently have any courses: Questo canale al momento non ha corsi
     Courses: Corsi
+  View All: Vedi tutto
 Video:
   Mark As Watched: 'Contrassegna come guardato'
   Remove From History: 'Rimuovi dalla Cronologia'
@@ -797,7 +816,7 @@ Video:
     Playback will resume automatically when your connection comes back: La riproduzione riprenderà automaticamente quando verrà ripristinata la connessione.
     Skipped segment: Segmento {segmentCategory} saltato
     Autoplay is off: La riproduzione automatica è disattivata
-    Autoplay is on: La riproduzione automatica è attiva
+    Autoplay is on: La riproduzione automatica è attivata
   IP block: YouTube ha bloccato il tuo indirizzo IP impedendogli di guardare i video. Prova a passare a una VPN o a un proxy diverso.
   Unlisted: Non elencato
   MembersOnly: I video riservati agli abbonati non possono essere guardati con FreeTube, poiché richiedono l'accesso a Google e l'iscrizione a pagamento al canale dell'utente che li ha caricati.
@@ -813,6 +832,7 @@ Video:
     'Remaining preroll-ad time: {remindingTimeSeconds}s': "Tempo rimanente per l'annuncio preroll: {remindingTimeSeconds}s"
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Tempo di backoff SABR rimanente: {remindingTimeSeconds}s'
   Popout Live Chat: Chat popout
+  Private: Su FreeTube non è possibile guardare video privati, poiché richiedono l'accesso tramite account Google e la proprietà del video.
 Playlist:
   #& About
   View Full Playlist: 'Guarda playlist completa'
@@ -863,7 +883,6 @@ Mini Player: 'Mini visualizzatore'
 Comments:
   Comments: 'Commenti'
   Click to View Comments: 'Fai clic per vedere i commenti'
-  Getting comment replies, please wait: 'Sto scaricando le risposte ai commenti, per favore attendi'
   Hide Comments: 'Nascondi i commenti'
   # Context: View 10 Replies, View 1 Reply
   There are no comments available for this video: 'Non ci sono commenti disponibili per questo video'
@@ -881,6 +900,7 @@ Comments:
   Hide {replyCount} replies: Nascondi 1 risposta | Nascondi {replyCount} risposte
   View 1 reply from {channelName}: Visualizza 1 risposta da {channelName}
   View {replyCount} replies from {channelName} and others: Visualizza {replyCount} risposte da {channelName} e altri
+  Loading replies: Caricamento risposte...
 Up Next: 'Prossimi video'
 
 # Toast Messages
@@ -894,7 +914,7 @@ Shuffle is now disabled: 'La riproduzione casuale è disabilitata'
 Shuffle is now enabled: 'La riproduzione casuale è abilitata'
 Playing Next Video: 'Riproduzione del video successivo'
 Playing Previous Video: 'Riproduzione del video precedente'
-Canceled next video autoplay: 'Riproduzione automatica del prossimo video annullata'
+Canceled next video autoplay: 'Riproduzione automatica del video successivo annullata'
 'The playlist has ended. Enable loop to continue playing': 'La playlist è terminata. Abilita la riproduzione a ciclo continuo per continuare la riproduzione'
 
 Yes: 'Sì'
@@ -1111,3 +1131,5 @@ KeyboardShortcutPrompt:
 shortcutLabelSeparator: ｜
 Expand side navigation: Espandi la navigazione laterale
 Compact side navigation: Compatta la navigazione laterale
+Screenshot Clipboard Success: Screenshot salvato negli appunti
+Screenshot Clipboard Error: Impossibile copiare lo screenshot negli appunti

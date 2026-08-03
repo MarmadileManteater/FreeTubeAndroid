@@ -20,6 +20,7 @@ class BotGuardWebView @JvmOverloads constructor(
   BackgroundPlayWebView(context, attrs) {
     val jsInterface = BotGuardJavascriptInterface()
     init {
+      clearCache(true)
       @SuppressLint("SetJavaScriptEnabled")
       settings.javaScriptEnabled = true
       @Suppress("DEPRECATION")
