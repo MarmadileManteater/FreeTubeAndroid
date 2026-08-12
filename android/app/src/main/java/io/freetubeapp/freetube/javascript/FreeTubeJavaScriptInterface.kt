@@ -401,28 +401,33 @@ class FreeTubeJavaScriptInterface(
 
   // region Data Extraction
 
-  private fun getBotGuardScript(videoId: String, sessionContext: String, includeDebugMessage: Boolean = true): String {
+  private fun getBotGuardScript(
+    videoId: String,
+    sessionContext: String,
+    initialAttestationData: String,
+    ytConfig: String
+  ): String {
     val script = context.assets.readText("botGuardScript.js")
     val functionName = script.split("export{")[1].split(" as default};")[0]
     val exportSection = "export{${functionName} as default};"
-    val then = if (includeDebugMessage) {
-      "(TOKEN_RESULT) => { console.log(`Your potoken is \${TOKEN_RESULT}`); Android.returnToken(TOKEN_RESULT) }"
-    } else {
-      "(TOKEN_RESULT) => { Android.returnToken(TOKEN_RESULT) }"
-    }
     val bakedScript =
-      script.replace(exportSection, "; ${functionName}(\"$videoId\", $sessionContext).then($then)")
+      script.replace(exportSection, "; ${functionName}(\"$videoId\", $sessionContext, $initialAttestationData, $ytConfig)")
     return bakedScript
   }
 
   @JavascriptInterface
-  fun generatePOToken(videoId: String, sessionContext: String): String {
+  fun generatePOToken(
+    videoId: String,
+    sessionContext: String,
+    initialAttestationData: String,
+    ytConfig: String
+  ): String {
     return Promise(coroutineScope) { resolve, reject ->
       webView.post {
         try {
-          val bgScript = getBotGuardScript(videoId, sessionContext)
+          val bgScript = getBotGuardScript(videoId, sessionContext, initialAttestationData, ytConfig)
           val bgWv = webView.generateBgWebview()
-          bgWv.jsInterface.onReturnToken {
+          bgWv.jsInterface.onReturn {
             run {
               webView.post {
                 resolve(it)
@@ -430,30 +435,24 @@ class FreeTubeJavaScriptInterface(
               }
             }
           }
+          bgWv.jsInterface.onReject {
+            run {
+              webView.post {
+                reject(it)
+                bgWv.destroy()
+              }
+            }
+          }
           webView.post {
             bgWv.loadDataWithBaseURL(
               "https://www.youtube.com/",
-              "<script>\n" +
-                "window.ofetch = window.fetch\n" +
-                "window.fetch = async (url, data) => {\n" +
-                "  if (url.startsWith('https://www.google.com/')) {\n" +
-                "    return new Promise((resolve, _) => {" +
-                "    const script = document.createElement('script')\n" +
-                "    script.src = url\n" +
-                "    script.async = true\n" +
-                "    document.body.appendChild(script)\n" +
-                "     script.addEventListener('load', () => {\n" +
-                "       resolve({ text: () => '() => {}' })\n" +
-                "     })\n" +
-                "    })\n" +
-                "  }\n" +
-                "  const id = crypto.randomUUID()\n" +
-                "  if (data && 'body' in data) {" +
-                "    Android.queueBody(id, data.body)\n" +
-                "    data.headers['x-fta-request-id'] = id\n" +
-                "  }" +
-                "  return await window.ofetch(url, data)\n" +
-                "}</script><script>${bgScript}</script>",
+              "<!DOCTYPE html>" +
+                "<html lang=\"en\">" +
+                "<head>" +
+                "<title></title>" +
+                "</head>" +
+                "<body><script>${bgScript}.then((TOKEN_RESULT) => { console.log(`Your potoken is \${TOKEN_RESULT}`); Android.returnToken(TOKEN_RESULT) }).catch((error) => { Android.rejectToken(error.toString()) })</script></body>" +
+                "</html>",
               "text/html",
               "utf-8",
               null

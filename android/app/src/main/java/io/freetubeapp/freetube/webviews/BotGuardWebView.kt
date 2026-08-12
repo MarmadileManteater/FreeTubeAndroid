@@ -58,14 +58,6 @@ class BotGuardWebView @JvmOverloads constructor(
               setRequestProperty("Accept-Language", "*")
             }
 
-            if (headers != null && headers.containsKey("x-fta-request-id")) {
-              if (jsInterface.pendingRequestBodies.containsKey(headers["x-fta-request-id"])) {
-                val body = jsInterface.pendingRequestBodies[headers["x-fta-request-id"]]
-                jsInterface.pendingRequestBodies.remove(headers["x-fta-request-id"])
-                outputStream.write(body?.toByteArray())
-              }
-            }
-
             try {
               // 🧝‍♀️ magic
               return WebResourceResponse(this.contentType, this.contentEncoding, inputStream)

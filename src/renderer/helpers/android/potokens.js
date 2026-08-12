@@ -2,8 +2,8 @@ import android from 'android'
 import { awaitAsyncResult } from './jsinterface'
 import i18n from '../../i18n'
 
-export async function generatePOToken(videoId, sessionContext) {
-  const id = android.generatePOToken(videoId, sessionContext)
+export async function generatePOToken(videoId, sessionContext, initialAttestationData, ytConfig) {
+  const id = android.generatePOToken(videoId, sessionContext, initialAttestationData, ytConfig)
   return await awaitAsyncResult(id)
 }
 

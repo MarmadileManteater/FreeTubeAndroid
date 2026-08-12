@@ -612,9 +612,11 @@ export async function getLocalVideoInfo(id) {
   } else if (process.env.IS_ANDROID) {
     contentPoToken = await generatePOToken(
       id,
-      JSON.stringify(webInnertube.session.context)
+      JSON.stringify(htmlExtracts.session.context),
+      JSON.stringify(htmlExtracts.initialAttestationData),
+      JSON.stringify(htmlExtracts.ytConfig)
     )
-    webInnertube.session.player.po_token = contentPoToken
+    player.po_token = contentPoToken
   }
 
   let playerResponse

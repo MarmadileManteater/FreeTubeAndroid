@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import io.freetubeapp.freetube.R
 import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.helpers.WindowInsetsControllerWrapper
+import io.freetubeapp.freetube.helpers.spoofDesktopUserAgent
 import io.freetubeapp.freetube.javascript.FreeTubeJavaScriptInterface
 import io.freetubeapp.freetube.javascript.dispatchEvent
 import org.json.JSONObject
@@ -37,6 +38,7 @@ class FreeTubeWebView (
   }
 
   init {
+    spoofDesktopUserAgent()
     layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
     setBackgroundColor(Color.TRANSPARENT)
 

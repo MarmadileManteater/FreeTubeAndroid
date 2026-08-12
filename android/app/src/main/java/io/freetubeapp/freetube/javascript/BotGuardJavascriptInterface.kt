@@ -1,36 +1,32 @@
 package io.freetubeapp.freetube.javascript
 
 import android.webkit.JavascriptInterface
+import io.freetubeapp.freetube.helpers.Promise
 
 class BotGuardJavascriptInterface {
-  private var poToken: String? = null
-  private var tokenListeners: MutableList<(String) -> Unit> = mutableListOf()
-  val pendingRequestBodies: MutableMap<String, String> = mutableMapOf()
-
-  @JavascriptInterface
-  fun queueBody(id: String, body: String) {
-    pendingRequestBodies[id] = body
+  lateinit var resolve: (String) -> Unit
+  lateinit var reject: (String) -> Unit
+  var promise: Promise<String, String> = Promise {
+    resolve, reject ->
+      this.resolve = resolve
+      this.reject = reject
   }
 
   @JavascriptInterface
   fun returnToken(token: String) {
-    notify(token)
-    poToken = token
+    resolve(token)
   }
 
-  fun notify(token: String) {
-     tokenListeners.forEach {
-       it(token)
-     }
-    tokenListeners = mutableListOf()
+  @JavascriptInterface
+  fun rejectToken(error: String) {
+    reject(error)
   }
 
-  fun onReturnToken(callback: (String) -> Unit) {
-    val poToken = poToken
-    if (poToken != null) {
-      callback(poToken)
-    } else {
-      tokenListeners.add(callback)
-    }
+  fun onReturn(callback: (String) -> Unit) {
+    promise.then(callback)
+  }
+
+  fun onReject(callback: (String) -> Unit) {
+    promise.catch(callback)
   }
 }
