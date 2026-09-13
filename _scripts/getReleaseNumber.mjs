@@ -11,7 +11,7 @@ const [__, major, minor] = packageJSON.version.split('.')
 
 if (
   latestMajor == major &&
-  latestMinor
+  latestMinor == minor
 ) {
   console.log(parseInt(latestBuild) + 1)
 } else {
