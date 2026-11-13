@@ -128,7 +128,7 @@ Subscriptions:
     profile has a large number of subscriptions.  Forcing RSS to avoid rate limiting
   'Your Subscription list is currently empty. Start adding subscriptions to see them here.': Your Subscription list is currently empty. If you want to import your subscriptions you can go to Data Settings and select Import Subscriptions or you can search for a channel and subscribe to them.
   Disabled Automatic Fetching: You have disabled automatic subscription fetching. Refresh subscriptions to see them here.
-  Empty Channels: Your subscribed channels currently does not have any videos.
+  Empty Channels: Your subscribed channels currently do not have any videos.
   Empty Posts: Your subscribed channels currently do not have any posts.
   Load More Videos: Load More Videos
   Load More Posts: Load More Posts
@@ -161,6 +161,7 @@ User Playlists:
   Search bar placeholder: Search for Playlists
   Playlists with Matching Videos: Playlists with Matching Videos
 
+  This playlist is private or does not exist.: This playlist is private or does not exist.
   This playlist currently has no videos.: This playlist currently has no videos.
 
   Create New Playlist: Create New Playlist
@@ -467,8 +468,8 @@ Settings:
     Default Playback Rate: Default Playback Rate
     Max Video Playback Rate: Max Video Playback Rate
     Video Playback Rate Interval: Video Playback Rate Interval
-    Default Video Format:
-      Default Video Format: Default Video Format
+    Default Media Format:
+      Default Media Format: Default Media Format
       Dash Formats: DASH Formats
       Legacy Formats: Legacy Formats
       Audio Formats: Audio Formats
@@ -689,6 +690,11 @@ Settings:
       Prompt To Skip: Prompt To Skip
       Do Nothing: Do Nothing
     Category Color: Category Color
+    Excluded Channels:
+      Disabled Message: Some channels were excluded using ID and weren't processed. Feature is blocked while those IDs are updating
+      Excluded Channels: Excluded Channels
+      Tooltip: Enter a channel ID to have SponsorBlock disabled. Sponsor segments in videos from this channel won't be skipped.
+        The channel ID entered must be a complete match and is case sensitive.
   Parental Control Settings:
     Parental Control Settings: Parental Control
     Hide Unsubscribe Button: Hide Unsubscribe Button
@@ -802,8 +808,7 @@ Channel:
   View All: View All
   Videos:
     Videos: Videos
-    This channel does not currently have any videos: This channel does not currently
-      have any videos
+    This channel has videos but none could be displayed, try fetching more: This channel has videos but none could be displayed, try fetching more
     Sort Types:
       Newest: Newest
       Oldest: Oldest
@@ -844,6 +849,7 @@ Channel:
     Joined: Joined
     Location: Location
     Featured Channels: Featured Channels
+    Links: Links
   Posts:
     This channel currently does not have any posts: This channel currently does not have any posts
     votes: '{votes} votes'
@@ -852,7 +858,7 @@ Channel:
     Hide Answers: Hide Answers
     Video hidden by FreeTube: Video hidden by FreeTube
 Video:
-  IP block: 'YouTube has blocked your IP address from watching videos. Please try switching to a different VPN or proxy.'
+  IP block: 'YouTube has blocked your IP address from watching videos, or this video may contain content featuring minors that YouTube restricts access to for signed-out users. If this is an IP block, try switching to a different VPN or proxy.'
   MembersOnly: Members-only videos cannot be watched with FreeTube as they require Google login and paid membership to the uploader's channel.
   AgeRestricted: Age-restricted videos cannot be watched with FreeTube as they require Google login and using an age-verified YouTube account.
   DRMProtected: DRM protected videos cannot be played in FreeTube, as they require proprietary, closed source components. If you want to watch this video please watch it on the official YouTube website in a DRM enabled web browser.
@@ -879,6 +885,8 @@ Video:
   Copy Invidious Channel Link: Copy Invidious Channel Link
   Hide Channel: Hide Channel
   Unhide Channel: Show Channel
+  Enable SponsorBlock on Channel: Enable SponsorBlock on Channel
+  Disable SponsorBlock on Channel: Disable SponsorBlock on Channel
   Views: Views
   Loop Playlist: Loop Playlist
   Shuffle Playlist: Shuffle Playlist
@@ -895,7 +903,11 @@ Video:
   Premieres: Premieres
   Upcoming: Upcoming
   Unlisted: Unlisted
+  AI: AI
+  'AI: Content was made with AI': 'AI: Content was made with AI'
+  How this was made: How this was made
   Station: Station
+  Premiere: Premiere
   Live: Live
   Live Now: Live Now
   Live Chat: Live Chat
@@ -916,6 +928,7 @@ Video:
   Published on: Published on
   Streamed on: Streamed on
   Started streaming on: Started streaming on
+  Reload Page: Reload Page
   DeArrow:
     Show Original Details: Show Original Details
     Show Modified Details: Show Modified Details
@@ -1087,7 +1100,7 @@ Tooltips:
   Player Settings:
     Proxy Videos Through Invidious: Will connect to Invidious to serve videos instead
       of making a direct connection to YouTube.
-    Default Video Format: Set the formats used when a video plays. DASH formats can
+    Default Media Format: Set the formats used when a video plays. DASH formats can
       play higher qualities. Legacy formats are limited to a max of 360p but use less
       bandwidth. Audio formats are audio only streams.
     Scroll Playback Rate Over Video Player: While the cursor is over the video, press and
@@ -1161,6 +1174,8 @@ Screenshot Error: Screenshot failed. {error}
 Screenshot Clipboard Error: Screenshot copy to clipboard failed
 Channel Hidden: '{channel} added to channel filter'
 Channel Unhidden: '{channel} removed from channel filter'
+SponsorBlock Disabled on Channel: 'SponsorBlock disabled on {channel}'
+SponsorBlock Enabled on Channel: 'SponsorBlock enabled on {channel}'
 Trimmed input must be at least N characters long: Trimmed input must be at least 1 character long | Trimmed input must be at least {length} characters long
 Tag already exists: '"{tagName}" tag already exists'
 

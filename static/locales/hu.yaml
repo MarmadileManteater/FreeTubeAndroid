@@ -200,6 +200,7 @@ User Playlists:
   Export list of URLs: Webcímek listába történő exportálása
   Move Video to the Top: Videó áthelyezése az elejére
   Move Video to the Bottom: Videó áthelyezése a végére
+  This playlist is private or does not exist.: Ez a lejátszási lista privát vagy nem létezik.
 History:
   # On History Page
   History: 'Előzmények'
@@ -386,11 +387,11 @@ Settings:
     Enable Theatre Mode by Default: 'A mozimód bekapcsolása alapértelmezetten'
     Default Volume: 'Alapértelmezett hangerő'
     Default Playback Rate: 'Alapértelmezett lejátszási sebesség'
-    Default Video Format:
-      Default Video Format: 'Alapértelmezett videóformátum'
+    Default Media Format:
       Dash Formats: 'DASH-formátumok'
       Legacy Formats: 'Örökölt formátumok'
       Audio Formats: 'Hangformátumok'
+      Default Media Format: Alapértelmezett médiaformátum
     Default Quality:
       Default Quality: 'Alapértelmezett felbontás'
       Auto: 'Automatikus'
@@ -477,7 +478,7 @@ Settings:
     Import Subscriptions: 'Feliratkozások importálása'
     Export Subscriptions: 'Feliratkozások exportálása'
     Export FreeTube: 'FreeTube exportálása'
-    Export YouTube: 'YouTube exportálása'
+    Export YouTube: 'YouTube-formátumba exportálás'
     Export NewPipe: 'NewPipe exportálása'
     Import History: 'Előzmények importálása'
     Export History: 'Előzmények exportálása'
@@ -605,6 +606,10 @@ Settings:
     UseDeArrowTitles: DeArrow-videócímek használata
     'DeArrow Thumbnail Generator API Url (Default is https://dearrow-thumb.ajay.app)': 'DeArrow előnézet-előállító API webcíme (alapértelmezett: https://dearrow-thumb.ajay.app)'
     UseDeArrowThumbnails: DeArrow használata bélyegképekhez
+    Excluded Channels:
+      Disabled Message: Néhány csatorna azonosító (ID) alapján ki lett zárva, ezért nem lettek feldolgozva. A funkció le van tiltva, amíg ezek az azonosítók frissülnek
+      Excluded Channels: Kizárt csatornák
+      Tooltip: Adjon meg egy csatornaazonosítót (ID-t), amelynél le szeretné tiltani a SponsorBlockot. Az adott csatorna videóiban található szponzori szegmensek nem lesznek átugorva. A megadott csatornaazonosítónak teljes egyezésűnek kell lennie, és a kis- és nagybetűk különböznek.
   External Player Settings:
     Ignore Unsupported Action Warnings: Nem támogatott műveletek figyelmeztetéseinek mellőzése
     Custom External Player Arguments: Egyéni külső lejátszó argumentumok
@@ -720,11 +725,11 @@ Channel:
   Your search results have returned 0 results: 'Keresési eredmény: 0 találat'
   Videos:
     Videos: 'Videók'
-    This channel does not currently have any videos: 'Ebben a csatornában jelenleg nincsenek videók'
     Sort Types:
       Newest: 'Legújabb'
       Oldest: 'Legrégebbi'
       Most Popular: 'Legnépszerűbb'
+    This channel has videos but none could be displayed, try fetching more: Ez a csatorna tartalmaz videókat, de egyik sem jeleníthető meg, további videók lekérése
   Playlists:
     Playlists: 'Lejátszási listák'
     This channel does not currently have any playlists: 'Ennek a csatornának jelenleg nincsenek lejátszási listái'
@@ -742,6 +747,7 @@ Channel:
     Tags:
       Tags: Címkék
       Search for: „{tag}” címke keresése
+    Links: Hivatkozások
   This channel is age-restricted and currently cannot be viewed in FreeTube.: Ez a csatorna korhatáros, és jelenleg nem tekinthető meg a FreeTube alkalmazásban.
   Channel Tabs: Csatornalapok
   Live:
@@ -873,7 +879,7 @@ Video:
     Playback will resume automatically when your connection comes back: A lejátszás automatikusan folytatódik, amikor a kapcsolat helyreáll.
     Autoplay is off: Az automatikus lejátszás ki van kapcsolva
     Autoplay is on: Az automatikus lejátszás be van kapcsolva
-  IP block: A YouTube letiltotta az IP-címét a videók megtekintéséhez. Próbáljon meg másik VPN-re vagy proxyra váltani.
+  IP block: A YouTube letiltotta az IP-címéről történő videómegtekintést, vagy előfordulhat, hogy a videó olyan tartalmat tartalmaz, amelyben kiskorúak szerepelnek, és amelyhez a YouTube korlátozza a hozzáférést a bejelentkezés nélkül használók számára. Ha IP-cím alapú tiltásról van szó, akkor próbáljon meg másik VPN-re vagy proxyra váltani.
   Unlisted: Listázatlan
   AgeRestricted: A FreeTube-on nem lehet korhatáros videókat megtekinteni, mivel ezekhez Google-bejelentkezés és korhatár-ellenőrzött YouTube-fiók használata szükséges.
   MembersOnly: A csak tagoknak szóló videók nem tekinthetők meg a FreeTube-on, mivel ezekhez Google-bejelentkezés és fizetett tagság szükséges a feltöltő csatornájához.
@@ -894,6 +900,13 @@ Video:
   Station: Állomás
   Playlist:
     Unavailable videos are hidden: 1 nem elérhető videó el van rejtve | {count} nem elérhető videó el van rejtve
+  Premiere: Premier
+  Enable SponsorBlock on Channel: SponsorBlock engedélyezése a csatornán
+  Disable SponsorBlock on Channel: SponsorBlock letiltása a csatornán
+  AI: MI
+  'AI: Content was made with AI': 'MI: A tartalom mesterséges intelligencia felhasználásával készült'
+  How this was made: Hogyan készült ez
+  Reload Page: Oldal újratöltése
 Playlist:
   #& About
   View Full Playlist: 'Teljes lejátszási lista megtekintése'
@@ -998,8 +1011,8 @@ Tooltips:
     Fetch Feeds from RSS: Amikor engedélyezve van, a FreeTube az RSS-t fogja használni az alapértelmezett módszer helyett a feliratkozási hírfolyam lekérdezéséhez. Az RSS gyorsabb és megakadályozza az IP-tiltást, de nem tartalmaz bizonyos információkat, például a videó időtartamát, az élő állapotot vagy a bejegyzéseket
     Fetch Automatically: Ha engedélyezve van, a FreeTube automatikusan lekéri a feliratkozási hírcsatornát indításkor, valamint új ablak megnyitásakor.
   Player Settings:
-    Default Video Format: A videóhoz használt formátumok beállítása. A DASH-formátumok magasabb minőségű lejátszást tesznek lehetővé. A régebbi formátumok legfeljebb 360p felbontásúak, de kevesebb sávszélességet igényelnek. A hangformátumok kizárólag hangadatfolyamokat tartalmaznak.
-    Proxy Videos Through Invidious: A videók lejátszásához a YouTube helyett az Invidioushoz csatlakozik.
+    Default Media Format: A videóhoz használt formátumok beállítása. A DASH-formátumok magasabb minőségű lejátszást tesznek lehetővé. A régebbi formátumok legfeljebb 360p felbontásúak, de kevesebb sávszélességet igényelnek. A hangformátumok kizárólag hangadatfolyamokat tartalmaznak.
+    Proxy Videos Through Invidious: A videók lejátszásához a YouTube helyett az Invidioust használja.
     Scroll Playback Rate Over Video Player: Amíg a kurzor a videó felett van, nyomja meg és tartsa lenyomva a Control billentyűt (Mac számítógépen a Command billentyű), és görgesse az egér görgőjét előre vagy hátra a lejátszási sebesség szabályozásához. Tartsa lenyomva a Control billentyűt (Mac számítógépen a Command billentyű), majd kattintson az egér bal gombjával az alapértelmezett lejátszási sebesség gyors visszatéréséhez (1x, hacsak nem módosították a beállításokban).
     Skip by Scrolling Over Video Player: Használja az egérgörgőt a videóban való előre- és visszaugráshoz, MPV-stílusban.
   External Player Settings:
@@ -1157,3 +1170,5 @@ Compact side navigation: Kompakt oldalsó navigáció
 Expand side navigation: Oldalsó navigáció kibontása
 Screenshot Clipboard Success: Képernyőkép mentve a vágólapra
 Screenshot Clipboard Error: Nem sikerült a képernyőképet a vágólapra másolni
+SponsorBlock Disabled on Channel: 'A SponsorBlock letiltva ennél a csatornánál: {channel}'
+SponsorBlock Enabled on Channel: 'A SponsorBlock engedélyezett ennél a csatornánál: {channel}'

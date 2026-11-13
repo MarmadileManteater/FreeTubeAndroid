@@ -2,7 +2,7 @@ import {
   app, BrowserWindow, dialog, Menu, ipcMain,
   powerSaveBlocker, screen, session, shell,
   nativeTheme, net, protocol, clipboard,
-  Tray
+  Tray, ClipboardItem,
 } from 'electron'
 import path from 'path'
 import cp from 'child_process'
@@ -138,12 +138,17 @@ function runApp() {
         }
       }
 
-      const copy = (url) => {
+      const copy = async (url) => {
         if (parameters.linkText) {
-          clipboard.write({
-            bookmark: parameters.linkText,
-            text: url
-          })
+          await clipboard.write([
+            new ClipboardItem({
+              'text/plain': url,
+              'electron application/bookmark': {
+                title: parameters.linkText,
+                url,
+              },
+            })
+          ])
         } else {
           clipboard.writeText(url)
         }
@@ -223,22 +228,22 @@ function runApp() {
         {
           label: 'Copy Lin&k',
           visible: visible && !isInAppUrl,
-          click: () => {
-            copy(parameters.linkURL)
+          click: async () => {
+            await copy(parameters.linkURL)
           }
         },
         {
           label: 'Copy YouTube Link',
           visible: visible && isInAppUrl,
-          click: () => {
-            copy(transformURL(true))
+          click: async () => {
+            await copy(transformURL(true))
           }
         },
         {
           label: 'Copy Invidious Link',
           visible: visible && isInAppUrl && (backendPreference === 'invidious' || backendFallback),
-          click: () => {
-            copy(transformURL(false))
+          click: async () => {
+            await copy(transformURL(false))
           }
         },
         // Only show search in new window for
@@ -608,9 +613,14 @@ function runApp() {
         requestHeaders['Sec-Fetch-Mode'] = 'navigate'
         requestHeaders['Sec-Fetch-Site'] = 'none'
         requestHeaders['Sec-Fetch-User'] = '?1'
-        requestHeaders.Cookie = requestHeaders.Cookie
-          ? requestHeaders.Cookie + `;PREF=tz=${Intl.DateTimeFormat().resolvedOptions().timeZone.replace('/', '.')}`
-          : ''
+
+        if (requestHeaders['X-Cookie']) {
+          requestHeaders.Cookie = requestHeaders.Cookie
+            ? requestHeaders.Cookie + ';' + requestHeaders['X-Cookie']
+            : requestHeaders['X-Cookie']
+
+          delete requestHeaders['X-Cookie']
+        }
       } else if (url === 'https://www.youtube.com/sw.js_data' || url.startsWith('https://www.youtube.com/api/timedtext')) {
         requestHeaders.Referer = 'https://www.youtube.com/sw.js'
         requestHeaders['Sec-Fetch-Site'] = 'same-origin'
@@ -648,7 +658,8 @@ function runApp() {
       urls: [
         'https://www.youtube.com/sw.js_data',
         'https://www.youtube.com/iframe_api',
-        'https://www.youtube.com/watch?*'
+        'https://www.youtube.com/watch?*',
+        'https://www.youtube.com/',
       ]
     }
 
@@ -1106,16 +1117,7 @@ function runApp() {
 
       newWindow.on('minimize', () => {
         if (trayOnMinimize) {
-          // Workaround for https://github.com/electron/electron/issues/49253
-          if (process.platform === 'linux') {
-            setTimeout(() => {
-              newWindow.restore()
-              newWindow.hide()
-            }, 100)
-          } else {
-            newWindow.hide()
-          }
-
+          newWindow.hide()
           manageTray(newWindow)
 
           if (newWindow === mainWindow) {
