@@ -36,11 +36,6 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        use: 'babel-loader',
-        exclude: /node_modules/,
-      },
-      {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
@@ -88,10 +83,6 @@ const config = {
             use: path.join(__dirname, 'patch-shaka-player-loader.js')
           }
         ]
-      },
-      {
-        test: /\.html$/,
-        use: 'vue-html-loader',
       },
       {
         test: /\.(png|jpe?g|gif|tif?f|bmp|webp|svg)(\?.*)?$/,

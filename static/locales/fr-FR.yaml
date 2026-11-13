@@ -192,6 +192,7 @@ User Playlists:
   Export list of URLs: Exporter la liste des URL
   Move Video to the Top: Déplacer la vidéo au début
   Move Video to the Bottom: Déplacer la vidéo à la fin
+  This playlist is private or does not exist.: Cette playlist est privée ou n’existe pas.
 History:
   # On History Page
   History: 'Historique'
@@ -378,11 +379,11 @@ Settings:
     Enable Theatre Mode by Default: 'Activer le mode cinéma par défaut'
     Default Volume: 'Volume par défaut'
     Default Playback Rate: 'Vitesse de lecture par défaut'
-    Default Video Format:
-      Default Video Format: 'Format de vidéo par défaut'
+    Default Media Format:
       Dash Formats: 'Formats DASH'
       Legacy Formats: 'Format Legacy'
       Audio Formats: 'Formats audio'
+      Default Media Format: Format du média par défaut
     Default Quality:
       Default Quality: 'Qualité par défaut'
       Auto: 'Auto'
@@ -597,6 +598,10 @@ Settings:
     UseDeArrowTitles: Utiliser DeArrow pour les titres des vidéos
     UseDeArrowThumbnails: Utiliser DeArrow pour les miniatures
     'DeArrow Thumbnail Generator API Url (Default is https://dearrow-thumb.ajay.app)': "URL de l'API du générateur de miniatures DeArrow (par défaut : https://dearrow-thumb.ajay.app)"
+    Excluded Channels:
+      Disabled Message: Certaines chaînes ont été exclues sur la base de leur identifiant et n'ont pas été traitées. La fonctionnalité est bloquée pendant la mise à jour de ces identifiants.
+      Excluded Channels: Chaînes exclues
+      Tooltip: Saisissez l'identifiant d'une chaîne pour désactiver SponsorBlock. Les segments publicitaires dans les vidéos de cette chaîne ne seront pas ignorés. L'identifiant de chaîne saisi doit correspondre exactement et tient compte de la casse.
   External Player Settings:
     Ignore Unsupported Action Warnings: Ignorer les avertissements concernant les actions non prises en charge
     External Player: Lecteur externe
@@ -667,11 +672,11 @@ Channel:
   Your search results have returned 0 results: 'Les résultats de votre recherche ont donné 0 résultat'
   Videos:
     Videos: 'Vidéos'
-    This channel does not currently have any videos: 'Cette chaîne n''a pas de vidéos actuellement'
     Sort Types:
       Newest: 'Plus récent'
-      Oldest: 'Plus ancien'
+      Oldest: 'Plus anciennes'
       Most Popular: 'Les plus populaires'
+    This channel has videos but none could be displayed, try fetching more: Cette chaîne a des vidéos mais aucune n'a pu être affichée, tenter d'en récupérer davantage
   Playlists:
     Playlists: 'Playlists'
     This channel does not currently have any playlists: 'Cette chaîne n’a pas encore de playlist'
@@ -717,7 +722,7 @@ Channel:
     This channel does not currently have any podcasts: Cette chaîne n’a pas encore de podcast
   Home:
     Home: Accueil
-    View Playlist: Afficher la playlist
+    View Playlist: Afficher playlist
   Courses:
     Courses: Cours
     This channel does not currently have any courses: Cette chaîne n'a actuellement pas de cours
@@ -823,7 +828,7 @@ Video:
     Playback will resume automatically when your connection comes back: La lecture reprendra automatiquement quand votre connexion reviendra.
     Autoplay is on: La lecture automatique est activée
     Autoplay is off: La lecture automatique est désactivée
-  IP block: YouTube a bloqué votre adresse IP pour le visionnage de vidéos. Veuillez essayer de changer de VPN ou de proxy.
+  IP block: YouTube a bloqué votre adresse IP et vous empêche de regarder des vidéos, ou bien cette vidéo contient peut-être du contenu mettant en scène des mineurs, dont YouTube restreint l'accès aux utilisateurs non connectés. S'il s'agit d'un blocage d'adresse IP, essayez d'utiliser un autre VPN ou un autre proxy.
   Unlisted: Non répertorié
   AgeRestricted: Les vidéos soumises à des restrictions d'âge ne peuvent pas être regardées avec FreeTube car elles nécessitent une connexion Google et l'utilisation d'un compte YouTube dont l'âge a été vérifié.
   MembersOnly: Les vidéos réservées aux membres ne peuvent pas être visionnées avec FreeTube, car elles nécessitent une connexion Google et une adhésion payante à la chaîne du vidéaste.
@@ -844,6 +849,13 @@ Video:
   Station: Chaîne
   Playlist:
     Unavailable videos are hidden: 1 vidéo non disponible est masquée | {count} vidéos non disponibles sont masquées
+  Premiere: Première
+  Enable SponsorBlock on Channel: Activer SponsorBlock sur la chaîne
+  Disable SponsorBlock on Channel: Désactiver SponsorBlock sur la chaîne
+  AI: IA
+  'AI: Content was made with AI': "IA : Ce contenu a été créé à l'aide de l'IA"
+  How this was made: Comment cela a été réalisé
+  Reload Page: Recharger page
 Playlist:
   #& About
   View Full Playlist: 'Afficher la playlist complète'
@@ -867,7 +879,7 @@ Playlist:
     PublishedOldest: Date de publication (la plus ancienne)
   Unavailable videos are hidden: Les vidéos non disponibles sont masquées
 Change Format:
-  Change Media Formats: 'Changer le format de la vidéo'
+  Change Media Formats: 'Changer le format du média'
   Use Dash Formats: 'Utiliser le format DASH'
   Use Legacy Formats: 'Utiliser le format Legacy'
   Use Audio Formats: 'Utiliser le format Audio'
@@ -984,7 +996,7 @@ Tooltips:
     Fetch Feeds from RSS: Lorsqu'il est activé, FreeTube utilisera RSS au lieu de sa méthode par défaut pour récupérer votre flux d'abonnement. RSS est plus rapide et empêche le blocage d'IP, mais ne fournit pas certaines informations comme la durée de la vidéo, le statut en direct ou les posts
     Fetch Automatically: Lorsque cette option est activée, FreeTube récupère automatiquement le flux de votre abonnement au démarrage et à l'ouverture d'une nouvelle fenêtre.
   Player Settings:
-    Default Video Format: Définir les formats utilisés lors de la lecture d'une vidéo. Les formats DASH peuvent être lus en qualité supérieure. Les formats Legacy sont limités à un maximum de 360p mais utilisent moins de bande passante. Les formats audio sont des flux audio uniquement.
+    Default Media Format: Définir les formats utilisés lors de la lecture d'une vidéo. Les formats DASH peuvent être lus en qualité supérieure. Les formats Legacy sont limités à un maximum de 360p mais utilisent moins de bande passante. Les formats audio sont des flux audio uniquement.
     Proxy Videos Through Invidious: Se connectera à Invidious pour lire des vidéos au lieu d'établir une connexion directe avec YouTube.
     Scroll Playback Rate Over Video Player: Lorsque le curseur se trouve sur la vidéo, maintenez la touche Contrôle (touche Commande sur Mac) enfoncée et faites défiler la molette de la souris vers l'avant ou l'arrière pour contrôler la vitesse de lecture. Maintenez la touche Contrôle (touche Commande sur Mac) enfoncée et cliquez sur le bouton gauche de la souris pour revenir rapidement à la vitesse de lecture par défaut (1x, sauf si elle a été modifiée dans les paramètres).
     Skip by Scrolling Over Video Player: Utilisez la molette de défilement pour passer d'une vidéo à l'autre, en style MPV.
@@ -1152,3 +1164,5 @@ Compact side navigation: Navigation latérale compacte
 Expand side navigation: Développer la navigation latérale
 Screenshot Clipboard Error: Échec de la copie de l'écran vers le presse-papier
 Screenshot Clipboard Success: Copie d'écran enregistrée dans le presse-papier
+SponsorBlock Disabled on Channel: SponsorBlock est désactivé sur {channel}
+SponsorBlock Enabled on Channel: SponsorBlock est activé sur {channel}

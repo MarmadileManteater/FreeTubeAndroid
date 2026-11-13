@@ -21,7 +21,7 @@ Zoom out: 'Zoum bihanaat'
 Toggle fullscreen: 'Tremen e skramm leun'
 Window: 'Prenestr'
 Minimize: 'Izekaat'
-Close: 'Seriñ'
+Close: 'Serriñ'
 Back: 'Distreiñ'
 Forward: 'War-raok'
 Open New Window: 'Digeriñ ur prenestr nevez'
@@ -77,7 +77,7 @@ Search Filters:
     Prioritize: Prioriziñ
     Popularity: Dre vrud
   Time:
-    Time: 'Padelezh'
+    Time: 'Deiziad'
     Any Time: 'A-holl-viskoaz'
     Today: 'Hiziv'
     This Week: 'Ar sizhun-mañ'
@@ -256,6 +256,7 @@ User Playlists:
   Export list of URLs: Ezporzhiañ roll an URLoù
   Move Video to the Top: Kas ar Video en Nec’h
   Move Video to the Bottom: Kas ar Video en Traoñ
+  This playlist is private or does not exist.: Prevez eo ar roll-videoioù-mañ pe n'eus ket anezhañ.
 History:
   # On History Page
   History: 'Roll istor'
@@ -455,11 +456,11 @@ Settings:
     Default Playback Rate: 'Feur lenn dre ziouer'
     Max Video Playback Rate: 'Feur lenn uhelañ ar videoioù'
     Video Playback Rate Interval: 'Esaouenn feur lenn ar videoioù'
-    Default Video Format:
-      Default Video Format: 'Furmad video dre ziouer'
-      Dash Formats: 'Furmad DASH'
-      Legacy Formats: 'Furmad Legacy'
+    Default Media Format:
+      Dash Formats: 'Furmadoù DASH'
+      Legacy Formats: 'Furmadoù Legacy'
       Audio Formats: 'Furmadoù son'
+      Default Media Format: Furmad ar media dre ziouer
     Default Quality:
       Default Quality: 'Kalite dre ziouer'
       Auto: 'Emgefreek'
@@ -682,6 +683,10 @@ Settings:
       Prompt To Skip: 'Kinnig da laoskel a-gostez'
       Do Nothing: 'Ober netra'
     Category Color: 'Liv ar rummad'
+    Excluded Channels:
+      Excluded Channels: Chadennoù ezlakaet
+      Disabled Message: Chadennoù 'zo bet laosket da gostez hervez o ID ha n'int ket bet kemeret e kont. Stanket eo an arc’hweladur-mañ e-pad hizivadur an ID-se
+      Tooltip: Lakait ID ur chadenn evit diweredekaat SponsorBlock. Ne vo ket tremenet hebiou ar bruderezh evit ar chadenn-mañ. Ret eo d'an ID bezañ klot ha ret eo doujañ d'ar pennlizherennoù.
   Parental Control Settings:
     Parental Control Settings: 'Kontroll ar gerent'
     Hide Unsubscribe Button: 'Kuzhat ar bouton digoumanantiñ'
@@ -786,11 +791,11 @@ Channel:
   Channel Tabs: 'Ivinelloù ar chadenn'
   Videos:
     Videos: 'Videoioù'
-    This channel does not currently have any videos: 'N''eus ket a video evit poent gant ar chadenn-mañ'
     Sort Types:
       Newest: 'Nevesañ'
       Oldest: 'Koshañ'
       Most Popular: 'Ar muiañ a verzh ganto'
+    This channel has videos but none could be displayed, try fetching more: Videoioù a zo e-barzh ar chadenn-mañ, met hini ne c'hall bezañ diskouezet, klaskit diskouez muioc'h
   Shorts:
     This channel does not currently have any shorts: 'N''eus ket a video short evit poent gant ar chadenn-mañ'
   Live:
@@ -819,6 +824,7 @@ Channel:
     Joined: 'Enskrivet'
     Location: 'Lec''hiadur'
     Featured Channels: 'Chadennoù lakaet war-wel'
+    Links: Liammoù
   Posts:
     This channel currently does not have any posts: 'N''eus ket a gaozeadenn evit poent gant ar chadenn-mañ'
     votes: '{votes} a vouezhioù'
@@ -835,7 +841,7 @@ Channel:
     This channel does not currently have any courses: Ar chadenn-mañ n'eus kentel ebet evit poent
   View All: Gwelet an holl
 Video:
-  IP block: 'Stanket eo bet ho chomlec''h IP gant YouTube. Klaskit cheñch VPN pe proksi evit lenn ar videoioù.'
+  IP block: 'Stanket eo bet ho chomlec''h IP gant YouTube, pe e c''hall ar video-mañ kavout tud dindan oad ennañ ha ne vez ket aotreet d''an implijerien n''int ket kennasket gant o c''hont. Ma vez stanket ar chomlec''h IP, klaskit cheñch VPN pe proksi.'
   More Options: 'Muioc''h a zibarzhioù'
   Mark As Watched: 'Lakaat evel lennet'
   Remove From History: 'Skarzhañ deus ar roll istor'
@@ -956,6 +962,13 @@ Video:
   Station: Roll videoioù war-eeun
   Playlist:
     Unavailable videos are hidden: 1 video dihergez a zo kuzhet | {count} video dihergez a zo kuzhet
+  Enable SponsorBlock on Channel: Gweredekaat SponsorBlock war ar Chadenn-mañ
+  Disable SponsorBlock on Channel: Diweredekaat SponsorBlock war ar Chadenn-mañ
+  Premiere: Rakskignañ
+  AI: IA
+  'AI: Content was made with AI': 'IA : Krouet eo bet gant Intent Artifisiel'
+  How this was made: Penaos eo bet krouet
+  Reload Page: Adkargañ ar bajenn
 Playlist:
   #& About
   Playlist: 'Roll-videoioù'
@@ -1055,7 +1068,7 @@ Tooltips:
     Open Deep Links In New Window: An URLoù kaset da FreeTube gant askouezhioù ur merdeer web pe roet war arroudenn an arc'had, a vo digoret e-barzh ur prenestr nevez.
   Player Settings:
     Proxy Videos Through Invidious: 'Kevreañ a raio ouzh Invidious evit mont da gerc''hat ar videoioù e-lec''h kevreañ war-eeun ouzh YouTube.'
-    Default Video Format: 'Arventennañ ar furmadoù implijet pa vez lennet ur video. Ar furmadoù DASH a c''hell bezañ lennet gant ur c''halite uheloc''h. Bevennet eo ar furmadoù Legacy da 360p d''ar muiañ met nebeutoc''h a vann- drafet a vez implijet. Ar furmadoù aodio zo lanvioù aodio hepken.'
+    Default Media Format: 'Arventennañ ar furmadoù implijet pa vez lennet ur video. Ar furmadoù DASH a c''hell bezañ lennet gant ur c''halite uheloc''h. Bevennet eo ar furmadoù Legacy da 360p d''ar muiañ met nebeutoc''h a vann- drafet a vez implijet. Ar furmadoù aodio zo lanvioù aodio hepken.'
     Scroll Playback Rate Over Video Player: 'Pa vez ar biz-red war ar video, dalc''hit pouezet war an douchenn Ctrl (Command war Mac) ha dibunit rodellig al logodenn war-raok pe war-gil evit cheñch ar feur lenn. Dalc''hit pouezet war an douchenn Ctrl (Command war Mac) ha klikit war bouton kleiz al logodenn a-benn distreiñ buan d''ar feur lenn dre ziouer (1x, nemet ma ''z eo bet kemmet en arventennoù).'
     Skip by Scrolling Over Video Player: 'Tremen d''ur video d''egile en ur zibunañ rodellig al logodenn war al lenner video, doare MPV.'
   External Player Settings:
@@ -1201,3 +1214,5 @@ Expand side navigation: Astenn ar merdeiñ kostez
 Compact side navigation: Fetisaat ar merdeiñ kostez
 Screenshot Clipboard Success: Enrollet eo an dapadenn-skramm er golver
 Screenshot Clipboard Error: C'hwitet war enrollañ an dapadenn-skramm er golver
+SponsorBlock Disabled on Channel: Diweredekaet eo SponsorBlock war chadenn {channel}
+SponsorBlock Enabled on Channel: Gweredekaet eo SponsorBlock war chadenn {channel}

@@ -191,6 +191,7 @@ User Playlists:
       There was an issue with creating the playlist.: Estis problemo dum la kreado de la ludlisto.
   Move Video to the Top: Movi videaĵon al la supro
   Move Video to the Bottom: Movi videaĵon al la malsupro
+  This playlist is private or does not exist.: Tiu ĉu ludlisto estas privata aŭ ne ekzistas.
 History:
   # On History Page
   History: 'Historio'
@@ -393,11 +394,11 @@ Settings:
     Default Playback Rate: Defaŭlta ludrapido
     Max Video Playback Rate: Maksimuma ludrapido
     Video Playback Rate Interval: Ludrapida intervalo
-    Default Video Format:
-      Default Video Format: Defaŭlta videaĵoformo
+    Default Media Format:
       Dash Formats: DASH-aj formoj
       Legacy Formats: Heredaĵaj formoj
       Audio Formats: Aŭdiaj formoj
+      Default Media Format: Defaŭlta medioformo
     Default Quality:
       Default Quality: Defaŭlta kvalito
       Auto: Aŭtomata
@@ -598,6 +599,10 @@ Settings:
       Prompt To Skip: Inviti por salti
       Do Nothing: Nenion fari
     Category Color: Koloro de kategorio
+    Excluded Channels:
+      Disabled Message: Kelkaj kanaloj estis ekskluzivitaj per identigilo kaj ne estis traktataj. La funkcio estas blokita dum tiuj identigiloj ĝisdatiĝas
+      Excluded Channels: Ekskluzivitaj kanaloj
+      Tooltip: Enigu kanalan identigilon por malŝalti SponsorBlock. Sponsoraj sekcioj en la videaĵoj de tiu ĉi kanalo ne estos saltitaj. La enigita kanala identigilo devas tute kongrui, majuskleco inkluzivita.
   Parental Control Settings:
     Parental Control Settings: Gepatraj enhavlimigoj
     Hide Unsubscribe Button: Kaŝi butonon de malaboni
@@ -609,6 +614,7 @@ Settings:
     Experimental Settings: Eksperimenta
     Warning: Ĉi tiuj agordoj estas eksperimentaj kaj povus kaŭzi kolapsojn dum ŝaltitaj. Savkopioj ege farindas. Vi estas avertita!
     Replace HTTP Cache: Anstataŭigi HTTP-kaŝmemoron
+    Disable Hardware Acceleration: Malŝalti aparatan plirapidigon
   Password Dialog:
     Password: Pasvorto
     Enter Password To Unlock: Enigu pasvorton por malŝlosi agordojn
@@ -656,11 +662,11 @@ Channel:
     Featured Channels: Rekomenditaj kanaloj
   Videos:
     Videos: Videaĵoj
-    This channel does not currently have any videos: Tiu ĉi kanalo aktuale ne havas iun ajn videaĵon
     Sort Types:
       Newest: Plej novaj
       Oldest: Plej malnovaj
       Most Popular: Plej popularaj
+    This channel has videos but none could be displayed, try fetching more: Ĉi tiu kanalo havas videaĵojn sed ne eblis montri iun ajn; provu plu venigi
   Subscribe: Aboni
   Unsubscribe: Malaboni
   Channel has been removed from your subscriptions: La kanalo estis forigita el viaj abonoj
@@ -821,6 +827,15 @@ Video:
   Collapse Playlist: Faldi ludliston
   Expand Playlist: Malfaldi ludliston
   Station: Stacio
+  Premiere: Premiero
+  Playlist:
+    Unavailable videos are hidden: 1 nedisponebla videaĵo estas kaŝita | {count} nedisponeblaj videaĵoj estas kaŝitaj
+  Enable SponsorBlock on Channel: Ŝalti SponsorBlock en kanalo
+  Disable SponsorBlock on Channel: Malŝalti SponsorBlock en kanalo
+  AI: AI
+  'AI: Content was made with AI': 'AI: La enhavo estis kreita helpe de AI'
+  How this was made: Kiel tio ĉi estis kreita
+  Reload Page: Reŝargi paĝon
 More: Pli
 Search Bar:
   Clear Input: Klarigi enigon
@@ -968,6 +983,7 @@ Playlist:
     VideoDurationAscending: Daŭro (plej mallonga)
     VideoDurationDescending: Daŭro (plej longa)
     Custom: Laŭmenda
+  Unavailable videos are hidden: Nedisponeblaj videaĵoj estas kaŝitaj
 Change Format:
   Change Media Formats: Ŝanĝi medioformojn
   Use Dash Formats: Uzi DASH-ajn formojn
@@ -1019,6 +1035,7 @@ Comments:
   Subscribed: Abonata
   Hearted: Koro
   Loading replies: Ŝargado de respondoj...
+  Comments are turned off: La komentoj estas malŝaltitaj
 Up Next: Sekve
 Description:
   Expand Description: '...pli'
@@ -1036,7 +1053,7 @@ Tooltips:
     Open Deep Links In New Window: URL-oj donataj al FreeTube, ekzemple de retumilaj etendaĵoj de alidirekto aŭ de komandliniaj argumentoj, estos malfermitaj en nova fenestro.
   Player Settings:
     Proxy Videos Through Invidious: Konektiĝos al Invidious por servi videaĵojn anstataŭ konektiĝi rekte al YouTube.
-    Default Video Format: Difinas la videaĵoformojn uzatajn por la ludado. DASH-aj formoj ofertas pli altajn kvalitojn. Heredaĵaj formoj estas limigitaj al 360p maksimume sed uzas malpli da kapacito. Aŭdiaj formoj nur enhavas sonon.
+    Default Media Format: Difinas la videaĵoformojn uzatajn por la ludado. DASH-aj formoj ofertas pli altajn kvalitojn. Heredaĵaj formoj estas limigitaj al 360p maksimume sed uzas malpli da kapacito. Aŭdiaj formoj nur enhavas sonon.
     Scroll Playback Rate Over Video Player: Kiam la kursoro estas sur la videaĵo, ade premu la stirklavon (komandklavon sur Mac) kaj rulumi supre aŭ malsupre por regi la ludrapidon. Ade premu la stirklavon (komandklavon sur Mac) kaj alklaku por tuje reveni al la defaŭlta ludrapido (1x krom se tio estis ŝanĝita en la agordoj).
     Skip by Scrolling Over Video Player: Rulumi por salti tra la videaĵo, kiel MPV.
   External Player Settings:
@@ -1056,6 +1073,7 @@ Tooltips:
     Fetch Automatically: Dum ŝaltita, FreeTube aŭtomate venigos viajn abonfluojn je startigo kaj kiam nova fenestro malfermiĝas.
   Experimental Settings:
     Replace HTTP Cache: Malŝaltas la HTTP-kaŝmemoron de Electron en la disko kaj ŝaltas laŭmendan bildkaŝmemoron en ĉefmemoro. La uzata memoro pligrandiĝos.
+    Disable Hardware Acceleration: Malŝaltas la aparatan plirapidigon de la grafika procezoro. Tio ĉi povus korekti grafikajn problemojn, sed la rendimento verŝajne malrapidiĝos.
   SponsorBlock Settings:
     UseDeArrowTitles: Anstataŭigi titolojn de videaĵoj per titoloj provizitaj de uzantoj de DeArrow.
     UseDeArrowThumbnails: Anstataŭigi videaĵajn bildetojn per bildetoj de DeArrow.
@@ -1116,3 +1134,5 @@ Keys:
   arrowup: Supra sago
 Screenshot Clipboard Success: Konservis ekrankopion al la tondujo
 Screenshot Clipboard Error: Malsukcesis kopii ekrankopion al la tondujo
+SponsorBlock Disabled on Channel: Malŝaltis SponsorBlock en {channel}
+SponsorBlock Enabled on Channel: Ŝaltis SponsorBlock en {channel}

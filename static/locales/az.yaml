@@ -91,7 +91,7 @@ Subscriptions:
   Load More Posts: Daha Çox Post Yüklə
   Subscriptions Tabs: Abunəliklər Səhifələri
   All Subscription Tabs Hidden: Bütün abunəlik səhifələri gizlidir. Məzmunu burada görmək üçün "{settingsSection}" bölməsində "{subsection}"-da bəzi səhifələri gizlətməyin.
-  Empty Channels: Abunə olduğunuz kanallarda hazırda heç bir video yoxdur.
+  Empty Channels: Abunə olduğunuz kanalların hazırda heç bir videosu yoxdur.
   Empty Posts: Abunə olduğunuz kanallarda hazırda heç bir post yoxdur.
   Disabled Automatic Fetching: Siz avtomatik abunəlik əldə etməyi bağlamısız. Abunəlikləri burada görmək üçün yeniləyin.
   Posts:
@@ -189,6 +189,7 @@ User Playlists:
   Move Video to the Bottom: Videonu Ən Aşağıya Keçir
   Export list of URLs: URL-lərin siyahısını ixrac et
   TotalTimePlaylist: 'Ümumi vaxt: {duration}'
+  This playlist is private or does not exist.: Bu pleylist ya şəxsidir, ya da mövcud deyil.
 History:
   # On History Page
   History: 'Tarixçə'
@@ -409,11 +410,11 @@ Settings:
     Default Playback Rate: İlkin Oynatma Sürəti
     Max Video Playback Rate: Ən Yüksək Video Oynatma Sürəti
     Video Playback Rate Interval: Video Oynatma Sürəti Aralığı
-    Default Video Format:
-      Default Video Format: İlkin Video Formatı
+    Default Media Format:
       Dash Formats: DASH Formatları
       Legacy Formats: Köhnə Formatlar
       Audio Formats: Səs Formatları
+      Default Media Format: İlkin Media Formatı
     Default Quality:
       Default Quality: İlkin Keyfiyyət
       Auto: Avtomatik
@@ -441,6 +442,10 @@ Settings:
       Prompt To Skip: Ötürmək Üçün Soruş
       Do Nothing: Heç Nə Etmə
     Category Color: Kateqoriya Rəngi
+    Excluded Channels:
+      Disabled Message: Bəzi kanallar ID vasitəsilə istisna edildi və emal olunmadı. Həmin ID-lər yenilənərkən xüsusiyyət bloklanır
+      Excluded Channels: İstisna Olunmuş Kanallar
+      Tooltip: SponsorBlock-u qapatmaq üçün kanal ID-si daxil edin. Bu kanaldakı videolarda sponsor bölümləri ötürülməyəcək. Daxil edilən kanal ID-si tam uyğunlaşmalıdır və böyük-kiçik hərflərə həssasdır.
   Sort Settings Sections (A-Z): Tənzimləmələr Bölmələrin Çeşidlə (A-Z)
   Return to Settings Menu: Tənzimləmələr Menyusuna Qayıt
   External Player Settings:
@@ -620,11 +625,11 @@ Settings:
 Channel:
   Videos:
     Videos: Videolar
-    This channel does not currently have any videos: Bu kanalda hazırda heç bir video yoxdur
     Sort Types:
       Newest: Ən yeni
       Oldest: Ən köhnə
       Most Popular: Ən Məşhur
+    This channel has videos but none could be displayed, try fetching more: Bu kanalın videoları var, amma heç biri göstərilə bilmədi, daha çox əldə etməyə çalışın
   Playlists:
     Playlists: Pleylistlər
     This channel does not currently have any playlists: Bu kanalın hazırda heç bir pleylisti yoxdur
@@ -671,6 +676,7 @@ Channel:
     Joined: Qoşuldu
     Location: Məkan
     Featured Channels: Seçilmiş Kanallar
+    Links: Linklər
   Posts:
     This channel currently does not have any posts: Bu kanalda hazırda heç bir post yoxdur
     votes: '{votes} səs'
@@ -693,7 +699,7 @@ Video:
       reversing playlists: pleylistləri tərs çevirir
       shuffling playlists: pleylistləri qarışdırır
       looping playlists: pleylistləri təkrarlayır
-  IP block: YouTube video izləməyinizə mane olmaq üçün IP ünvanınızı bloklayıb. Zəhmət olmasa, başqa VPN və ya proksiyə keçməyə cəhd edin.
+  IP block: YouTube IP ünvanınızı video izləməkdən bloklayıb və ya bu video YouTube-un daxil olmamış istifadəçilər üçün məhdudlaşdırdığı yeniyetmələrin yer aldığı məzmun ehtiva edə bilər. Əgər bu IP blokudursa, başqa VPN və ya proksiyə keçməyə cəhd edin.
   MembersOnly: Şəxsi üzvlük videoları Google ilə daxil olmağı və kanal sahibinə üzvlük ödənişi tələb etdiyi üçün FreeTube vasitəsilə izlənilə bilməz.
   AgeRestricted: Yaş məhdudiyyəti olan videolar Google ilə daxil olmağı və yaşı təsdiqlənmiş YouTube hesabın istifadə etməyi tələb etdiyi üçün FreeTube vasitəsilə izlənilə bilməz.
   DRMProtected: DRM ilə qorunan videolar xüsusi, qapalı mənbəli komponentlər tələb etdiyindən FreeTube vasitəsilə oynadıla bilmir. Əgər bu videoya baxmaq istəyirsinizsə, xahiş olunur DRM aktivləşdirilmiş veb brauzerdə rəsmi YouTube veb saytın istifadə edəsiniz.
@@ -797,6 +803,13 @@ Video:
     'Remaining SABR backoff time: {remindingTimeSeconds}s': 'Qalan SABR gecikmə vaxtı: {remindingTimeSeconds}s'
   Playlist:
     Unavailable videos are hidden: 1 əlçatmaz video gizlədilib | {count} əlçatmaz video gizlədilib
+  Premiere: Premyera
+  Enable SponsorBlock on Channel: Kanalda SponsorBlock-u Aktivləşdir
+  Disable SponsorBlock on Channel: Kanalda SponsorBlock-u Qapat
+  AI: Sİ
+  'AI: Content was made with AI': 'Süni intellekt: Məzmun süni intellektlə hazırlanmışdır'
+  How this was made: Bu necə hazırlanıb
+  Reload Page: Səhifəni Yenidən Yüklə
 Tooltips:
   General Settings:
     Preferred API Backend: FreeTube-un məlumatları əldə etmək üçün istifadə edəcəyi arxa uc sistemini seçin. Yerli API daxili çıxarıcıdır. Invidious API isə Invidious serverinə qoşulmağı tələb edir.
@@ -810,7 +823,7 @@ Tooltips:
     Open Deep Links In New Window: Brauzer yönləndirmə əlavələri və ya əmr xətti arqumentləri ilə FreeTube-a ötürülən URL-lər yeni pəncərədə açılır.
   Player Settings:
     Proxy Videos Through Invidious: Videoları YouTube-a birbaşa qoşulmaq əvəzinə təqdim etmək üçün Invidious-a qoşulacaq.
-    Default Video Format: Video oynadılarkən istifadə olunan formatları təyin et. DASH formatları daha yüksək keyfiyyətdə oynadıla bilir. Köhnə formatlar maksimum 360p ilə məhdudlaşır, lakin daha az şəbəkə trafiki istifadə edir. Səs formatları isə yalnız səsdən ibarət yayımlardır.
+    Default Media Format: Video oynadılarkən istifadə olunan formatları təyin et. DASH formatları daha yüksək keyfiyyətdə oynadıla bilir. Köhnə formatlar maksimum 360p ilə məhdudlaşır, lakin daha az şəbəkə trafiki istifadə edir. Səs formatları isə yalnız səsdən ibarət yayımlardır.
     Scroll Playback Rate Over Video Player: Kursor videonun üzərindəykən, oynatma sürətini tənzimləmək üçün Control düyməsini (Mac-də Command düyməsini) basıb saxlayın və siçan çarxını irəli və ya geriyə sürüşdürün. İlkin oynatma sürətinə (tənzimləmələrdə dəyişdirilməyibsə, 1x) cəld qayıtmaq üçün Control düyməsini (Mac-də Command düyməsini) basıb saxlayın və siçanın sol düyməsini klikləyin.
     Skip by Scrolling Over Video Player: MPV üslubundakı kimi, videoda ötürmək üçün siçan çarxın istifadə et.
   External Player Settings:
@@ -1125,3 +1138,5 @@ Yes, Open Link: Bəli, Linki Aç
 KeyboardShortcutTemplate: '{label} ({shortcut})'
 shortcutJoinOperator: +
 shortcutLabelSeparator: ｜
+SponsorBlock Disabled on Channel: SponsorBlock {channel} kanalında qapadılıb
+SponsorBlock Enabled on Channel: SponsorBlock {channel} kanalında aktivdir

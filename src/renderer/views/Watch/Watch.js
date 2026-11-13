@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue'
+import { defineComponent, shallowRef } from 'vue'
 import { isNavigationFailure, NavigationFailureType } from 'vue-router'
 import { mapActions, mapMutations } from 'vuex'
 import shaka from 'shaka-player'
@@ -21,6 +21,9 @@ import {
   extractNumberFromString,
   formatDurationAsTimestamp,
   formatNumber,
+  formatSubscriberCount,
+  throttle,
+  getLocalesWithFallback,
   showToast
 } from '../../helpers/utils'
 import {
@@ -96,7 +99,9 @@ export default defineComponent({
   setup: function () {
     const { t, locale } = useI18n()
 
-    return { t, currentLocale: locale }
+    const liveChat = shallowRef(null)
+
+    return { t, currentLocale: locale, liveChat }
   },
   data: function () {
     return {
@@ -110,7 +115,6 @@ export default defineComponent({
       videoPlayerLoaded: false,
       isFamilyFriendly: false,
       isLive: false,
-      liveChat: null,
       isLiveContent: false,
       isUpcoming: false,
       isPostLiveDvr: false,
@@ -148,6 +152,8 @@ export default defineComponent({
       sabrData: null,
       legacyFormats: [],
       captions: [],
+      /** @type {import('youtubei.js').Misc.Format[]} */
+      hlsAudioMetadata: [],
       /** @type {'EQUIRECTANGULAR' | 'EQUIRECTANGULAR_THREED_TOP_BOTTOM' | 'MESH'| null} */
       vrProjection: null,
       autoplayNextRecommendedVideo: false,
@@ -178,6 +184,7 @@ export default defineComponent({
       /** @type {string[]|null} */
       customErrorIcon: null,
       videoGenreIsMusic: false,
+      contentDisclosures: null,
       /** @type {Date|null} */
       streamingDataExpiryDate: null,
       currentPlaybackRate: null,
@@ -461,6 +468,7 @@ export default defineComponent({
       this.videoDescription = ''
       this.videoDescriptionHtml = ''
       this.license = ''
+      this.contentDisclosures = null
       this.videoViewCount = 0
       this.videoLikeCount = 0
       this.videoDislikeCount = 0
@@ -563,7 +571,8 @@ export default defineComponent({
 
       try {
         const videoInfo = await getLocalVideoInfo(this.videoId)
-        const { info: result, poToken, clientInfo, adEndTimeUnixMs } = videoInfo
+        const { info: result, poToken, clientInfo, adEndTimeUnixMs, contentDisclosures } = videoInfo
+        this.contentDisclosures = contentDisclosures || null
 
         const playabilityStatus = result.playability_status
         this.playabilityStatus = playabilityStatus.status
@@ -672,7 +681,7 @@ export default defineComponent({
         const subCount = !result.secondary_info.owner.subscriber_count.isEmpty() ? parseLocalSubscriberCount(result.secondary_info.owner.subscriber_count.text) : NaN
 
         if (!isNaN(subCount)) {
-          this.channelSubscriptionCountText = formatNumber(subCount, subCount >= 10000 ? { notation: 'compact' } : undefined)
+          this.channelSubscriptionCountText = subCount >= 10000 ? formatNumber(subCount, { notation: 'compact' }) : formatSubscriberCount(subCount)
         } else {
           this.channelSubscriptionCountText = ''
         }
@@ -731,6 +740,7 @@ export default defineComponent({
 
         this.videoChapters = chapters
         this.videoChaptersKind = chaptersKind
+        this.hlsAudioMetadata = []
 
         // The apostrophe is intentionally that one (char code 8217), because that is the one YouTube uses
         const BOT_MESSAGE = 'Sign in to confirm you’re not a bot'
@@ -769,8 +779,9 @@ export default defineComponent({
           } else {
             errorText = `[${playabilityStatus.status}] ${playabilityStatus.reason}`
 
-            if (playabilityStatus.error_screen?.subreason) {
-              errorText += `: ${playabilityStatus.error_screen.subreason.text}`
+            const subreason = playabilityStatus.error_screen?.subreason?.text
+            if (subreason) {
+              errorText += `: ${subreason}`
             }
           }
 
@@ -791,34 +802,15 @@ export default defineComponent({
         }
 
         if ((this.isLive || this.isPostLiveDvr) && !this.isUpcoming) {
-          let useRemoteManifest = true
+          if (result.streaming_data.dash_manifest_url) {
+            this.manifestSrc = result.streaming_data.dash_manifest_url
+            this.manifestMimeType = MANIFEST_TYPE_DASH
+          } else {
+            this.manifestSrc = result.streaming_data.hls_manifest_url
+            this.manifestMimeType = MANIFEST_TYPE_HLS
 
-          if (this.isPostLiveDvr) {
-            // I wasn't able to get SABR working with Post-Live-DVR yet, so for the moment we'll use YouTube's provided DASH manifest instead.
-            // It only contains the last 4 hours of the stream, instead of starting from the beginning but that is better than nothing.
-            if (
-              result.streaming_data.adaptive_formats[0]?.url ||
-              result.streaming_data.adaptive_formats[0]?.signature_cipher ||
-              result.streaming_data.adaptive_formats[0]?.cipher
-            ) {
-              try {
-                this.manifestSrc = await this.createLocalDashManifest(result, true)
-                this.manifestMimeType = MANIFEST_TYPE_DASH
-                useRemoteManifest = false
-              } catch (error) {
-                console.error(`Failed to generate DASH manifest for this Post Live DVR video ${this.videoId}, falling back to using YouTube's provided one...`, error)
-              }
-            }
-          }
-
-          if (useRemoteManifest) {
-            if (result.streaming_data.dash_manifest_url) {
-              this.manifestSrc = result.streaming_data.dash_manifest_url
-              this.manifestMimeType = MANIFEST_TYPE_DASH
-            } else {
-              this.manifestSrc = result.streaming_data.hls_manifest_url
-              this.manifestMimeType = MANIFEST_TYPE_HLS
-            }
+            this.hlsAudioMetadata = result.streaming_data.adaptive_formats
+              .filter((format) => format.mime_type.startsWith('audio/mp4'))
           }
 
           this.streamingDataExpiryDate = result.streaming_data.expires
@@ -842,7 +834,8 @@ export default defineComponent({
                 value: 'numeric'
               })
             }
-            this.upcomingTimestamp = Intl.DateTimeFormat(this.currentLocale, timestampOptions).format(upcomingTimestamp)
+            const locales = getLocalesWithFallback(this.currentLocale)
+            this.upcomingTimestamp = Intl.DateTimeFormat(locales, timestampOptions).format(upcomingTimestamp)
 
             let upcomingTimeLeft = upcomingTimestamp - now
 
@@ -870,8 +863,9 @@ export default defineComponent({
             if (upcomingTimeLeft < 1) {
               this.upcomingTimeLeft = this.t('Video.Published.In less than a minute').toLowerCase()
             } else {
+              const locales = getLocalesWithFallback(this.currentLocale)
               // TODO a I18n entry for time format might be needed here
-              this.upcomingTimeLeft = new Intl.RelativeTimeFormat(this.currentLocale).format(upcomingTimeLeft, timeUnit)
+              this.upcomingTimeLeft = new Intl.RelativeTimeFormat(locales).format(upcomingTimeLeft, timeUnit)
             }
 
             this.premiereDate = upcomingTimestamp
@@ -1047,7 +1041,7 @@ export default defineComponent({
 
           const subCount = parseLocalSubscriberCount(result.subCountText)
           if (!isNaN(subCount)) {
-            this.channelSubscriptionCountText = formatNumber(subCount, subCount >= 10000 ? { notation: 'compact' } : undefined)
+            this.channelSubscriptionCountText = subCount >= 10000 ? formatNumber(subCount, { notation: 'compact' }) : formatSubscriberCount(subCount)
           } else {
             this.channelSubscriptionCountText = ''
           }
@@ -1091,6 +1085,7 @@ export default defineComponent({
           this.isFamilyFriendly = result.isFamilyFriendly
           this.isPostLiveDvr = !!result.isPostLiveDvr
           this.isUnlisted = !result.isListed
+          this.contentDisclosures = null
 
           this.captions = sortCaptions(result.captions.map(caption => {
             return {
@@ -1136,6 +1131,7 @@ export default defineComponent({
           }
           this.videoChapters = chapters
           this.videoChaptersKind = 'chapters'
+          this.hlsAudioMetadata = []
 
           if (this.isLive || this.isPostLiveDvr) {
             // The live DASH manifest is currently unusable as it returns 403s after 1 minute of playback
@@ -1992,7 +1988,7 @@ export default defineComponent({
     },
 
     isHiddenVideo: function (forbiddenTitles, channelsHidden, video) {
-      return channelsHidden.some(ch => ch.name === video.authorId) ||
+      return channelsHidden.some(ch => ch.name === video.authorId || (video.collaborators?.length > 0 && ch.name === video.collaborators[0].id)) ||
         channelsHidden.some(ch => ch.name === video.author) ||
         forbiddenTitles.some((text) => video.title?.toLowerCase().includes(text)) ||
         forbiddenTitles.some((text) => video.author?.toLowerCase().includes(text))
@@ -2034,9 +2030,7 @@ export default defineComponent({
       this.startNextVideoInPip = uiState.startNextVideoInPip
     },
 
-    async onPlayerReloadRequested() {
-      showToast('Reloading player according to SABR request')
-
+    async saveWatchProgressForReload() {
       const timestamp = this.getTimestamp()
       if (timestamp > 0) {
         // Reload at the middle should restart at current timestamp
@@ -2053,6 +2047,16 @@ export default defineComponent({
           }
         }
       }
+    },
+
+    onManualReloadRequested: throttle(async function () {
+      await this.saveWatchProgressForReload()
+      await this.reloadView()
+    }, 1000),
+
+    async onSabrReloadRequested() {
+      showToast('Reloading player according to SABR request')
+      await this.saveWatchProgressForReload()
       await this.reloadView()
     },
 
