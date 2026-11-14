@@ -3,10 +3,8 @@ const fs = require('fs')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const JsonMinimizerPlugin = require('json-minimizer-webpack-plugin')
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const MinimizerPlugin = require('minimizer-webpack-plugin')
 const ProcessLocalesPlugin = require('./ProcessLocalesPlugin')
 const {
   SHAKA_LOCALE_MAPPINGS,
@@ -17,8 +15,7 @@ const { sigViewTemplateParameters } = require('./sigViewConfig')
 
 const isDevMode = process.env.NODE_ENV === 'development'
 
-const { version: swiperVersion } = JSON.parse(fs.readFileSync(path.join(__dirname, '../node_modules/swiper/package.json')))
-
+/** @type {import('webpack').Configuration} */
 const config = {
   name: 'web',
   mode: process.env.NODE_ENV,
@@ -29,6 +26,30 @@ const config = {
   output: {
     path: path.join(__dirname, '../android/app/src/main/assets'),
     filename: '[name].js',
+    copy: [
+      {
+        from: 'static/pwabuilder-sw.js',
+        to: '.'
+      },
+      {
+        from: 'static',
+        to: 'static',
+        globOptions: {
+          ignore: [
+            '**/.*',
+            'static/{locales,locales-android,pwabuilder-sw.js,dashFiles,storyboards}'
+          ]
+        }
+      },
+      {
+        context: path.dirname(require.resolve('shaka-player/ui/locales/en.json')),
+        from: `{${SHAKA_LOCALES_TO_BE_BUNDLED.join(',')}}.json`,
+        to: 'static/shaka-player-locales',
+        transform: (input) => {
+          return JSON.stringify(JSON.parse(input.toString('utf-8')))
+        }
+      }
+    ]
   },
   externals: {
     android: 'Android'
@@ -66,22 +87,33 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: [
+        oneOf: [
           {
-            loader: MiniCssExtractPlugin.loader
+            test: /[/\\]swiper[/\\]/,
+            type: 'asset/resource',
+            generator: {
+              filename: 'swiper-[name].[contenthash][ext]'
+            }
           },
           {
-            loader: 'css-loader',
-            options: {
-              esModule: false
-            }
-          }
-        ],
-        rules: [
-          {
-            resource: path.resolve(__dirname, '../node_modules/shaka-player/dist/controls.css'),
-            use: path.join(__dirname, 'patch-shaka-player-loader.js')
-          }
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader
+              },
+              {
+                loader: 'css-loader',
+                options: {
+                  esModule: false
+                }
+              }
+            ],
+            rules: [
+              {
+                resource: require.resolve('shaka-player/dist/controls.css'),
+                use: path.join(__dirname, 'patch-shaka-player-loader.js')
+              }
+            ],
+          },
         ]
       },
       {
@@ -99,15 +131,32 @@ const config = {
         }
       },
     ],
+    generator: {
+      json: {
+        JSONParse: false
+      }
+    }
   },
   // webpack defaults to only optimising the production builds, so having this here is fine
   optimization: {
     minimizer: [
-      '...', // extend webpack's list instead of overwriting it
-      new JsonMinimizerPlugin({
-        exclude: /\/locales\/.*\.json/
-      }),
-      new CssMinimizerPlugin()
+      new MinimizerPlugin({
+        test: /\.(?:cs|j)s(\?.*)?$/i,
+        minify: [
+          {
+            implementation: MinimizerPlugin.cssnanoMinify
+          },
+          {
+            implementation: MinimizerPlugin.terserMinify,
+            options: {
+              compress: {
+                // webpack sets passes to 2 in its default minimizer config too
+                passes: 2
+              }
+            }
+          }
+        ]
+      })
     ]
   },
   node: {
@@ -126,8 +175,7 @@ const config = {
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
       __VUE_I18N_LEGACY_API__: 'false',
       __VUE_I18N_FULL_INSTALL__: 'false',
-      __INTLIFY_PROD_DEVTOOLS__: 'false',
-      'process.env.SWIPER_VERSION': `'${swiperVersion}'`
+      __INTLIFY_PROD_DEVTOOLS__: 'false'
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser.js'
@@ -148,18 +196,6 @@ const config = {
     new MiniCssExtractPlugin({
       filename: isDevMode ? '[name].css' : '[name].[contenthash].css',
       chunkFilename: isDevMode ? '[id].css' : '[id].[contenthash].css',
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.join(__dirname, '../node_modules/swiper/modules/{a11y,navigation,pagination}-element.css').replaceAll('\\', '/'),
-          to: `swiper-${swiperVersion}.css`,
-          context: path.join(__dirname, '../node_modules/swiper/modules'),
-          transformAll: (assets) => {
-            return Buffer.concat(assets.map(asset => asset.data))
-          }
-        }
-      ]
     })
   ],
   resolve: {
@@ -196,27 +232,6 @@ config.plugins.push(
     'process.env.GEOLOCATION_NAMES': JSON.stringify(fs.readdirSync(path.join(__dirname, '..', 'static', 'geolocations')).map(filename => filename.replace('.json', ''))),
     'process.env.SHAKA_LOCALE_MAPPINGS': JSON.stringify(SHAKA_LOCALE_MAPPINGS),
     'process.env.SHAKA_LOCALES_PREBUNDLED': JSON.stringify(SHAKA_LOCALES_PREBUNDLED)
-  }),
-  new CopyWebpackPlugin({
-    patterns: [
-      {
-        from: path.join(__dirname, '../static/pwabuilder-sw.js'),
-        to: path.join(__dirname, '../android/app/src/main/assets/pwabuilder-sw.js'),
-      },
-      {
-        from: path.join(__dirname, '../static'),
-        to: path.join(__dirname, '../android/app/src/main/assets/static'),
-        globOptions: {
-          dot: true,
-          ignore: ['**/.*', '**/locales/**', '**/locales-android/**', '**/pwabuilder-sw.js', '**/dashFiles/**', '**/storyboards/**'],
-        },
-      },
-      {
-        from: path.join(__dirname, '../node_modules/shaka-player/ui/locales', `{${SHAKA_LOCALES_TO_BE_BUNDLED.join(',')}}.json`).replaceAll('\\', '/'),
-        to: path.join(__dirname, '../android/app/src/main/assets/static/shaka-player-locales'),
-        context: path.join(__dirname, '../node_modules/shaka-player/ui/locales')
-      }
-    ]
   })
 )
 
