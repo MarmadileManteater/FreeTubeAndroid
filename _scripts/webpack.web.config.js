@@ -182,7 +182,6 @@ const config = {
       'process.env.IS_ELECTRON': false,
       'process.env.IS_ELECTRON_MAIN': false,
       'process.env.SUPPORTS_LOCAL_API': false,
-      'process.env.SWIPER_VERSION': `'${swiperVersion}'`,
       'process.env.IS_ANDROID': false,
       'process.env.IS_RELEASE': !isDevMode,
       __VUE_OPTIONS_API__: 'true',
