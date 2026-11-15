@@ -39,7 +39,7 @@ Global:
     Watching Count: 1 se uită | {count} se uită
     Comment Count: 1 comentariu | {count} comentarii
     Like Count: 1 apreciere | {count} aprecieri
-    Replies Remaining: "{' '}(1 rămas) | {' '}({count} rămase)"
+    Replies Remaining: "{' '}(1 rămas) | {' '}({număr} rămase)"
 Version {versionNumber} is now available!  Click for more details: 'Versiunea {versionNumber} este acum disponibilă!  Click pentru mai multe detalii'
 Download From Site: 'Descărcați de pe site'
 
@@ -103,6 +103,8 @@ Subscriptions:
   All Subscription Tabs Hidden: Toate filele de abonament sunt ascunse. Pentru a vedea conținutul aici, vă rugăm să afișați unele file din secțiunea "{subsection}” din "{settingsSection}”.
   Empty Posts: Canalele tale abonate nu au momentan nicio postare.
   Load More Posts: Încarcă mai multe postări
+  Posts:
+    RSS Message: YouTube nu oferă fluxuri RSS pentru postări. Dezactivează setarea „{rssSetting}” pentru a vizualiza postările sau activează setarea „{hideSetting}” pentru a ascunde această filă.
 Trending:
   Trending: 'Tendințe'
   Trending Tabs: File în tendințe
@@ -381,8 +383,7 @@ Settings:
     Enable Theatre Mode by Default: 'Activați modul teatru în mod implicit'
     Default Volume: 'Volum implicit'
     Default Playback Rate: 'Viteza de redare implicită'
-    Default Video Format:
-      Default Video Format: 'Format video implicit'
+    Default Media Format:
       Dash Formats: 'Formate DASH'
       Legacy Formats: 'Formate vechi'
       Audio Formats: 'Formate audio'
@@ -693,7 +694,6 @@ Channel:
   Your search results have returned 0 results: 'Rezultatele căutării tale au returnat 0 rezultate'
   Videos:
     Videos: 'Videoclipuri'
-    This channel does not currently have any videos: 'Acest canal nu are în prezent niciun videoclip'
     Sort Types:
       Newest: 'Cele mai noi'
       Oldest: 'Cele mai vechi'
@@ -944,6 +944,8 @@ More: Mai multe
 Search Bar:
   Clear Input: Ștergeți intrarea
   Remove: Șterge
+  Open Search Container: Deschide containerul de căutare
+  Search: Căutare
 Are you sure you want to open this link?: Sunteți sigur că doriți să deschideți acest link?
 Open New Window: Deschide fereastră nouă
 Default Invidious instance has been cleared: Instanța implicită Invidious a fost eliminată
@@ -962,7 +964,7 @@ Tooltips:
     DefaultCustomArgumentsTemplate: "(Implicit: '{defaultCustomArguments}')"
     Ignore Default Arguments: Nu trimiteți niciun argument implicit către playerul extern în afară de URL-ul video (de exemplu, rata de redare, URL-ul listei de redare etc.). Argumentele personalizate vor fi transmise în continuare.
   Player Settings:
-    Default Video Format: Setați formatele utilizate la redarea unui videoclip. Formatele DASH pot reda calități superioare. Formatele tradiționale sunt limitate la maximum 360p, dar utilizează mai puțină lățime de bandă. Formatele audio sunt doar fluxuri audio.
+    Default Media Format: Setați formatele utilizate la redarea unui videoclip. Formatele DASH pot reda calități superioare. Formatele tradiționale sunt limitate la maximum 360p, dar utilizează mai puțină lățime de bandă. Formatele audio sunt doar fluxuri audio.
     Proxy Videos Through Invidious: Se va conecta la Invidious pentru a servi videoclipuri în loc să facă o conexiune directă la YouTube.
     Scroll Playback Rate Over Video Player: În timp ce cursorul se află deasupra videoclipului, țineți apăsată tasta Control (tasta Command pe Mac) și derulați rotița mouse-ului înainte sau înapoi pentru a controla rata de redare. Țineți apăsată tasta Control (tasta Command pe Mac) și faceți clic cu butonul stâng al mouse-ului pentru a reveni rapid la rata de redare implicită (1x, cu excepția cazului în care aceasta a fost modificată în setări).
     Skip by Scrolling Over Video Player: Utilizați rotița de derulare pentru a trece prin videoclip, stil MPV.
@@ -1106,4 +1108,4 @@ KeyboardShortcutTemplate: '{label} ({shortcut})'
 Yes, Restart: Da, repornire
 shortcutJoinOperator: +
 Compact side navigation: Navigatie Compacta pe o parte
-Expand side navigation: Expandează navigația de pe margini
+Expand side navigation: Extinde meniul de navigare lateral

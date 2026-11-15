@@ -39,6 +39,7 @@
           :total-playlist-duration="totalPlaylistDuration"
           :is-duration-approximate="isDurationApproximate"
           :info-source="infoSource"
+          :is-unviewable="isUnviewable"
           :more-video-data-available="moreVideoDataAvailable"
           :search-video-mode-allowed="isUserPlaylistRequested && shownVideoCount > 1"
           :search-query-text="searchQueryTextRequested"
@@ -90,6 +91,7 @@
           <AutoScrollWrapper
             v-if="visiblePlaylistItems.length > 0"
             :hot-zone-enabled="isSortOrderCustom && isVideoDragging"
+            :is-grid-mode="listType === 'grid'"
           >
             <FtElementList
               v-if="listType === 'grid'"
@@ -184,6 +186,13 @@
           </FtFlexBox>
         </template>
         <FtFlexBox
+          v-else-if="isUnviewable"
+        >
+          <p class="message">
+            {{ t("User Playlists['This playlist is private or does not exist.']") }}
+          </p>
+        </FtFlexBox>
+        <FtFlexBox
           v-else
         >
           <p class="message">
@@ -217,7 +226,7 @@ import {
   extractLocalCacheablePlaylistContinuation,
   getLocalPlaylist,
   getLocalPlaylistContinuation,
-  parseLocalPlaylistVideo,
+  parseLocalPlaylistVideos,
 } from '../../helpers/api/local'
 import {
   debounce,
@@ -250,6 +259,7 @@ const channelThumbnail = ref('')
 const channelId = ref('')
 const infoSource = ref('local')
 const showUnavailableVideosAlert = ref(false)
+const isUnviewable = ref(false)
 const playlistItems = ref([])
 /** @type {import('vue').ComputedRef<any[] | null>} */
 const tempShownPlaylistItems = ref(null)
@@ -260,6 +270,7 @@ const draggedVideo = ref({ videoId: null, playlistItemId: null })
 const userPlaylistVisibleLimit = ref(100)
 /** @type {import('vue').ShallowRef<import('youtubei.js').YT.Playlist | null>} */
 const continuationData = shallowRef(null)
+const nextIndex = ref(-1)
 const isLoadingMore = ref(false)
 const playlistInEditMode = ref(false)
 const forceListView = ref(false)
@@ -323,7 +334,7 @@ const moreVideoDataAvailable = computed(() => {
   }
 
   if (infoSource.value === 'invidious') {
-    return playlistItems.value.length < videoCount.value
+    return nextIndex.value !== -1
   }
 
   return continuationData.value !== null
@@ -496,6 +507,7 @@ function resetState() {
   channelId.value = ''
   infoSource.value = 'local'
   showUnavailableVideosAlert.value = false
+  isUnviewable.value = false
   playlistItems.value = []
   continuationData.value = null
   updatePageTitle()
@@ -519,7 +531,7 @@ async function getPlaylistLocal() {
       }
     }
 
-    const playlistItems_ = result.items.map(parseLocalPlaylistVideo)
+    const playlistItems_ = parseLocalPlaylistVideos(result.items)
 
     playlistTitle.value = result.info.title
     playlistDescription.value = result.info.description ?? ''
@@ -557,6 +569,13 @@ async function getPlaylistLocal() {
 
     isLoading.value = false
   } catch (err) {
+    if (err.message.includes('This playlist type is unviewable') ||
+        err.message.includes('The playlist does not exist')) {
+      isUnviewable.value = true
+      isLoading.value = false
+      return
+    }
+
     console.error(err)
 
     if (backendPreference.value === 'local' && backendFallback.value) {
@@ -571,11 +590,11 @@ async function getPlaylistLocal() {
 
 async function getPlaylistInvidious() {
   try {
-    const result = await invidiousGetPlaylistInfo(playlistId.value)
+    const { playlist: result, nextIndex: nextIndexValue } = await invidiousGetPlaylistInfo(playlistId.value)
 
     playlistTitle.value = result.title
     playlistDescription.value = result.description
-    firstVideoId.value = result.videos[0].videoId
+    firstVideoId.value = result.videos[0]?.videoId || ''
     viewCount.value = result.viewCount
     videoCount.value = result.videoCount
     channelName.value = result.author
@@ -593,12 +612,19 @@ async function getPlaylistInvidious() {
     lastUpdated.value = dateString.toLocaleDateString(locale.value, { year: 'numeric', month: 'short', day: 'numeric' })
 
     playlistItems.value = result.videos
+    nextIndex.value = nextIndexValue
 
     updatePageTitle()
 
     isLoading.value = false
   } catch (err) {
     console.error(err)
+
+    if (err.message.includes('Could not extract playlistSidebarRenderer')) {
+      isUnviewable.value = true
+      isLoading.value = false
+      return
+    }
 
     if (process.env.SUPPORTS_LOCAL_API && backendPreference.value === 'invidious' && backendFallback.value) {
       console.warn('Error getting data with Invidious, falling back to local backend')
@@ -744,7 +770,7 @@ async function getNextPageLocal() {
   let shouldGetNextPage = false
 
   if (result) {
-    const parsedVideos = result.items.map(parseLocalPlaylistVideo)
+    const parsedVideos = parseLocalPlaylistVideos(result.items)
     playlistItems.value = playlistItems.value.concat(parsedVideos)
 
     if (result.has_continuation) {
@@ -770,9 +796,9 @@ async function getNextPageLocal() {
 async function getNextPageInvidious() {
   isLoadingMore.value = true
 
-  const index = playlistItems.value.length
-  const result = await invidiousGetPlaylistInfo(playlistId.value, index)
+  const { playlist: result, nextIndex: nextIndexValue } = await invidiousGetPlaylistInfo(playlistId.value, nextIndex.value)
   playlistItems.value.push(...result.videos)
+  nextIndex.value = nextIndexValue
 
   isLoadingMore.value = false
 }
@@ -1162,7 +1188,7 @@ onBeforeRouteLeave((to) => {
       continuationData: continuationData.value
         ? extractLocalCacheablePlaylistContinuation(continuationData.value)
         : null,
-      videoCount: videoCount.value,
+      nextIndex: nextIndex.value,
     })
   }
 

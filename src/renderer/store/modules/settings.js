@@ -309,6 +309,8 @@ const state = {
   useDeArrowTitles: false,
   useDeArrowThumbnails: false,
   deArrowThumbnailGeneratorUrl: 'https://dearrow-thumb.ajay.app',
+  sponsorBlockExcludedChannels: '[]',
+  sponsorBlockShowExcludedChannels: true,
   // This makes the `favorites` playlist uses as quick bookmark target
   // If the playlist is removed quick bookmark is disabled
   quickBookmarkTargetPlaylistId: 'favorites',
@@ -481,6 +483,9 @@ const customState = {
 }
 
 const customGetters = {
+  getDefaultPlayback(state) {
+    return Math.round((state['defaultPlayback'] + Number.EPSILON) * 100) / 100
+  },
 }
 
 const customMutations = {}

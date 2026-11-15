@@ -198,6 +198,7 @@ User Playlists:
   Export list of URLs: Exportovat seznam adres URL
   Move Video to the Top: Přesunout video na začátek
   Move Video to the Bottom: Přesunout video na konec
+  This playlist is private or does not exist.: Tento playlist je soukromý nebo neexistuje.
 History:
   # On History Page
   History: 'Historie'
@@ -385,11 +386,11 @@ Settings:
     Enable Theatre Mode by Default: 'Ve výchozím nastavení povolit režim kino'
     Default Volume: 'Výchozí hlasitost'
     Default Playback Rate: 'Výchozí rychlost přehrávání'
-    Default Video Format:
-      Default Video Format: 'Výchozí formát videa'
+    Default Media Format:
       Dash Formats: 'Formát DASH'
       Legacy Formats: 'Starší formáty'
       Audio Formats: 'Zvukové formáty'
+      Default Media Format: Výchozí formát médií
     Default Quality:
       Default Quality: 'Výchozí kvalita'
       Auto: 'Automaticky'
@@ -603,6 +604,10 @@ Settings:
     UseDeArrowTitles: Použít názvy videí z DeArrow
     'DeArrow Thumbnail Generator API Url (Default is https://dearrow-thumb.ajay.app)': Adresa URL API generátoru náhledů DeArrow (výchozí je https://dearrow-thumb.ajay.app)
     UseDeArrowThumbnails: Použít službu DeArrow pro náhledy
+    Excluded Channels:
+      Disabled Message: Některé kanály byly vyloučeny pomocí ID a nebyly zpracovány. Funkce je během aktualizace těchto ID zablokována
+      Excluded Channels: Vyloučené kanály
+      Tooltip: Zadejte ID kanálu pro zakázání funkce SponsorBlock. Sponzorské segmenty ve videích od tohoto kanálu nebudou přeskočeny. ID kanálu musí přesně odpovídat a je závislé na velikosti písmen.
   External Player Settings:
     Custom External Player Arguments: Argumenty vlastního externího přehrávače
     Custom External Player Executable: Spustitelný vlastní externí přehrávač
@@ -718,11 +723,11 @@ Channel:
   Your search results have returned 0 results: 'Vaše vyhledávání přineslo 0 výsledků'
   Videos:
     Videos: 'Videa'
-    This channel does not currently have any videos: 'Tento kanál momentálně nemá žádné videa'
     Sort Types:
       Newest: 'Nejnovější'
       Oldest: 'Nejstarší'
       Most Popular: 'Populární'
+    This channel has videos but none could be displayed, try fetching more: Tento kanál má videa, ale žádná se nepodařilo zobrazit, zkuste načíst více
   Playlists:
     Playlists: 'Playlisty'
     This channel does not currently have any playlists: 'Tento kanál nemá žádné playlisty'
@@ -834,7 +839,7 @@ Video:
     OpeningTemplate: Otevřít {videoOrPlaylist} v {externalPlayer}...
     video: video
     OpenInTemplate: Otevřít v {externalPlayer}
-  Premieres: Premiéra
+  Premieres: Premiéry
   Show Super Chat Comment: Zobrazit komentář Super Chat
   Scroll to Bottom: Posunout dolů
   Upcoming: Nadcházející
@@ -892,6 +897,13 @@ Video:
   Station: Stanice
   Playlist:
     Unavailable videos are hidden: Je skyto 1 nedostupné video | Je skryto {count} nedostupných videí
+  Premiere: Premiéra
+  Enable SponsorBlock on Channel: Povolit SponsorBlock u kanálu
+  Disable SponsorBlock on Channel: Zakázat SponsorBlock u kanálu
+  AI: AI
+  'AI: Content was made with AI': 'AI: Obsah byl vytvořen pomocí umělé inteligence'
+  How this was made: Jak byl tento obsah vytvořen
+  Reload Page: Znovu načíst stránku
 Playlist:
   #& About
   View Full Playlist: 'Zobrazit celý seznam skladeb'
@@ -977,7 +989,7 @@ Tooltips:
     Open Deep Links In New Window: Adresy předané aplikaci FreeTube, například rozšířením pro prohlížeč nebo argumenty v příkazovém řádku, budou otevřeny v novém okně.
   Player Settings:
     Proxy Videos Through Invidious: 'Připojí se k Invidious, aby poskytoval videa namísto přímého připojení k YouTube.'
-    Default Video Format: 'Nastavte formáty použité při přehrávání videa. Formáty DASH umožní přehrávat vyšší kvality. Starší formáty jsou omezeny na maximálně 360p, ale používají menší šířku pásma. Zvukové formáty jsou streamy obsahující pouze audio.'
+    Default Media Format: 'Nastavte formáty použité při přehrávání videa. Formáty DASH umožní přehrávat vyšší kvality. Starší formáty jsou omezeny na maximálně 360p, ale používají menší šířku pásma. Zvukové formáty jsou streamy obsahující pouze audio.'
     Scroll Playback Rate Over Video Player: Když je kurzor na videu, stisknutím a podržením Ctrl (Command na Mac) a posouváním kolečka myši nahoru a dolu ovládejte rychlost přehrávání. Stisknutím a podržením Ctrl (Command na Mac) a stisknutím levého tlačítka myši se rychle vrátíte na výchozí rychlost přehrávání (1x, pokud není změněná v nastavení).
     Skip by Scrolling Over Video Player: Pomocí rolovacího kolečka můžete video přeskakovat ve stylu MPV.
   Subscription Settings:
@@ -1157,3 +1169,5 @@ Compact side navigation: Kompaktní boční navigace
 Expand side navigation: Rozbalit boční navigaci
 Screenshot Clipboard Success: Snímek uložen do schránky
 Screenshot Clipboard Error: Nepodařilo se uložit snímek do schránky
+SponsorBlock Disabled on Channel: SponsorBlock zakázán u kanálu {channel}
+SponsorBlock Enabled on Channel: SponsorBlock povolen u kanálu {channel}
