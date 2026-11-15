@@ -1,6 +1,7 @@
 package io.freetubeapp.freetube.javascript
 
 import android.webkit.WebView
+import io.freetubeapp.freetube.helpers.dispatchEvent
 
 class AsyncJSCommunicator(givenWebView: WebView) {
   private val webView = givenWebView
