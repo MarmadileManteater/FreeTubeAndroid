@@ -7,8 +7,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import io.freetubeapp.freetube.helpers.consoleLog
 import io.freetubeapp.freetube.javascript.BotGuardJavascriptInterface
-import io.freetubeapp.freetube.javascript.consoleLog
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL

@@ -10,7 +10,6 @@ import android.media.session.PlaybackState.STATE_PAUSED
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import io.freetubeapp.freetube.MediaControlsReceiver
-import io.freetubeapp.freetube.javascript.dispatchEvent
 import java.net.URL
 
 // 🤫 pay no attention to the one behind the curtain

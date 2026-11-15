@@ -10,11 +10,13 @@ import io.freetubeapp.freetube.activities.FreeTubeActivity
 import io.freetubeapp.freetube.helpers.MediaSessionFacade
 import io.freetubeapp.freetube.helpers.Promise
 import io.freetubeapp.freetube.helpers.WriteMode
+import io.freetubeapp.freetube.helpers.dispatchEvent
 import io.freetubeapp.freetube.helpers.getDataDirectory
 import io.freetubeapp.freetube.helpers.getFileName
 import io.freetubeapp.freetube.helpers.readBytes
 import io.freetubeapp.freetube.helpers.readText
 import io.freetubeapp.freetube.helpers.resolveAmbiguousUri
+import io.freetubeapp.freetube.helpers.setScale
 import io.freetubeapp.freetube.helpers.writeBytes
 import io.freetubeapp.freetube.webviews.FreeTubeWebView
 import kotlinx.coroutines.CoroutineScope
